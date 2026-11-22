@@ -409,6 +409,35 @@ button.chip { font: inherit; font-weight: 700; font-size: 0.8rem; letter-spacing
 .fb.no { background: var(--coral); color: #2b0507; }
 .fb.wait { background: var(--stage-2); color: var(--ink); animation: none; }
 
+/* Topics */
+.topics { display: flex; flex-wrap: wrap; gap: 0.6rem; }
+.topic { display: flex; align-items: center; gap: 0.5rem; padding: 0.5rem 0.9rem; border-radius: 99rem; border: 0.12rem solid var(--line); background: rgba(0,0,0,0.25); font-weight: 700; cursor: pointer; }
+.topic input { width: 1.2rem; height: 1.2rem; accent-color: var(--mint); margin: 0; }
+.topic small { color: var(--muted); font-weight: 400; font-size: 0.8rem; }
+.topic:has(input:checked) { border-color: var(--mint); background: rgba(94,242,194,0.12); box-shadow: 0 0 1rem rgba(94,242,194,0.25); }
+.edtopic { display: flex; gap: 0.7rem; flex-wrap: wrap; align-items: end; }
+.edtopic .f { flex: 1 1 13rem; }
+.edtopic select { background: rgba(0,0,0,0.3); border: 0.12rem solid var(--line); border-radius: 0.5rem; padding: 0.5rem 0.7rem; color: var(--ink); min-height: 2.6rem; }
+
+/* Countdown timer */
+.potrow { display: flex; align-items: center; gap: 0.6rem; }
+.timer {
+  --p: 100; --tcol: var(--mint);
+  position: relative; width: 3.3rem; height: 3.3rem; border-radius: 50%; border: 0; padding: 0; flex: none;
+  display: grid; place-items: center; color: var(--ink);
+  background: conic-gradient(var(--tcol) calc(var(--p) * 1%), rgba(255,255,255,0.12) 0);
+  box-shadow: 0 0 1.2rem rgba(94,242,194,0.3);
+}
+.timer::before { content: ""; position: absolute; inset: 0.3rem; border-radius: 50%; background: var(--stage); }
+.timer span { position: relative; font-family: var(--display); font-size: 1.3rem; font-variant-numeric: tabular-nums; }
+.timer.warn { --tcol: var(--coral); box-shadow: 0 0 1.6rem rgba(255,90,95,0.6); animation: timerPulse .5s ease-in-out infinite alternate; }
+.timer.paused { opacity: 0.55; animation: none; }
+.timer.paused span { font-size: 0.75rem; letter-spacing: 0.05em; }
+@keyframes timerPulse { to { transform: scale(1.1); } }
+.timer.big { width: 6rem; height: 6rem; }
+.timer.big::before { inset: 0.5rem; }
+.timer.big span { font-size: 2.4rem; }
+
 /* Strikes and splashes */
 #xo { background: radial-gradient(ellipse at center, rgba(255,90,95,0.3), rgba(10,6,24,0.8)); }
 .shake { animation: shake .5s; }
@@ -521,6 +550,15 @@ button.chip { font: inherit; font-weight: 700; font-size: 0.8rem; letter-spacing
       </div>
 
       <div class="card">
+        <h3>Topics</h3>
+        <p class="note">Pick one or more topics. Rounds are drawn from the questions in the topics you pick.</p>
+        <div class="topics" id="topicList"></div>
+        <div class="row" style="justify-content:flex-start">
+          <button class="btn" id="editBtn" type="button">Edit topics and questions</button>
+        </div>
+      </div>
+
+      <div class="card">
         <h3>Game</h3>
         <div class="grid2">
           <label class="f">Rounds<select id="rounds"></select></label>
@@ -528,10 +566,18 @@ button.chip { font: inherit; font-weight: 700; font-size: 0.8rem; letter-spacing
             <label class="check"><input type="checkbox" id="shuffle"> Shuffle the questions</label>
             <label class="check"><input type="checkbox" id="lastDouble"> Last round is worth double</label>
           </div>
+          <label class="f">Time to answer<select id="answerTime">
+            <option value="0">No time limit</option><option value="10">10 seconds</option><option value="15">15 seconds</option>
+            <option value="20">20 seconds</option><option value="30">30 seconds</option><option value="45">45 seconds</option><option value="60">1 minute</option>
+          </select></label>
+          <label class="f">Time to steal<select id="stealTime">
+            <option value="0">No time limit</option><option value="15">15 seconds</option><option value="20">20 seconds</option>
+            <option value="30">30 seconds</option><option value="45">45 seconds</option><option value="60">1 minute</option><option value="90">90 seconds</option>
+          </select></label>
         </div>
+        <p class="note">When time runs out, the team gets a strike. During a steal, running out of time means the steal fails. Tap the timer on the board to pause it.</p>
         <div class="row" style="justify-content:flex-start">
           <button class="btn sun" id="startBtn" type="button">Start new game</button>
-          <button class="btn" id="editBtn" type="button">Edit questions</button>
         </div>
         <p class="note" id="packNote"></p>
       </div>
@@ -547,6 +593,21 @@ button.chip { font: inherit; font-weight: 700; font-size: 0.8rem; letter-spacing
           <p class="note">On each team computer, open this same game file or web address and choose <b>Join a game</b>, then type the code. Each team can have one computer or many. At the start of each round the buzzers open; the first team to buzz types their answer, and the board checks it.</p>
         </div>
         <p class="note" id="devUnavailable" hidden>Team buzzers need the downloaded game file opened in a regular web browser. They can't connect from inside Claude.</p>
+      </div>
+
+      <div class="card" id="driveCard">
+        <h3>Save your work</h3>
+        <p class="note">Saves your topics, questions, settings and any game in progress, so you can load them on another computer.</p>
+        <div class="row" style="justify-content:flex-start">
+          <button class="btn sun" id="driveSave" type="button">Save to Google Drive</button>
+          <button class="btn" id="driveLoad" type="button">Load from Google Drive</button>
+          <button class="sbtn" id="driveOut" type="button" hidden>Disconnect Google</button>
+        </div>
+        <p class="note" id="driveStatus" aria-live="polite"></p>
+        <div class="row" style="justify-content:flex-start">
+          <button class="btn" id="fileSave" type="button">Download a backup file</button>
+          <label class="btn" for="fileOpen" style="display:inline-flex;align-items:center">Open a backup file<input type="file" id="fileOpen" accept=".json,application/json" hidden></label>
+        </div>
       </div>
 
       <div class="card">
@@ -568,7 +629,10 @@ button.chip { font: inherit; font-weight: 700; font-size: 0.8rem; letter-spacing
       <button class="team" id="teamA" type="button"><span><span class="tname"></span><span class="tag"></span></span><span class="tscore">0</span></button>
       <div class="pot">
         <span class="label">Round points</span>
-        <span class="num" id="pot">0</span>
+        <div class="potrow">
+          <span class="num" id="pot">0</span>
+          <button class="timer" id="timer" type="button" hidden aria-label="Answer timer. Tap to pause."><span id="timerNum"></span></button>
+        </div>
         <div class="strikes" id="strikes" aria-label="Strikes"><span>✕</span><span>✕</span><span>✕</span></div>
       </div>
       <button class="team right" id="teamB" type="button"><span><span class="tname"></span><span class="tag"></span></span><span class="tscore">0</span></button>
@@ -599,15 +663,24 @@ button.chip { font: inherit; font-weight: 700; font-size: 0.8rem; letter-spacing
   <section class="view scroll" id="editor" hidden>
     <div class="panel">
       <div class="edhead">
-        <h2>Questions</h2>
+        <h2>Topics &amp; questions</h2>
         <button class="btn sun" id="addQ" type="button">Add question</button>
         <button class="btn" id="edDone" type="button">Done</button>
+      </div>
+      <div class="card">
+        <h3>Topic</h3>
+        <div class="edtopic">
+          <label class="f">Editing topic<select id="edSet"></select></label>
+          <label class="f">Topic name<input type="text" id="setName" maxlength="40" autocomplete="off"></label>
+          <button class="btn" id="newSet" type="button">+ New topic</button>
+          <button class="sbtn danger" id="deleteSet" type="button">Delete topic</button>
+        </div>
       </div>
       <p class="note">Up to 8 answers per question. "Also accept" lists other words that count when you type a guess (separate them with commas). The sample questions use made-up numbers; survey your own students for real ones. Questions save in this browser automatically.</p>
       <div id="qlist" style="display:grid;gap:0.8rem"></div>
 
       <div class="card">
-        <h3>Copy or paste a whole set</h3>
+        <h3>Copy or paste a whole topic</h3>
         <p class="note">One question per block, blank line between blocks. Each answer line is <b>answer | points | also accept</b>. Add <b>x2</b> or <b>x3</b> to the end of a question for bonus points.</p>
         <textarea id="io" spellcheck="false" placeholder="Name a fruit you'd find in a lunchbox&#10;Apple | 45 | apples&#10;Banana | 30&#10;Grapes | 15 | grape&#10;Orange | 10"></textarea>
         <div class="row" style="justify-content:flex-start">
@@ -616,7 +689,7 @@ button.chip { font: inherit; font-weight: 700; font-size: 0.8rem; letter-spacing
           <button class="btn sun" id="addFromBox" type="button">Add these questions</button>
           <button class="btn" id="replaceFromBox" type="button">Replace all with these</button>
           <label class="btn" for="fileIn" style="display:inline-flex;align-items:center">Open a .txt file<input type="file" id="fileIn" accept=".txt,text/plain" hidden></label>
-          <button class="sbtn danger" id="resetSamples" type="button">Restore sample questions</button>
+          <button class="sbtn danger" id="resetSamples" type="button">Reset this topic to its starter questions</button>
         </div>
       </div>
     </div>
@@ -661,6 +734,7 @@ button.chip { font: inherit; font-weight: 700; font-size: 0.8rem; letter-spacing
           </div>
           <div class="padright">
             <div class="padmsg" id="padMsg"></div>
+            <div class="timer big" id="padTimer" hidden><span></span></div>
             <button class="buzz" id="buzzBtn" type="button" hidden>Buzz</button>
             <form id="ansForm" autocomplete="off" hidden>
               <input id="ansIn" type="text" maxlength="60" placeholder="Type your answer…" aria-label="Your answer" enterkeyhint="send">
@@ -781,6 +855,46 @@ const SAMPLE = [
     ["The gym", 6, "gym, sports, practice"] ] }
 ].map(x => ({ q: x.q, m: x.m, answers: x.a.map(([t, p, alt]) => ({ t, p, alt })) }));
 
+const toQs = list => list.map(x => ({ q: x.q, m: 1, answers: x.a.map(([t, p, alt]) => ({ t, p, alt: alt || "" })) }));
+const STARTER = [
+  { id: "school", name: "School life", questions: SAMPLE },
+  { id: "science", name: "Science", questions: toQs([
+    { q: "Name a planet in our solar system", a: [["Mars", 28, "red planet"], ["Jupiter", 20], ["Saturn", 16], ["Earth", 12], ["Venus", 9], ["Mercury", 6], ["Neptune", 5], ["Uranus", 4]] },
+    { q: "Name a state of matter", a: [["Solid", 40, "solids"], ["Liquid", 30, "liquids"], ["Gas", 22, "gases"], ["Plasma", 8]] },
+    { q: "Name something a plant needs to grow", a: [["Water", 35, "h2o, rain"], ["Sunlight", 30, "sun, light"], ["Soil", 15, "dirt"], ["Air", 10, "carbon dioxide, co2"], ["Nutrients", 6, "fertilizer, minerals, food"], ["Space", 4, "room"]] },
+    { q: "Name an organ in the human body", a: [["Heart", 32], ["Brain", 25], ["Lungs", 15, "lung"], ["Stomach", 10], ["Liver", 8], ["Skin", 6], ["Kidneys", 4, "kidney"]] },
+    { q: "Name a source of energy", a: [["Solar", 30, "sun, sunlight"], ["Wind", 22], ["Coal", 15], ["Oil", 12, "gas, gasoline, petroleum, fossil fuels"], ["Nuclear", 9], ["Water", 7, "hydro, hydroelectric, dam"]] }
+  ]) },
+  { id: "geography", name: "Geography", questions: toQs([
+    { q: "Name one of the seven continents", a: [["Africa", 22], ["Asia", 20], ["Europe", 18], ["North America", 15], ["South America", 12], ["Australia", 8, "oceania"], ["Antarctica", 5]] },
+    { q: "Name one of Earth's oceans", a: [["Pacific", 40], ["Atlantic", 32], ["Indian", 14], ["Arctic", 9], ["Southern", 5, "antarctic"]] },
+    { q: "Name a country with a huge population", a: [["China", 38], ["India", 34], ["United States", 14, "usa, us, america"], ["Indonesia", 6], ["Brazil", 5], ["Russia", 3]] },
+    { q: "Name a famous river", a: [["Nile", 34], ["Amazon", 26], ["Mississippi", 18], ["Yangtze", 8], ["Thames", 6], ["Ganges", 5]] },
+    { q: "Name a U.S. state that touches an ocean", a: [["California", 30], ["Florida", 25], ["Texas", 12], ["New York", 10], ["Hawaii", 9], ["Alaska", 8], ["Maine", 6]] }
+  ]) },
+  { id: "history", name: "U.S. History", questions: toQs([
+    { q: "Name a U.S. president", a: [["Abraham Lincoln", 28, "lincoln, abe lincoln"], ["George Washington", 26, "washington"], ["Barack Obama", 14, "obama"], ["John F. Kennedy", 10, "jfk, kennedy"], ["Franklin D. Roosevelt", 8, "fdr, roosevelt"], ["Thomas Jefferson", 7, "jefferson"]] },
+    { q: "Name one of the original thirteen colonies", a: [["Virginia", 22], ["Massachusetts", 20], ["New York", 15], ["Pennsylvania", 13], ["Georgia", 10], ["New Jersey", 8], ["Maryland", 7], ["Connecticut", 5]] },
+    { q: "Name a freedom protected by the First Amendment", a: [["Freedom of speech", 40, "speech, free speech"], ["Freedom of religion", 25, "religion"], ["Freedom of the press", 15, "press"], ["Right to assemble", 12, "assembly, assemble"], ["Right to petition", 8, "petition"]] },
+    { q: "Name a war the United States fought in", a: [["World War II", 30, "ww2, wwii, world war 2, second world war"], ["Civil War", 22], ["Revolutionary War", 18, "american revolution, revolution"], ["World War I", 12, "ww1, wwi, world war 1, first world war"], ["Vietnam War", 10, "vietnam"], ["Korean War", 8, "korea"]] },
+    { q: "Name something printed on U.S. money", a: [["A president", 34, "presidents, washington, lincoln, face"], ["In God We Trust", 18, "motto"], ["Eagle", 15], ["The year", 12, "date"], ["Liberty", 11], ["E pluribus unum", 10]] }
+  ]) },
+  { id: "english", name: "English", questions: toQs([
+    { q: "Name a part of speech", a: [["Noun", 35, "nouns"], ["Verb", 30, "verbs"], ["Adjective", 15], ["Adverb", 10], ["Pronoun", 6], ["Preposition", 4]] },
+    { q: "Name a punctuation mark", a: [["Period", 35, "full stop"], ["Comma", 25], ["Question mark", 15], ["Exclamation point", 12, "exclamation mark"], ["Apostrophe", 7], ["Semicolon", 6]] },
+    { q: "Name a play by Shakespeare", a: [["Romeo and Juliet", 42, "romeo, romeo & juliet"], ["Hamlet", 20], ["Macbeth", 18], ["Othello", 7], ["A Midsummer Night's Dream", 7, "midsummer"], ["King Lear", 6, "lear"]] },
+    { q: "Name a genre of fiction", a: [["Fantasy", 25], ["Mystery", 20], ["Science fiction", 18, "sci fi, scifi"], ["Horror", 14], ["Romance", 12], ["Historical fiction", 11, "historical"]] },
+    { q: "Name an element of a story", a: [["Characters", 32, "character"], ["Plot", 25], ["Setting", 20], ["Conflict", 13], ["Theme", 10]] }
+  ]) },
+  { id: "math", name: "Math", questions: toQs([
+    { q: "Name a shape with straight sides", a: [["Square", 32], ["Triangle", 28], ["Rectangle", 18], ["Pentagon", 10], ["Hexagon", 8], ["Octagon", 4]] },
+    { q: "Name a prime number less than 20", a: [["2", 25, "two"], ["3", 20, "three"], ["5", 18, "five"], ["7", 16, "seven"], ["11", 9, "eleven"], ["13", 6, "thirteen"], ["17", 4, "seventeen"], ["19", 2, "nineteen"]] },
+    { q: "Name a unit of measurement", a: [["Inch", 22, "inches"], ["Meter", 20, "metre, meters"], ["Foot", 18, "feet"], ["Mile", 14], ["Centimeter", 12, "cm, centimeters"], ["Pound", 8, "lbs, lb"], ["Gallon", 6]] },
+    { q: "Name a basic math operation", a: [["Addition", 35, "add, plus, adding"], ["Subtraction", 30, "subtract, minus"], ["Multiplication", 20, "multiply, times"], ["Division", 15, "divide"]] },
+    { q: "Name something you'd use in math class", a: [["Calculator", 34], ["Ruler", 20], ["Pencil", 16], ["Protractor", 12], ["Graph paper", 10, "paper"], ["Compass", 8]] }
+  ]) }
+];
+
 const LS_PACK = "ss-pack-v1", LS_GAME = "ss-game-v1", LS_PREF = "ss-pref-v1";
 const lsGet = k => { try { const v = localStorage.getItem(k); return v ? JSON.parse(v) : null; } catch (e) { return null; } };
 const lsSet = (k, v) => { try { localStorage.setItem(k, JSON.stringify(v)); } catch (e) {} };
@@ -794,8 +908,34 @@ function validPack(p) {
   return ok ? p : null;
 }
 
-let pack = validPack(lsGet(LS_PACK)) || clone(SAMPLE);
-let prefs = Object.assign({ sound: true, teamA: "Pencils", teamB: "Erasers", rounds: 5, shuffle: true, lastDouble: true, devices: false, code: null }, lsGet(LS_PREF) || {});
+/* Topics library: every topic is a named list of questions. */
+const LS_LIB = "ss-lib-v1";
+const newId = () => "t" + Math.random().toString(36).slice(2, 9);
+const starterSets = () => STARTER.map(s => ({ id: s.id, name: s.name, questions: clone(s.questions) }));
+const validQs = qs => Array.isArray(qs) && qs.every(q => q && typeof q.q === "string" && Array.isArray(q.answers) && q.answers.every(a => a && typeof a.t === "string"));
+let lib = lsGet(LS_LIB);
+if (!lib || !Array.isArray(lib.sets) || !lib.sets.length || !lib.sets.every(s => s && s.id && validQs(s.questions))) {
+  lib = { sets: starterSets() };
+  const old = validPack(lsGet(LS_PACK));
+  if (old && JSON.stringify(old) !== JSON.stringify(SAMPLE)) lib.sets.unshift({ id: "mine", name: "My questions", questions: old });
+  lsSet(LS_LIB, lib);
+}
+const saveLib = () => lsSet(LS_LIB, lib);
+const setById = id => lib.sets.find(s => s.id === id);
+
+const PREF_KEYS = ["teamA", "teamB", "rounds", "shuffle", "lastDouble", "answerTime", "stealTime", "topics", "sound"];
+let prefs = Object.assign({ sound: true, teamA: "Pencils", teamB: "Erasers", rounds: 5, shuffle: true, lastDouble: true, devices: false, code: null,
+  answerTime: 20, stealTime: 30, topics: [lib.sets[0].id], editSet: lib.sets[0].id }, lsGet(LS_PREF) || {});
+function fixTopics() {
+  if (!Array.isArray(prefs.topics)) prefs.topics = [];
+  prefs.topics = prefs.topics.filter(id => setById(id));
+  if (!prefs.topics.length) prefs.topics = [lib.sets[0].id];
+}
+fixTopics();
+function edSet() { let s = setById(prefs.editSet); if (!s) { s = lib.sets[0]; prefs.editSet = s.id; } return s; }
+let pack = edSet().questions;
+const poolQs = () => prefs.topics.map(setById).filter(Boolean)
+  .flatMap(s => s.questions.map(q => ({ ...q, topic: s.name }))).filter(q => q.answers.length && q.q.trim());
 const PREFIX = "survey-showdown-v1-";
 const CODE_CHARS = "ABCDEFGHJKMNPQRSTUVWXYZ23456789";
 const inClaude = !!window.claude;   // inside the Claude viewer, peer connections are blocked
@@ -805,7 +945,7 @@ if (game && !(Array.isArray(game.qs) && Array.isArray(game.teams))) game = null;
 let history = [];
 let view = "setup";
 
-const savePack = () => lsSet(LS_PACK, pack);
+const savePack = () => { edSet().questions = pack; saveLib(); };
 const savePrefs = () => lsSet(LS_PREF, prefs);
 const saveGame = () => lsSet(LS_GAME, game);
 
@@ -992,14 +1132,15 @@ const mult = () => {
 const other = t => 1 - t;
 
 function startGame() {
-  if (!pack.length) { toast("Add a question first"); return; }
-  const n = Math.min(Number(prefs.rounds) || 5, pack.length);
-  let idx = pack.map((_, i) => i);
+  const pool = poolQs();
+  if (!pool.length) { toast("The topics you picked have no questions yet"); return; }
+  const n = Math.min(Number(prefs.rounds) || 5, pool.length);
+  let idx = pool.map((_, i) => i);
   if (prefs.shuffle) shuffle(idx);
   idx = idx.slice(0, n);
   game = {
     teams: [{ name: prefs.teamA || "Team A", score: 0 }, { name: prefs.teamB || "Team B", score: 0 }],
-    qs: idx.map(i => clone(pack[i])).filter(q => q.answers.length),
+    qs: idx.map(i => clone(pool[i])),
     round: 0, control: 0, revealed: [], strikes: 0, pot: 0, phase: "play", last: null, over: false,
     faceoff: true, turn: null, faceoffMisses: 0, buzzBy: null,
     lastDouble: !!prefs.lastDouble
@@ -1035,17 +1176,76 @@ function celebrate(L) {
 }
 
 function act(fn) {
+  const pk = timerKey();
   history.push(JSON.stringify(game));
   if (history.length > 80) history.shift();
   fn();
+  syncTimer(pk);
   saveGame();
   renderGame();
 }
 function undo() {
   if (!history.length) { toast("Nothing to undo"); return; }
   game = JSON.parse(history.pop());
+  syncTimer("", true);
   saveGame(); $("#win").hidden = true; renderGame();
 }
+
+/* ---------- Answer timer ---------- */
+let answerPending = false, lastTickSec = -1;
+const GRACE_MS = 1500;   // time for splashes and reading before the clock really starts
+function timerSecs() { return !game ? 0 : game.phase === "steal" ? Number(prefs.stealTime) || 0 : Number(prefs.answerTime) || 0; }
+function timerApplies() {
+  if (!game || game.over || timerSecs() <= 0) return false;
+  if (game.phase === "steal") return true;
+  if (game.phase !== "play") return false;
+  return game.faceoff ? game.turn != null : true;
+}
+const timerKey = () => game ? [game.round, game.phase, turnTeam(), !!game.faceoff, game.revealed.length, game.strikes].join("|") : "";
+function syncTimer(prevKey, force) {
+  if (!game) return;
+  if (!timerApplies()) { game.deadline = null; game.paused = null; return; }
+  if (force || prevKey !== timerKey() || (game.deadline == null && game.paused == null)) {
+    // A steal opens with a strike X and the "Steal!" screen, so it gets extra time before the clock bites.
+    game.deadline = Date.now() + timerSecs() * 1000 + (game.phase === "steal" ? 4500 : GRACE_MS); game.paused = null; game.autoPaused = false;
+  }
+}
+function timeLeftMs() { return !game ? null : game.deadline != null ? Math.max(0, game.deadline - Date.now()) : game.paused != null ? game.paused : null; }
+function toggleTimerPause() {
+  if (!game) return;
+  if (game.paused != null) { game.deadline = Date.now() + game.paused; game.paused = null; toast("Timer running"); }
+  else if (game.deadline != null) { game.paused = Math.max(0, game.deadline - Date.now()); game.deadline = null; toast("Timer paused"); }
+  else return;
+  game.autoPaused = false;
+  saveGame(); renderGame();
+}
+function renderTimer() {
+  const el = $("#timer");
+  const left = timeLeftMs();
+  if (!game || game.over || left == null) { el.hidden = true; return; }
+  const max = timerSecs() * 1000 || 1;
+  const sec = Math.min(timerSecs(), Math.ceil(left / 1000));
+  el.hidden = false;
+  el.style.setProperty("--p", Math.max(0, Math.min(100, (left / max) * 100)).toFixed(1));
+  el.classList.toggle("paused", game.paused != null);
+  el.classList.toggle("warn", game.paused == null && sec <= 5);
+  $("#timerNum").textContent = game.paused != null ? "PAUSED" : sec;
+  if (game.paused == null && sec <= 5 && sec > 0 && sec !== lastTickSec) { lastTickSec = sec; if (prefs.sound) tone(sec <= 3 ? 1200 : 900, 0, 0.08, "square", 0.06); }
+  if (sec > 5) lastTickSec = -1;
+}
+function timeUp() {
+  const team = turnTeam();
+  game.deadline = null;
+  toast("Time's up!");
+  conns.forEach(c => { if (c._meta && c._meta.team === team) sendTo(c, { t: "result", r: "timeout" }); });
+  if (game.phase === "play" && game.faceoff && game.turn != null) faceoffMiss(game.turn);
+  else strike();
+}
+setInterval(() => {
+  if (!game || game.over || view !== "game") return;
+  renderTimer();
+  if (game.deadline != null && game.deadline <= Date.now() && !answerPending && $("#xo").hidden) timeUp();
+}, 200);
 
 function reveal(i) {
   if (!game || game.over || game.revealed.includes(i)) return;
@@ -1237,7 +1437,8 @@ function stateMsg() {
   return { ...base, mode: "game", round: game.round + 1, rounds: game.qs.length, q: q.q, n: q.answers.length, rev,
     strikes: game.strikes, phase: game.phase, pot: game.pot, control: game.control, faceoff: !!game.faceoff,
     turn: turnTeam(), buzzOpen: game.phase === "play" && !!game.faceoff && game.turn == null,
-    buzzBy: game.buzzBy || null, mult: mult(), last: game.last };
+    buzzBy: game.buzzBy || null, mult: mult(), last: game.last,
+    timeLeft: timeLeftMs(), timerPaused: game.paused != null, timerMax: timerSecs() };
 }
 
 function onDeviceData(conn, msg) {
@@ -1264,9 +1465,11 @@ function deviceAnswer(conn, m, text) {
   if (Date.now() - teamCooldown[m.team] < 2600) { sendTo(conn, { t: "result", r: "busy" }); return; }
   teamCooldown[m.team] = Date.now();
   const team = m.team;
+  answerPending = true;
   splash({ big: `“${text}”`, sub: `${game.teams[team].name}${m.name ? ` (${m.name})` : ""} say…`, tone: team === 0 ? "pink" : "cyan", ms: 1300 });
   setTimeout(() => {
     hideSplash();
+    answerPending = false;
     if (!game || turnTeam() !== team) return;
     const r = checkGuess(text, team);
     conns.forEach(c => { if (c._meta && c._meta.team === team) sendTo(c, { t: "result", r, text }); });
@@ -1307,6 +1510,11 @@ function show(v) {
   $("#editor").hidden = v !== "editor";
   $("#team").hidden = v !== "team";
   if (v === "team") renderTeam();
+  if (game && !game.over) {
+    if (v !== "game" && game.deadline != null) { game.paused = Math.max(0, game.deadline - Date.now()); game.deadline = null; game.autoPaused = true; saveGame(); }
+    if (v === "game" && game.autoPaused && game.paused != null) { game.deadline = Date.now() + game.paused; game.paused = null; game.autoPaused = false; saveGame(); }
+    if (v === "game" && game.deadline != null && game.deadline < Date.now()) { game.deadline = Date.now() + timerSecs() * 1000 + GRACE_MS; saveGame(); }
+  }
   if (v !== "game") { renderNet(); broadcast(); }
   $("#menuBtn").hidden = v !== "game";
   $("#undoBtn").hidden = v !== "game";
@@ -1353,7 +1561,7 @@ function renderGame() {
   const sk = game.phase === "steal" ? 3 : game.strikes;
   [...$("#strikes").children].forEach((s, i) => s.classList.toggle("on", i < sk));
 
-  $("#question").innerHTML = `<small>We asked 100 students</small>${esc(q.q)}`;
+  $("#question").innerHTML = `<small>${q.topic ? esc(q.topic) + " · " : ""}Top ${q.answers.length} answers on the board</small>${esc(q.q)}`;
 
   const key = game.round + "|" + game.qs.length + "|" + q.q;
   const board = $("#board");
@@ -1390,7 +1598,7 @@ function renderGame() {
     const by = game.buzzBy && game.buzzBy.team === game.turn && game.buzzBy.name ? ` (${game.buzzBy.name})` : "";
     st.textContent = `${game.teams[game.turn].name}${by} ${game.buzzBy ? "buzzed in" : "can answer"}. Type the answer on your computer.`;
   } else if (game.phase === "play") {
-    if (game.strikes === 0 && game.revealed.length === 0) st.textContent = `Face-off! Tap the winning team's score panel. ${A} is in control for now.`;
+    if (game.faceoff && game.strikes === 0 && game.revealed.length === 0) st.textContent = `Face-off! Tap the winning team's score panel. ${A} is in control for now.`;
     else st.textContent = `${A} is guessing. ${3 - game.strikes} strike${3 - game.strikes === 1 ? "" : "s"} left.`;
   } else if (game.phase === "steal") {
     st.classList.add("steal");
@@ -1418,6 +1626,7 @@ function renderGame() {
   if (done) $("#nextBtn").textContent = game.round >= game.qs.length - 1 ? "Final score →" : "Next round →";
   $("#nextBtn").classList.toggle("pulse", done);
   $("#reopenBtn").hidden = !(devicesOn() && game.phase === "play" && game.faceoff && game.turn != null);
+  renderTimer();
   renderNet();
   broadcast();
   if (pendingCelebrate) {
@@ -1449,12 +1658,22 @@ function confetti() {
 function renderSetup() {
   $("#team-a").value = prefs.teamA;
   $("#team-b").value = prefs.teamB;
+  fixTopics();
+  const pool = poolQs();
+  $("#topicList").innerHTML = lib.sets.map(s => {
+    const n = s.questions.filter(q => q.answers.length && q.q.trim()).length;
+    return `<label class="topic"><input type="checkbox" data-set="${esc(s.id)}"${prefs.topics.includes(s.id) ? " checked" : ""}><span>${esc(s.name || "Untitled topic")}</span><small>${n} question${n === 1 ? "" : "s"}</small></label>`;
+  }).join("");
   const sel = $("#rounds"); sel.innerHTML = "";
-  for (let i = 1; i <= Math.max(1, pack.length); i++) sel.add(new Option(i + (i === 1 ? " round" : " rounds"), i));
-  sel.value = Math.min(prefs.rounds, Math.max(1, pack.length));
+  for (let i = 1; i <= Math.max(1, pool.length); i++) sel.add(new Option(i + (i === 1 ? " round" : " rounds"), i));
+  sel.value = Math.min(prefs.rounds, Math.max(1, pool.length));
+  $("#answerTime").value = String(prefs.answerTime);
+  $("#stealTime").value = String(prefs.stealTime);
   $("#shuffle").checked = !!prefs.shuffle;
   $("#lastDouble").checked = !!prefs.lastDouble;
-  $("#packNote").textContent = `${pack.length} question${pack.length === 1 ? "" : "s"} in your set.`;
+  $("#packNote").textContent = `${pool.length} question${pool.length === 1 ? "" : "s"} in the topics you picked.`;
+  $("#driveCard").hidden = inClaude;
+  renderDrive();
   $("#devices").checked = devicesOn();
   $("#devices").disabled = inClaude;
   $("#devUnavailable").hidden = !inClaude;
@@ -1475,6 +1694,12 @@ function renderSetup() {
 /* ---------- Editor ---------- */
 function totalOf(q) { return q.answers.reduce((s, a) => s + (Number(a.p) || 0), 0); }
 function renderEditor() {
+  pack = edSet().questions;
+  const ss = $("#edSet");
+  ss.innerHTML = lib.sets.map(s => `<option value="${esc(s.id)}">${esc(s.name || "Untitled topic")}</option>`).join("");
+  ss.value = edSet().id;
+  if (document.activeElement !== $("#setName")) $("#setName").value = edSet().name;
+  $("#resetSamples").hidden = !STARTER.some(s => s.id === edSet().id);
   const list = $("#qlist");
   list.innerHTML = pack.map((q, qi) => `
     <div class="qcard" data-qi="${qi}">
@@ -1590,6 +1815,7 @@ document.addEventListener("keydown", e => {
   else if (k === "z") undo();
   else if (k === "n") nextRound();
   else if (k === "r") revealRest();
+  else if (k === "p") toggleTimerPause();
   else if (k === "g") { e.preventDefault(); $("#guessInput").focus(); }
 });
 
@@ -1602,6 +1828,7 @@ $("#devices").addEventListener("change", e => {
   renderNet();
 });
 $("#reopenBtn").addEventListener("click", reopenBuzzers);
+$("#timer").addEventListener("click", toggleTimerPause);
 $("#netChip").addEventListener("click", () => splash({ big: prefs.code || "", sub: "Join code: open the game on a team computer and choose Join a game", tone: "sun", ms: 6000 }));
 $("#joinModeBtn").addEventListener("click", () => { if (prefs.devices) { prefs.devices = false; savePrefs(); hostStop(); } show("team"); });
 $("#rounds").addEventListener("change", e => { prefs.rounds = Number(e.target.value); savePrefs(); });
@@ -1684,8 +1911,44 @@ let resetArmed = 0;
 $("#resetSamples").addEventListener("click", e => {
   const b = e.currentTarget;
   if (Date.now() - resetArmed > 3000) { resetArmed = Date.now(); b.classList.add("armed"); b.textContent = "Tap again: this replaces your questions"; setTimeout(() => { b.classList.remove("armed"); b.textContent = "Restore sample questions"; }, 3000); return; }
-  resetArmed = 0; pack = clone(SAMPLE); savePack(); renderEditor(); toast("Sample questions restored");
+  const st = STARTER.find(s => s.id === edSet().id); if (!st) return;
+  resetArmed = 0; pack = clone(st.questions); savePack(); renderEditor(); toast("Starter questions restored");
 });
+
+// Topics in the editor
+$("#edSet").addEventListener("change", e => { prefs.editSet = e.target.value; savePrefs(); renderEditor(); });
+$("#setName").addEventListener("input", e => {
+  edSet().name = e.target.value.slice(0, 40); saveLib();
+  const o = $("#edSet").selectedOptions[0]; if (o) o.textContent = e.target.value || "Untitled topic";
+});
+$("#newSet").addEventListener("click", () => {
+  const s = { id: newId(), name: "New topic", questions: [] };
+  lib.sets.push(s); prefs.editSet = s.id; saveLib(); savePrefs(); renderEditor();
+  const n = $("#setName"); n.focus(); n.select();
+});
+let delSetArmed = 0;
+$("#deleteSet").addEventListener("click", e => {
+  const b = e.currentTarget;
+  if (lib.sets.length <= 1) { toast("Keep at least one topic"); return; }
+  if (Date.now() - delSetArmed > 3000) {
+    delSetArmed = Date.now(); b.classList.add("armed"); b.textContent = `Tap again to delete “${edSet().name}”`;
+    setTimeout(() => { b.classList.remove("armed"); b.textContent = "Delete topic"; }, 3000); return;
+  }
+  delSetArmed = 0; b.classList.remove("armed"); b.textContent = "Delete topic";
+  const gone = edSet().id;
+  lib.sets = lib.sets.filter(s => s.id !== gone);
+  prefs.editSet = lib.sets[0].id; fixTopics(); saveLib(); savePrefs(); renderEditor(); toast("Topic deleted");
+});
+// Topics and timers in setup
+$("#topicList").addEventListener("change", e => {
+  const id = e.target.dataset.set; if (!id) return;
+  const on = new Set(prefs.topics);
+  if (e.target.checked) on.add(id); else on.delete(id);
+  if (!on.size) { e.target.checked = true; toast("Pick at least one topic"); return; }
+  prefs.topics = lib.sets.map(s => s.id).filter(x => on.has(x)); savePrefs(); renderSetup();
+});
+$("#answerTime").addEventListener("change", e => { prefs.answerTime = Number(e.target.value); savePrefs(); });
+$("#stealTime").addEventListener("change", e => { prefs.stealTime = Number(e.target.value); savePrefs(); });
 
 /* ---------- Team devices: team side ---------- */
 const LS_JOIN = "ss-join-v1";
@@ -1751,13 +2014,13 @@ function onHostData(msg) {
   else if (msg.t === "result") showFb(msg.r);
 }
 function showFb(r) {
-  const map = { hit: ["On the board!", "ok"], miss: ["Not on the board", "no"], dup: ["Already on the board", "wait"], turn: ["It's not your team's turn", "wait"], busy: ["One answer at a time", "wait"] };
+  const map = { hit: ["On the board!", "ok"], miss: ["Not on the board", "no"], dup: ["Already on the board", "wait"], turn: ["It's not your team's turn", "wait"], busy: ["One answer at a time", "wait"], timeout: ["Time's up!", "no"] };
   const m = map[r]; if (!m) return;
   const fb = $("#padFb");
   fb.textContent = m[0]; fb.className = "fb " + m[1];
   fb.hidden = true; void fb.offsetWidth; fb.hidden = false;
   if (r === "hit") { sfx("ding"); burstAt(fb, 40, ["#5ef2c2", "#ffb547", "#ffffff"]); }
-  if (r === "miss") sfx("buzz");
+  if (r === "miss" || r === "timeout") sfx("buzz");
   clearTimeout(fbTimer); fbTimer = setTimeout(() => { fb.hidden = true; }, 2600);
 }
 function doBuzz() {
@@ -1831,7 +2094,26 @@ function renderTeam() {
   const form = $("#ansForm"), wasHidden = form.hidden;
   form.hidden = !showForm;
   if (showForm && wasHidden) { $("#ansIn").value = ""; $("#ansIn").focus(); sfx("ding"); }
+  dTimer = (s.mode === "game" && s.timeLeft != null)
+    ? { until: Date.now() + s.timeLeft, left: s.timeLeft, paused: !!s.timerPaused, max: (Number(s.timerMax) || 1) * 1000, mine: s.turn === T }
+    : null;
+  renderPadTimer();
 }
+let dTimer = null, dTick = -1;
+function renderPadTimer() {
+  const el = $("#padTimer");
+  if (!dTimer || view !== "team") { el.hidden = true; return; }
+  const left = dTimer.paused ? dTimer.left : Math.max(0, dTimer.until - Date.now());
+  const sec = Math.min(dTimer.max / 1000, Math.ceil(left / 1000));
+  el.hidden = false;
+  el.style.setProperty("--p", Math.max(0, Math.min(100, (left / dTimer.max) * 100)).toFixed(1));
+  el.classList.toggle("paused", dTimer.paused);
+  el.classList.toggle("warn", !dTimer.paused && sec <= 5);
+  el.firstElementChild.textContent = dTimer.paused ? "PAUSED" : sec;
+  if (dTimer.mine && !dTimer.paused && sec <= 5 && sec > 0 && sec !== dTick) { dTick = sec; if (prefs.sound) tone(sec <= 3 ? 1200 : 900, 0, 0.08, "square", 0.06); }
+  if (sec > 5) dTick = -1;
+}
+setInterval(() => { if (view === "team") renderPadTimer(); }, 200);
 
 $("#join-code").addEventListener("input", e => { const v = e.target.value.toUpperCase().replace(/[^A-Z0-9]/g, ""); e.target.value = v; join.code = v; saveJoin(); });
 $("#join-name").addEventListener("input", e => { join.name = e.target.value.slice(0, 16); saveJoin(); });
@@ -1861,6 +2143,139 @@ $("#ansForm").addEventListener("submit", e => {
   fb.textContent = `Sent: “${v}”`; fb.className = "fb wait"; fb.hidden = false;
   clearTimeout(fbTimer); fbTimer = setTimeout(() => { fb.hidden = true; }, 4000);
 });
+
+/* ---------- Saving: Google Drive and backup files ---------- */
+// OAuth client ID from Google Cloud (a public identifier, not a secret). Empty until set up.
+const GOOGLE_CLIENT_ID = "";
+const DRIVE_SCOPE = "https://www.googleapis.com/auth/drive.file";   // only files this app creates
+const DRIVE_FILE_NAME = "Survey Showdown save.json";
+let gToken = null, gTokenExp = 0, gClient = null, gisLoading = null;
+
+function exportData() {
+  const p = {}; PREF_KEYS.forEach(k => { p[k] = prefs[k]; });
+  return { app: "survey-showdown", version: 1, savedAt: new Date().toISOString(), library: lib, prefs: p, game: game && !game.over ? game : null };
+}
+function importData(d) {
+  if (!d || d.app !== "survey-showdown" || !d.library || !Array.isArray(d.library.sets)) return false;
+  const sets = d.library.sets.filter(s => s && typeof s.name === "string" && validQs(s.questions));
+  if (!sets.length) return false;
+  lib = { sets: sets.map(s => ({ id: String(s.id || newId()).slice(0, 40), name: s.name.slice(0, 40),
+    questions: s.questions.map(q => ({ q: String(q.q), m: [1, 2, 3].includes(Number(q.m)) ? Number(q.m) : 1,
+      answers: q.answers.slice(0, 8).map(a => ({ t: String(a.t), p: Number(a.p) || 0, alt: String(a.alt || "") })) })) })) };
+  saveLib();
+  if (d.prefs && typeof d.prefs === "object") { PREF_KEYS.forEach(k => { if (k in d.prefs) prefs[k] = d.prefs[k]; }); }
+  prefs.editSet = lib.sets[0].id; fixTopics(); savePrefs(); syncSound();
+  if (d.game && Array.isArray(d.game.qs) && Array.isArray(d.game.teams) && d.game.teams.length === 2) {
+    game = d.game; game.deadline = null; game.paused = null; history = []; boardKey = null; saveGame();
+  }
+  show(view === "editor" ? "editor" : "setup");
+  return true;
+}
+function driveMsg(text, bad) { const s = $("#driveStatus"); s.textContent = text; s.className = "note" + (bad ? " netbad" : ""); }
+function renderDrive() {
+  const connected = !!(gToken && Date.now() < gTokenExp);
+  $("#driveOut").hidden = !connected;
+  if (!GOOGLE_CLIENT_ID && !$("#driveStatus").textContent) driveMsg("Google Drive saving is being set up for this site. Until then, use the backup file.");
+}
+function loadGis() {
+  if (window.google?.accounts?.oauth2) return Promise.resolve();
+  if (gisLoading) return gisLoading;
+  gisLoading = new Promise((res, rej) => {
+    const s = document.createElement("script");
+    s.src = "https://accounts.google.com/gsi/client"; s.async = true;
+    s.onload = () => res(); s.onerror = () => { gisLoading = null; rej(new Error("gis")); };
+    document.head.appendChild(s);
+  });
+  return gisLoading;
+}
+// Must run inside the teacher's click, so the Google sign-in popup is allowed.
+function withGoogle(then) {
+  if (!GOOGLE_CLIENT_ID) { driveMsg("Google Drive saving isn't set up for this site yet. Use the backup file for now.", true); return; }
+  if (gToken && Date.now() < gTokenExp - 60000) { then(); return; }
+  if (!window.google?.accounts?.oauth2) { driveMsg("Google sign-in is still loading. Try again in a moment.", true); loadGis().catch(() => driveMsg("Couldn't load Google sign-in. Check the internet connection.", true)); return; }
+  if (!gClient) gClient = google.accounts.oauth2.initTokenClient({ client_id: GOOGLE_CLIENT_ID, scope: DRIVE_SCOPE, callback: () => {} });
+  gClient.callback = r => {
+    if (!r || r.error) { driveMsg("Google sign-in didn't finish, so nothing was saved or loaded.", true); return; }
+    gToken = r.access_token; gTokenExp = Date.now() + (Number(r.expires_in) || 3600) * 1000;
+    renderDrive(); then();
+  };
+  gClient.error_callback = () => driveMsg("The Google sign-in window closed before it finished.", true);
+  gClient.requestAccessToken();
+}
+async function gfetch(url, opts = {}) {
+  const r = await fetch(url, { ...opts, headers: { ...(opts.headers || {}), Authorization: "Bearer " + gToken } });
+  if (r.status === 401) { gToken = null; renderDrive(); throw new Error("signin"); }
+  if (!r.ok) throw new Error("http" + r.status);
+  return r;
+}
+async function findSave() {
+  const q = encodeURIComponent(`name='${DRIVE_FILE_NAME}' and trashed=false`);
+  const r = await gfetch(`https://www.googleapis.com/drive/v3/files?q=${q}&spaces=drive&orderBy=modifiedTime%20desc&pageSize=1&fields=files(id,modifiedTime)`);
+  const j = await r.json();
+  return (j.files && j.files[0]) || null;
+}
+const driveFail = e => driveMsg(e && e.message === "signin" ? "Your Google sign-in expired. Press the button again to sign in." : "Google Drive didn't respond. Check the internet connection and try again.", true);
+const niceTime = d => d.toLocaleString([], { weekday: "short", hour: "numeric", minute: "2-digit" });
+async function driveSave() {
+  driveMsg("Saving to Google Drive…");
+  try {
+    const body = JSON.stringify(exportData());
+    const f = await findSave();
+    if (f) {
+      await gfetch(`https://www.googleapis.com/upload/drive/v3/files/${f.id}?uploadType=media`, { method: "PATCH", headers: { "Content-Type": "application/json" }, body });
+    } else {
+      const b = "ss" + Math.random().toString(36).slice(2);
+      const meta = JSON.stringify({ name: DRIVE_FILE_NAME, mimeType: "application/json", description: "Topics, questions and settings for Survey Showdown" });
+      const multi = `--${b}\r\nContent-Type: application/json; charset=UTF-8\r\n\r\n${meta}\r\n--${b}\r\nContent-Type: application/json\r\n\r\n${body}\r\n--${b}--`;
+      await gfetch("https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart", { method: "POST", headers: { "Content-Type": `multipart/related; boundary=${b}` }, body: multi });
+    }
+    driveMsg(`Saved to your Google Drive as “${DRIVE_FILE_NAME}” (${niceTime(new Date())}).`);
+  } catch (e) { driveFail(e); }
+}
+async function driveLoad() {
+  driveMsg("Loading from Google Drive…");
+  try {
+    const f = await findSave();
+    if (!f) { driveMsg("There's no Survey Showdown save in this Google Drive yet. Save one first.", true); return; }
+    const data = await (await gfetch(`https://www.googleapis.com/drive/v3/files/${f.id}?alt=media`)).json();
+    if (!importData(data)) { driveMsg("That save file couldn't be read.", true); return; }
+    driveMsg(`Loaded your save from ${niceTime(new Date(f.modifiedTime))}.`);
+  } catch (e) { driveFail(e); }
+}
+$("#driveSave").addEventListener("click", () => withGoogle(driveSave));
+let loadArmed = 0;
+$("#driveLoad").addEventListener("click", e => {
+  const b = e.currentTarget;
+  if (Date.now() - loadArmed > 4000) {
+    loadArmed = Date.now(); b.classList.add("armed"); b.textContent = "Tap again: replaces this computer's topics";
+    setTimeout(() => { b.classList.remove("armed"); b.textContent = "Load from Google Drive"; }, 4000); return;
+  }
+  loadArmed = 0; b.classList.remove("armed"); b.textContent = "Load from Google Drive";
+  withGoogle(driveLoad);
+});
+$("#driveOut").addEventListener("click", () => {
+  try { if (gToken) google.accounts.oauth2.revoke(gToken, () => {}); } catch (e) {}
+  gToken = null; gTokenExp = 0; renderDrive(); driveMsg("Disconnected from Google Drive.");
+});
+$("#fileSave").addEventListener("click", () => {
+  const blob = new Blob([JSON.stringify(exportData(), null, 1)], { type: "application/json" });
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(blob);
+  a.download = `survey-showdown-${new Date().toISOString().slice(0, 10)}.json`;
+  document.body.appendChild(a); a.click(); a.remove();
+  setTimeout(() => URL.revokeObjectURL(a.href), 4000);
+  driveMsg("Backup file downloaded. You can upload it to Google Drive or keep it anywhere.");
+});
+$("#fileOpen").addEventListener("change", e => {
+  const f = e.target.files[0]; if (!f) return;
+  const r = new FileReader();
+  r.onload = () => {
+    let d = null; try { d = JSON.parse(String(r.result)); } catch (err) {}
+    if (importData(d)) driveMsg(`Loaded “${f.name}”.`); else driveMsg("That file isn't a Survey Showdown backup.", true);
+  };
+  r.readAsText(f); e.target.value = "";
+});
+if (!inClaude && GOOGLE_CLIENT_ID) loadGis().catch(() => {});
 
 /* ---------- Boot ---------- */
 function start(data) {
