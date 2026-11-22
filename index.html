@@ -217,6 +217,7 @@ kbd { font-family: var(--body); font-weight: 700; border: 0.1rem solid var(--lin
 .qmeta select { background: rgba(0,0,0,0.3); border: 0.1rem solid var(--line); border-radius: 0.4rem; padding: 0.25rem 0.4rem; }
 .arow { display: grid; grid-template-columns: 1.4rem minmax(0, 2fr) 4.5rem minmax(0, 2fr) 2.4rem; gap: 0.4rem; align-items: center; }
 .arow .i { color: var(--muted); font-weight: 700; text-align: right; font-size: 0.85rem; }
+.arow .whyin { grid-column: 2 / -1; font-size: 0.8rem; opacity: 0.9; }
 .arow input { padding: 0.35rem 0.5rem; font-size: 0.9rem; }
 .ahead { font-size: 0.7rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); font-weight: 700; }
 .sbtn { background: transparent; border: 0.1rem solid var(--line); border-radius: 0.4rem; color: var(--muted); font-weight: 700; padding: 0.3rem 0.6rem; font-size: 0.8rem; min-height: 2rem; }
@@ -305,6 +306,19 @@ body { background: var(--stage); }
 /* Team colors */
 #teamA { --tc: var(--pink); --tc-soft: var(--pink-soft); --tc-glow: var(--pink-glow); }
 #teamB { --tc: var(--cyan); --tc-soft: var(--cyan-soft); --tc-glow: var(--cyan-glow); }
+#teamC { --tc: var(--sun); --tc-soft: rgba(255,181,71,0.2); --tc-glow: rgba(255,181,71,0.55); }
+#teamD { --tc: var(--mint); --tc-soft: rgba(94,242,194,0.2); --tc-glow: rgba(94,242,194,0.5); }
+.scoreline.t3 { grid-template-columns: 1fr 1fr auto 1fr; }
+.scoreline.t4 { grid-template-columns: 1fr 1fr auto 1fr 1fr; }
+.scoreline.t3 .team .tscore, .scoreline.t4 .team .tscore { font-size: 2rem; }
+.scoreline.t3 .team .tname, .scoreline.t4 .team .tname { font-size: 1rem; }
+.scoreline.t3 .team, .scoreline.t4 .team { padding: 0.4rem 0.7rem; }
+#pickC { --tc: var(--sun); --tc-glow: rgba(255,181,71,0.55); }
+#pickD { --tc: var(--mint); --tc-glow: rgba(94,242,194,0.5); }
+#padCard.c { --tc: var(--sun); --tc-glow: rgba(255,181,71,0.55); }
+#padCard.d { --tc: var(--mint); --tc-glow: rgba(94,242,194,0.5); }
+.padscore .c { color: var(--sun); }
+.padscore .d { color: var(--mint); }
 .team { position: relative; overflow: hidden; border-color: var(--tc-soft); background: linear-gradient(135deg, var(--tc-soft), rgba(0,0,0,0.3) 70%); }
 .team .tname { color: var(--tc); text-shadow: 0 0 1rem var(--tc-glow); }
 .team .tscore { text-shadow: 0 0.2rem 0 rgba(0,0,0,0.45), 0 0 1.4rem var(--tc-glow); }
@@ -449,7 +463,8 @@ button.chip { font: inherit; font-weight: 700; font-size: 0.8rem; letter-spacing
 .mode:has(input:disabled) { opacity: 0.45; cursor: not-allowed; }
 
 /* Everyone plays: host screen */
-#party { display: grid; grid-template-rows: auto minmax(0, 1fr) auto; gap: 0.7rem; }
+#party, #lightning { display: grid; grid-template-rows: auto minmax(0, 1fr) auto; gap: 0.7rem; }
+#lightning .pmain { overflow-y: auto; }
 .phead { display: flex; align-items: center; justify-content: center; gap: 1rem; }
 .pmain { display: grid; grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr); gap: 1.2rem; min-height: 0; }
 #pBoard { margin: 0.55rem; }
@@ -517,6 +532,80 @@ button.chip { font: inherit; font-weight: 700; font-size: 0.8rem; letter-spacing
 .wrong li { background: rgba(255,90,95,0.16); color: #ffb3b5; border: 0.1rem solid rgba(255,90,95,0.5); border-radius: 99rem; padding: 0.2rem 0.75rem; font-weight: 700; text-decoration: line-through; }
 .final.party > div b { color: var(--sun) !important; text-shadow: 0 0 1.2rem rgba(255,181,71,0.6) !important; }
 
+/* Options, help, tour, modals, pause, sound */
+.optcard summary { cursor: pointer; list-style: none; }
+.optcard summary::-webkit-details-marker { display: none; }
+.optcard summary h3::after { content: " ▾"; }
+.optcard[open] summary h3::after { content: " ▴"; }
+.optlist { display: grid; grid-template-columns: repeat(auto-fit, minmax(17rem, 1fr)); gap: 1rem; }
+.optgroup { display: grid; gap: 0.5rem; align-content: start; }
+.optgroup h4 { margin: 0; font-size: 0.8rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); }
+.optitem { display: grid; grid-template-columns: auto 1fr; gap: 0.1rem 0.6rem; align-items: start; cursor: pointer; }
+.optitem input { width: 1.2rem; height: 1.2rem; accent-color: var(--mint); margin: 0.1rem 0 0; }
+.optitem b { font-size: 0.95rem; }
+.optitem span { grid-column: 2; color: var(--muted); font-size: 0.8rem; }
+.tourban { border-color: var(--sun); background: linear-gradient(135deg, rgba(255,181,71,0.18), rgba(0,0,0,0.25)); }
+.tourban p { margin: 0; }
+.hist { display: grid; gap: 0.4rem; }
+.hrow { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 0.6rem; align-items: center; padding: 0.5rem 0.8rem; border-radius: 0.6rem; background: rgba(0,0,0,0.25); border: 0.1rem solid var(--line); }
+.hrow b { display: block; }
+.hrow small { color: var(--muted); }
+.hrow .row { gap: 0.4rem; }
+.preview { display: grid; gap: 0.6rem; }
+.pq { border: 0.1rem solid var(--line); border-radius: 0.6rem; padding: 0.6rem 0.8rem; background: rgba(0,0,0,0.2); }
+.pq b { display: block; margin-bottom: 0.3rem; }
+.pq ul { margin: 0; padding-left: 1.2rem; display: grid; gap: 0.15rem; font-size: 0.9rem; }
+.pq li small { color: var(--muted); }
+.pq label { display: flex; gap: 0.5rem; align-items: center; font-weight: 700; }
+.why { text-align: center; font-size: 1.05rem; padding: 0.4rem 1rem; border-radius: 0.6rem; background: rgba(94,242,194,0.1); border: 0.1rem solid rgba(94,242,194,0.4); text-wrap: balance; }
+.why b { color: var(--mint); }
+#pWhy { text-align: left; max-height: 7rem; overflow-y: auto; display: grid; gap: 0.15rem; font-size: 0.9rem; }
+.mini li small.whyline { display: block; width: 100%; font-weight: 400; text-transform: none; font-size: 0.8rem; opacity: 0.85; }
+.mini li.on, .mini li.missed { flex-wrap: wrap; }
+#modal, #pauseScreen, #devPause { position: fixed; inset: 0; display: grid; place-items: center; padding: 1rem; }
+#modal { z-index: 39; background: rgba(10,6,24,0.82); }
+.modalbody { display: grid; gap: 0.6rem; max-height: 65vh; overflow-y: auto; }
+.modalbody table { width: 100%; border-collapse: collapse; font-size: 0.9rem; }
+.modalbody td, .modalbody th { text-align: left; padding: 0.3rem 0.4rem; border-bottom: 0.08rem solid var(--line); }
+.modalbody th { color: var(--muted); font-size: 0.75rem; letter-spacing: 0.08em; text-transform: uppercase; }
+.bar { height: 0.5rem; border-radius: 99rem; background: rgba(255,255,255,0.12); overflow: hidden; min-width: 4rem; }
+.bar i { display: block; height: 100%; background: var(--mint); }
+.bar.low i { background: var(--coral); }
+#pauseScreen { z-index: 37; background: radial-gradient(circle, #2a2068, #0d0920); overflow: hidden; }
+#pauseScreen .spbig { --g1: #e8e2ff; --g2: var(--violet); }
+#devPause { z-index: 37; background: rgba(10,6,24,0.92); }
+#devPause .spbig { --g1: #e8e2ff; --g2: var(--violet); font-size: 4rem; }
+#soundPanel { position: fixed; z-index: 41; right: max(16px, env(safe-area-inset-right, 0px)); top: calc(3.4rem + env(safe-area-inset-top, 0px)); width: min(20rem, calc(100% - 32px)); box-sizing: border-box; display: grid; gap: 0.7rem; padding: 1rem; border-radius: 0.9rem; background: var(--stage-2); border: 0.12rem solid var(--line); box-shadow: 0 1rem 2.5rem rgba(0,0,0,0.5); }
+#soundPanel input[type=range] { accent-color: var(--sun); width: 100%; }
+#tour { position: fixed; inset: 0; z-index: 45; }
+.tourhole { position: fixed; border-radius: 0.9rem; box-shadow: 0 0 0 200vmax rgba(10,6,24,0.78); outline: 0.2rem solid var(--sun); transition: all .35s ease; pointer-events: none; }
+.tourbox { position: fixed; width: min(26rem, calc(100% - 32px)); box-sizing: border-box; background: var(--stage-2); border: 0.15rem solid var(--sun); border-radius: 1rem; padding: 1rem 1.2rem; display: grid; gap: 0.5rem; box-shadow: 0 1rem 2.5rem rgba(0,0,0,0.6); transition: top .35s ease, left .35s ease; }
+.tourbox h3 { margin: 0; font-family: var(--display); font-weight: 400; color: var(--sun); font-size: 1.3rem; }
+.tourbox p { margin: 0; }
+.tourstep { font-size: 0.75rem; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); }
+.helpdoc .card p { margin: 0; }
+.helpnav { display: flex; flex-wrap: wrap; gap: 0.4rem; }
+.helpnav a { color: var(--ink); text-decoration: none; font-weight: 700; font-size: 0.85rem; padding: 0.3rem 0.8rem; border-radius: 99rem; border: 0.1rem solid var(--line); background: rgba(0,0,0,0.25); }
+.helpnav a:hover, .helpnav a:focus-visible { border-color: var(--sun); color: var(--sun); }
+.helpdoc .card { scroll-margin-top: 4rem; }
+/* Lightning round */
+.lgrid { display: grid; gap: 0.6rem; align-content: start; }
+.lrow { display: grid; grid-template-columns: 2.4rem minmax(0, 1.4fr) minmax(0, 1fr) 3.6rem; gap: 0.6rem; align-items: center; padding: 0.55rem 0.8rem; border-radius: 0.6rem; background: linear-gradient(180deg, #3a2f85, #221c52); border: 0.12rem solid #6a5bd6; }
+.lrow .ln { font-family: var(--display); color: var(--sun); text-align: center; }
+.lrow .lq { font-weight: 700; }
+.lrow .la { font-weight: 700; text-transform: uppercase; color: var(--muted); overflow-wrap: anywhere; }
+.lrow .lp { font-family: var(--display); text-align: right; font-size: 1.3rem; }
+.lrow.cur { outline: 0.2rem solid var(--sun); box-shadow: 0 0 1.5rem rgba(255,181,71,0.45); }
+.lrow.got { background: linear-gradient(180deg, #b8ffeb, var(--mint) 45%, #2fd3a4); color: var(--mint-ink); border-color: var(--mint); }
+.lrow.got .la, .lrow.got .ln { color: var(--mint-ink); }
+.lrow.zero .lp { color: var(--coral); }
+.lbteam { border: 0.12rem solid var(--tcol, var(--sun)); }
+.lbteam .nm { color: var(--tcol, var(--sun)); }
+.lbdiv { list-style: none; font-size: 0.7rem; color: var(--muted); letter-spacing: 0.1em; text-transform: uppercase; padding: 0.3rem 0.2rem 0; }
+.rmlist li { cursor: pointer; }
+.rmlist li.hidden { background: linear-gradient(180deg, #3a2f85, #221c52); color: var(--ink); }
+#rmButtons .btn { flex: 1 1 8rem; }
+
 /* Strikes and splashes */
 #xo { background: radial-gradient(ellipse at center, rgba(255,90,95,0.3), rgba(10,6,24,0.8)); }
 .shake { animation: shake .5s; }
@@ -533,7 +622,7 @@ button.chip { font: inherit; font-weight: 700; font-size: 0.8rem; letter-spacing
 #splash .rays { background: repeating-conic-gradient(from 0deg, color-mix(in srgb, var(--g2) 11%, transparent) 0 9deg, transparent 9deg 18deg); }
 @keyframes spin { to { transform: rotate(360deg); } }
 .spcard { position: relative; text-align: center; display: grid; gap: 1.2rem; justify-items: center; }
-.spbig { font-family: var(--display); font-size: 7rem; line-height: 0.95; text-wrap: balance; background: linear-gradient(180deg, var(--g1), var(--g2)); -webkit-background-clip: text; background-clip: text; color: transparent; filter: drop-shadow(0 0.4rem 0 rgba(0,0,0,0.5)) drop-shadow(0 0 2rem var(--g2)); animation: slam .7s cubic-bezier(.2,1.6,.4,1) both; }
+.spbig { max-width: 94vw; overflow-wrap: anywhere; font-family: var(--display); font-size: min(7rem, 11vw); line-height: 0.95; text-wrap: balance; background: linear-gradient(180deg, var(--g1), var(--g2)); -webkit-background-clip: text; background-clip: text; color: transparent; filter: drop-shadow(0 0.4rem 0 rgba(0,0,0,0.5)) drop-shadow(0 0 2rem var(--g2)); animation: slam .7s cubic-bezier(.2,1.6,.4,1) both; }
 .spsub { font-size: 2.1rem; font-weight: 700; max-width: 36ch; text-wrap: balance; animation: rise .6s .35s both; }
 .sptag { font-family: var(--display); font-size: 1.6rem; color: #1b0f00; background: linear-gradient(180deg, var(--g1), var(--g2)); padding: 0.35rem 1.2rem; border-radius: 0.6rem; box-shadow: 0 0.3rem 0 rgba(0,0,0,0.4); animation: slam .6s .6s cubic-bezier(.2,1.6,.4,1) both; }
 .sphint { font-size: 0.8rem; color: var(--muted); letter-spacing: 0.1em; text-transform: uppercase; animation: rise .5s 1.2s both; }
@@ -554,7 +643,10 @@ button.chip { font: inherit; font-weight: 700; font-size: 0.8rem; letter-spacing
   .board { margin: 0.55rem 0.3rem; }
   .padmain { grid-template-columns: 1fr; }
   .padright { order: -1; }
-  #party { grid-template-rows: auto auto auto; }
+  #party, #lightning { grid-template-rows: auto auto auto; }
+  .lrow { grid-template-columns: 1.8rem minmax(0, 1fr) 2.8rem; }
+  .lrow .la { grid-column: 2; }
+  .scoreline.t3, .scoreline.t4 { grid-template-columns: 1fr 1fr; }
   .pmain { grid-template-columns: 1fr; }
   .lobby .code { font-size: 3.4rem; }
   .lb ol.two { grid-template-columns: 1fr; }
@@ -588,8 +680,10 @@ button.chip { font: inherit; font-weight: 700; font-size: 0.8rem; letter-spacing
     <span class="chip" id="roundChip" hidden></span>
     <button class="chip net" id="netChip" type="button" hidden></button>
     <span class="spacer"></span>
+    <button class="tbtn" id="pauseBtn" type="button" hidden>Pause</button>
     <button class="tbtn" id="undoBtn" type="button" hidden>Undo</button>
     <button class="tbtn" id="soundBtn" type="button" aria-pressed="true">Sound on</button>
+    <button class="tbtn" id="helpBtn" type="button">Help</button>
     <button class="tbtn" id="fsBtn" type="button">Full screen</button>
     <button class="tbtn" id="menuBtn" type="button" hidden>Setup</button>
   </div>
@@ -610,6 +704,14 @@ button.chip { font: inherit; font-weight: 700; font-size: 0.8rem; letter-spacing
           <div class="dtile"><span class="df">2</span><span class="db">Nuggets<i>22</i></span></div>
           <div class="dtile"><span class="df">3</span><span class="db">Tacos<i>12</i></span></div>
           <div class="dtile"><span class="df">4</span><span class="db">Burger<i>9</i></span></div>
+        </div>
+      </div>
+
+      <div class="card tourban" id="tourBanner" hidden>
+        <p><b>New here?</b> A quick tour shows where everything is.</p>
+        <div class="row" style="justify-content:flex-start">
+          <button class="btn sun" id="tourStart" type="button">Take the 1-minute tour</button>
+          <button class="btn ghost" id="tourDismiss" type="button">No thanks</button>
         </div>
       </div>
 
@@ -636,9 +738,14 @@ button.chip { font: inherit; font-weight: 700; font-size: 0.8rem; letter-spacing
       <div class="card" id="teamsCard">
         <h3>Teams</h3>
         <div class="grid2">
-          <label class="f">Left team<input type="text" id="team-a" maxlength="24" autocomplete="off"></label>
-          <label class="f">Right team<input type="text" id="team-b" maxlength="24" autocomplete="off"></label>
+          <label class="f" data-opt="multi">Number of teams<select id="teamCount"><option value="2">2 teams</option><option value="3">3 teams</option><option value="4">4 teams</option></select></label>
+          <span data-opt="multi"></span>
+          <label class="f">Team 1<input type="text" id="team-a" maxlength="24" autocomplete="off"></label>
+          <label class="f">Team 2<input type="text" id="team-b" maxlength="24" autocomplete="off"></label>
+          <label class="f" id="lblTeamC" hidden>Team 3<input type="text" id="team-c" maxlength="24" autocomplete="off"></label>
+          <label class="f" id="lblTeamD" hidden>Team 4<input type="text" id="team-d" maxlength="24" autocomplete="off"></label>
         </div>
+        <p class="note" data-opt="multi" id="multiNote" hidden>With 3 or 4 teams, control rotates each round, and after three strikes the next team in order gets the steal.</p>
       </div>
 
       <div class="card">
@@ -647,6 +754,8 @@ button.chip { font: inherit; font-weight: 700; font-size: 0.8rem; letter-spacing
         <div class="topics" id="topicList"></div>
         <div class="row" style="justify-content:flex-start">
           <button class="btn" id="editBtn" type="button">Edit topics and questions</button>
+          <button class="btn" id="libraryBtn" type="button" data-opt="library">Browse the topic library</button>
+          <button class="btn" id="surveyBtn" type="button" data-opt="survey">Run a class survey</button>
         </div>
       </div>
 
@@ -665,6 +774,14 @@ button.chip { font: inherit; font-weight: 700; font-size: 0.8rem; letter-spacing
             <option value="0">No time limit</option><option value="30">30 seconds</option><option value="45">45 seconds</option><option value="60">1 minute</option>
             <option value="90">90 seconds</option><option value="120">2 minutes</option><option value="180">3 minutes</option><option value="300">5 minutes</option>
           </select></label>
+          <label class="f" id="lblPTeams" data-opt="teams" hidden>Play as<select id="pTeams">
+            <option value="0">Individuals</option><option value="2">2 teams</option><option value="3">3 teams</option><option value="4">4 teams</option><option value="5">5 teams</option><option value="6">6 teams</option>
+          </select></label>
+          <div data-opt="lightning" style="display:grid;gap:0.4rem;align-content:end">
+            <label class="check"><input type="checkbox" id="lightningOn"> Finish with a lightning round</label>
+            <label class="f" id="lblLTime">Lightning time<select id="lTime"><option value="30">30 seconds</option><option value="45">45 seconds</option><option value="60">1 minute</option><option value="90">90 seconds</option></select></label>
+          </div>
+          <label class="f" data-opt="history">Class or period (for game history)<input type="text" id="periodLabel" maxlength="30" placeholder="e.g. Period 3" autocomplete="off"></label>
           <label class="f" id="lblSpeed">Speed bonus<select id="speedBonus">
             <option value="0">Off</option><option value="5">+5 points</option><option value="10">+10 points</option><option value="20">+20 points</option>
           </select></label>
@@ -693,6 +810,7 @@ button.chip { font: inherit; font-weight: 700; font-size: 0.8rem; letter-spacing
           <div class="joinbox">
             <div><span class="label">Join code</span><b id="joinCode">·····</b></div>
             <button class="sbtn" id="newCodeBtn" type="button">New code</button>
+            <button class="sbtn" id="classroomBtn" type="button" data-opt="classroom">Share to Google Classroom</button>
             <p class="note" id="netStatus"></p>
           </div>
           <p class="note">On each team computer, open this same game file or web address and choose <b>Join a game</b>, then type the code. Each team can have one computer or many. At the start of each round the buzzers open; the first team to buzz types their answer, and the board checks it.</p>
@@ -715,6 +833,18 @@ button.chip { font: inherit; font-weight: 700; font-size: 0.8rem; letter-spacing
         </div>
       </div>
 
+      <div class="card" data-opt="history" id="historyCard">
+        <h3>Game history</h3>
+        <div id="historyList" class="hist"></div>
+        <div class="row" style="justify-content:flex-start"><button class="sbtn danger" id="historyClear" type="button">Clear history</button></div>
+      </div>
+
+      <details class="card optcard" id="optCard">
+        <summary><h3>Options: turn features on or off</h3></summary>
+        <p class="note">Everything here is on by default. Turn off what you don't use to keep the screens simple. Settings are saved on this computer and in your Google Drive save.</p>
+        <div id="optList" class="optlist"></div>
+      </details>
+
       <div class="card">
         <h3>How a round works</h3>
         <ol class="howto">
@@ -732,6 +862,7 @@ button.chip { font: inherit; font-weight: 700; font-size: 0.8rem; letter-spacing
   <section class="view" id="game" hidden>
     <div class="scoreline">
       <button class="team" id="teamA" type="button"><span><span class="tname"></span><span class="tag"></span></span><span class="tscore">0</span></button>
+      <button class="team" id="teamC" type="button" hidden><span><span class="tname"></span><span class="tag"></span></span><span class="tscore">0</span></button>
       <div class="pot">
         <span class="label">Round points</span>
         <div class="potrow">
@@ -740,6 +871,7 @@ button.chip { font: inherit; font-weight: 700; font-size: 0.8rem; letter-spacing
         </div>
         <div class="strikes" id="strikes" aria-label="Strikes"><span>✕</span><span>✕</span><span>✕</span></div>
       </div>
+      <button class="team right" id="teamD" type="button" hidden><span><span class="tname"></span><span class="tag"></span></span><span class="tscore">0</span></button>
       <button class="team right" id="teamB" type="button"><span><span class="tname"></span><span class="tag"></span></span><span class="tscore">0</span></button>
     </div>
 
@@ -748,6 +880,7 @@ button.chip { font: inherit; font-weight: 700; font-size: 0.8rem; letter-spacing
     <div class="board" id="board"></div>
 
     <div class="controls">
+      <div class="why" id="whyBox" hidden></div>
       <div class="status" id="status" aria-live="polite"></div>
       <div class="row">
         <form class="guess" id="guessForm" autocomplete="off">
@@ -758,6 +891,8 @@ button.chip { font: inherit; font-weight: 700; font-size: 0.8rem; letter-spacing
         <button class="btn strike" id="strikeBtn" type="button">✕ Strike</button>
         <button class="btn ghost" id="awardA" type="button"></button>
         <button class="btn ghost" id="awardB" type="button"></button>
+        <button class="btn ghost" id="awardC" type="button" hidden></button>
+        <button class="btn ghost" id="awardD" type="button" hidden></button>
         <button class="btn" id="revealBtn" type="button">Reveal the rest</button>
         <button class="btn primary" id="nextBtn" type="button">Next round →</button>
       </div>
@@ -776,7 +911,7 @@ button.chip { font: inherit; font-weight: 700; font-size: 0.8rem; letter-spacing
         <b class="code" id="pCode">·····</b>
         <p>On your computer, go to <b id="pUrl"></b>, choose <b>Join a game</b> and type the code.</p>
         <p class="note" id="pNet"></p>
-        <button class="sbtn" id="pNewCode" type="button">New code</button>
+        <div class="row"><button class="sbtn" id="pNewCode" type="button">New code</button><button class="sbtn" id="pClassroom" type="button" data-opt="classroom">Share to Google Classroom</button></div>
       </div>
       <div class="board" id="pBoard" hidden></div>
       <div class="lb">
@@ -785,6 +920,7 @@ button.chip { font: inherit; font-weight: 700; font-size: 0.8rem; letter-spacing
       </div>
     </div>
     <div class="controls">
+      <div class="why" id="pWhy" hidden></div>
       <div class="status" id="pStatus" aria-live="polite"></div>
       <div class="review" id="pReview" hidden>
         <span class="rlabel">Wrong guesses · tap one that should count</span>
@@ -796,6 +932,126 @@ button.chip { font: inherit; font-weight: 700; font-size: 0.8rem; letter-spacing
         <button class="btn primary" id="pNext" type="button" hidden>Next round →</button>
         <button class="btn ghost" id="pFinish" type="button" hidden>End game</button>
       </div>
+    </div>
+  </section>
+
+  <!-- LIGHTNING ROUND: host screen -->
+  <section class="view" id="lightning" hidden>
+    <div class="phead">
+      <h2 class="question" id="lTitle"><small>Lightning round</small>Answer five quick questions</h2>
+      <button class="timer" id="lTimer" type="button" hidden aria-label="Lightning timer. Tap to pause."><span></span></button>
+    </div>
+    <div class="pmain">
+      <div class="lgrid" id="lBoard"></div>
+      <div class="lb" id="lSide">
+        <h3><span id="lSideTitle">Scores</span><small id="lSideCount"></small></h3>
+        <ol id="lList"></ol>
+      </div>
+    </div>
+    <div class="controls">
+      <div class="status" id="lStatus" aria-live="polite"></div>
+      <div class="row">
+        <form class="guess" id="lForm" autocomplete="off" hidden>
+          <input id="lIn" type="text" placeholder="Type the answer…" aria-label="Lightning answer" enterkeyhint="go">
+          <button class="btn" type="submit">Enter</button>
+        </form>
+        <button class="btn" id="lPass" type="button" hidden>Pass</button>
+        <button class="btn sun" id="lStart" type="button">Start</button>
+        <button class="btn strike" id="lStop" type="button" hidden>Stop the clock</button>
+        <button class="btn primary" id="lNext" type="button" hidden>Next →</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- CLASS SURVEY: host screen -->
+  <section class="view scroll" id="surveyHost" hidden>
+    <div class="panel">
+      <div class="edhead"><h2>Class survey</h2><button class="btn" id="svBack" type="button">Done</button></div>
+      <div class="card" id="svSetup">
+        <h3>1. Write the survey</h3>
+        <p class="note">One question per line. Students answer on their own computers; their most common answers become the board, with points based on how many said each one.</p>
+        <textarea id="svQs" style="min-height:8rem;font-family:var(--body)" placeholder="Name something you'd find in a backpack&#10;Name a reason to stay up late&#10;Name a job you'd love to have"></textarea>
+        <div class="grid2">
+          <label class="f">Answers per student, per question<select id="svPer"><option value="1">1</option><option value="2">2</option><option value="3" selected>3</option></select></label>
+          <label class="f">Save the results to topic<select id="svTopic"></select></label>
+        </div>
+        <div class="row" style="justify-content:flex-start"><button class="btn sun" id="svOpen" type="button">Open the survey</button></div>
+      </div>
+      <div class="card" id="svLive" hidden>
+        <h3>2. Students answer</h3>
+        <div class="joinbox"><div><span class="label">Join code</span><b id="svCode">·····</b></div>
+          <p class="note">Students open <b id="svUrl"></b>, choose <b>Join a game</b> and type the code. <span id="svNet"></span></p></div>
+        <div id="svCounts" class="hist"></div>
+        <div class="row" style="justify-content:flex-start">
+          <button class="btn sun" id="svBuild" type="button">Close the survey and build the boards</button>
+        </div>
+      </div>
+      <div class="card" id="svResult" hidden>
+        <h3>3. Check the boards</h3>
+        <p class="note">Similar answers and misspellings are grouped. Uncheck anything you don't want, then save.</p>
+        <div id="svBoards" class="preview"></div>
+        <div class="row" style="justify-content:flex-start">
+          <button class="btn sun" id="svSave" type="button">Save to topic</button>
+          <button class="btn" id="svAgain" type="button">Start another survey</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- HELP -->
+  <section class="view scroll" id="help" hidden>
+    <div class="panel helpdoc">
+      <div class="edhead"><h2>Help</h2><button class="btn sun" id="helpTour" type="button">Take the tour</button><button class="btn" id="helpBack" type="button">Back</button></div>
+      <nav class="helpnav" aria-label="Help topics">
+        <a href="#h-start">Getting started</a><a href="#h-classic">Two-team game</a><a href="#h-party">Everyone plays</a>
+        <a href="#h-devices">Student computers</a><a href="#h-topics">Topics &amp; questions</a><a href="#h-teach">Teaching tools</a>
+        <a href="#h-run">Running the game</a><a href="#h-save">Saving &amp; sharing</a><a href="#h-trouble">Troubleshooting</a><a href="#h-keys">Shortcuts</a>
+      </nav>
+      <div class="card" id="h-start"><h3>Getting started</h3><ol class="howto">
+        <li>Open the game on the classroom display and press <b>Full screen</b>.</li>
+        <li>In <b>Game mode</b>, choose <b>Two teams</b> (classic face-off on the board) or <b>Everyone plays</b> (every student or group plays on their own computer).</li>
+        <li>Tick one or more <b>Topics</b>, set the number of rounds and timers, and press <b>Start new game</b> (or <b>Open the lobby</b>).</li>
+        <li>Everything is saved in this browser as you go. Use <b>Save your work</b> to keep a copy in Google Drive or a file.</li></ol></div>
+      <div class="card" id="h-classic"><h3>Two-team game</h3><ol class="howto">
+        <li><b>Face-off:</b> one player from each team answers. Tap the winning team's score panel to give them control, or turn on team buzzers so teams buzz in from their computers.</li>
+        <li><b>Play:</b> the team in control keeps guessing. Tap a tile to reveal it, or type the guess in the box and the game checks it for you, even with misspellings.</li>
+        <li><b>Strikes and steals:</b> three wrong answers, and the next team gets one guess to steal all the round points.</li>
+        <li><b>Mistakes:</b> press <b>Undo</b> to take back anything. If a correct guess was marked wrong, press Undo, then tap the right tile; that wording counts from then on.</li>
+        <li>With 3 or 4 teams (Options), control rotates each round and the next team in order steals.</li></ol></div>
+      <div class="card" id="h-party"><h3>Everyone plays</h3><ol class="howto">
+        <li>Open the lobby. Students go to the web address on the screen, choose <b>Join a game</b> and type the code and their name.</li>
+        <li>Each round, everyone answers the same question on their own computer. Correct answers fill in their board; wrong ones use up their strikes.</li>
+        <li>The round ends when time runs out, everyone is done, or you press <b>End round</b>. Everyone then sees all the answers.</li>
+        <li>After a round, tap a wrong guess under the board to accept it if it should have counted.</li>
+        <li>With <b>Play as: teams</b>, students pick a team when they join and the team score is the average of its players, so team sizes don't matter.</li>
+        <li>Tap ✕ next to a name on the leaderboard, then <b>Remove?</b>, to remove a player.</li></ol></div>
+      <div class="card" id="h-devices"><h3>Student computers</h3>
+        <p>Computers connect over the internet with the join code. No accounts are needed. Each computer needs the game's web address and internet access. <b>New code</b> makes a fresh code if the old one got shared too widely. A student who refreshes keeps their score.</p>
+        <p><b>Host remote:</b> on your phone, open the game, choose <b>Join a game</b>, tick <b>I'm the teacher</b> and type the code. Tap <b>Allow</b> on the big screen. Your phone shows the hidden answers and the main buttons.</p></div>
+      <div class="card" id="h-topics"><h3>Topics &amp; questions</h3>
+        <p>Press <b>Edit topics and questions</b> to make topics, add questions, and set each answer's points and other accepted wordings (<b>Also accept</b>). Answers are matched forgivingly: plurals, typos, word order and common synonyms count.</p>
+        <p>Other ways to add questions: paste from a <b>spreadsheet</b>, use <b>Make questions with AI</b>, browse the <b>topic library</b>, or run a <b>class survey</b> to build boards from your students' real answers.</p></div>
+      <div class="card" id="h-teach"><h3>Teaching tools</h3><ul class="howto">
+        <li><b>Explanation cards:</b> add a short "why" to any answer in the editor. It appears when the answer is revealed and on students' screens after each round.</li>
+        <li><b>Mistake report:</b> at the end of a game, see which answers were missed most and the most common wrong guesses.</li>
+        <li><b>Class survey:</b> students answer your questions first; the app groups their answers and builds the boards.</li></ul></div>
+      <div class="card" id="h-run"><h3>Running the game</h3><ul class="howto">
+        <li><b>Pause</b> covers the board and stops the clocks, for interruptions.</li>
+        <li><b>Sound</b> opens volume controls, background music and quiet mode.</li>
+        <li><b>Lightning round:</b> tick it in Setup to finish with five quick questions against the clock.</li>
+        <li><b>Speed bonus:</b> extra points for answering first.</li></ul></div>
+      <div class="card" id="h-save"><h3>Saving &amp; sharing</h3><ul class="howto">
+        <li><b>Save to Google Drive</b> keeps your topics, settings, history and any game in progress in your own Drive.</li>
+        <li><b>Share this topic by link</b> (in the editor) makes a link another teacher can open to add your topic.</li>
+        <li><b>Game history</b> lists finished games with scores and mistake reports. Add a class or period name in Setup to tell them apart.</li>
+        <li><b>Share to Google Classroom</b> posts the join link to a class.</li></ul></div>
+      <div class="card" id="h-trouble"><h3>Troubleshooting</h3><ul class="howto">
+        <li><b>"Can't reach the connection service" or "No game found":</b> check the code, and that the board shows the same code. Some school networks block this kind of connection; ask IT to allow it, or play on the board only.</li>
+        <li><b>Google sign-in blocked:</b> school accounts may need IT to allow the app. Personal Gmail works.</li>
+        <li><b>Something looks stuck:</b> refresh the page. Games, topics and scores are saved as you go.</li>
+        <li><b>A correct answer marked wrong:</b> Undo and tap the tile (two teams), or accept it after the round (Everyone plays).</li></ul></div>
+      <div class="card" id="h-keys"><h3>Keyboard shortcuts (on the board)</h3>
+        <p><kbd>1</kbd>–<kbd>8</kbd> reveal an answer · <kbd>X</kbd> strike · <kbd>Z</kbd> undo · <kbd>N</kbd> next round · <kbd>R</kbd> reveal the rest · <kbd>P</kbd> pause · <kbd>G</kbd> type a guess. On a team computer, <kbd>Space</kbd> buzzes in.</p></div>
     </div>
   </section>
 
@@ -815,6 +1071,44 @@ button.chip { font: inherit; font-weight: 700; font-size: 0.8rem; letter-spacing
           <button class="btn" id="newSet" type="button">+ New topic</button>
           <button class="sbtn danger" id="deleteSet" type="button">Delete topic</button>
         </div>
+        <div class="row" style="justify-content:flex-start" data-opt="share">
+          <button class="btn" id="shareTopic" type="button">Share this topic by link</button>
+          <button class="btn" id="shareTopicClassroom" type="button" data-opt="classroom">Share link to Google Classroom</button>
+        </div>
+        <textarea id="shareOut" readonly hidden style="min-height:4rem"></textarea>
+      </div>
+
+      <div class="card" data-opt="ai" id="aiCard">
+        <h3>Make questions with AI</h3>
+        <p class="note">Describe a topic or paste your notes. Claude drafts survey-style questions with answers, points, other accepted wordings and short explanations. Check them before class: AI can make mistakes.</p>
+        <label class="f">Topic or notes<textarea id="aiPrompt" style="min-height:6rem;font-family:var(--body)" placeholder="e.g. Unit 4 review: supply and demand, shortages, surplus, equilibrium price"></textarea></label>
+        <div class="grid2">
+          <label class="f">How many questions<select id="aiCount"><option>3</option><option selected>5</option><option>8</option><option>10</option></select></label>
+          <label class="f">Class level<select id="aiLevel"><option>9th grade</option><option selected>10th grade</option><option>11th grade</option><option>12th grade</option><option>Mixed high school</option></select></label>
+        </div>
+        <label class="f">Anthropic API key<input type="password" id="aiKey" autocomplete="off" placeholder="sk-ant-…"></label>
+        <label class="check"><input type="checkbox" id="aiRemember"> Remember the key on this computer</label>
+        <p class="note">Get a key at console.anthropic.com (usage is billed to that account; about a cent or two per batch). The key goes only from this browser to Anthropic. Don't save it on a shared computer.</p>
+        <div class="row" style="justify-content:flex-start">
+          <button class="btn sun" id="aiGo" type="button">Draft questions</button>
+          <button class="btn" id="aiAddHere" type="button" hidden>Add to this topic</button>
+          <button class="btn" id="aiAddNew" type="button" hidden>Add as a new topic</button>
+        </div>
+        <p class="note" id="aiStatus" aria-live="polite"></p>
+        <div id="aiPreview" class="preview"></div>
+      </div>
+
+      <div class="card" data-opt="sheet" id="sheetCard">
+        <h3>Import from a spreadsheet</h3>
+        <p class="note">In Google Sheets or Excel, use columns <b>Question, Answer, Points, Also accept, Explanation</b>, one row per answer. Leave the question blank to keep adding answers to the one above. Select the cells, copy, and paste below, or open a .csv file.</p>
+        <textarea id="sheetIn" spellcheck="false" placeholder="Question&#9;Answer&#9;Points&#9;Also accept&#9;Explanation&#10;Name a primary color&#9;Red&#9;40&#9;&#9;One of the three primaries&#10;&#9;Blue&#9;35&#10;&#9;Yellow&#9;25"></textarea>
+        <div class="row" style="justify-content:flex-start">
+          <button class="btn sun" id="sheetAdd" type="button">Add to this topic</button>
+          <button class="btn" id="sheetNew" type="button">Add as a new topic</button>
+          <button class="btn" id="sheetTemplate" type="button">Copy a blank template</button>
+          <label class="btn" for="sheetFile" style="display:inline-flex;align-items:center">Open a .csv file<input type="file" id="sheetFile" accept=".csv,.tsv,text/csv,text/tab-separated-values" hidden></label>
+        </div>
+        <p class="note" id="sheetStatus" aria-live="polite"></p>
       </div>
       <p class="note">Up to 8 answers per question. "Also accept" lists other words that count when you type a guess (separate them with commas). The sample questions use made-up numbers; survey your own students for real ones. Questions save in this browser automatically.</p>
       <div id="qlist" style="display:grid;gap:0.8rem"></div>
@@ -844,6 +1138,7 @@ button.chip { font: inherit; font-weight: 700; font-size: 0.8rem; letter-spacing
           <label class="f">Join code (shown on the board)<input type="text" id="join-code" class="codein" maxlength="5" autocomplete="off" autocapitalize="characters" spellcheck="false"></label>
           <label class="f">Your name or team name<input type="text" id="join-name" maxlength="16" autocomplete="off"></label>
         </div>
+        <label class="check" id="joinRemoteRow"><input type="checkbox" id="joinRemote"> I'm the teacher: use this device as a remote control</label>
         <div class="row" style="justify-content:flex-start">
           <button class="btn sun" id="joinBtn" type="button">Join</button>
           <button class="btn ghost" id="joinBack" type="button">Back to setup</button>
@@ -856,6 +1151,8 @@ button.chip { font: inherit; font-weight: 700; font-size: 0.8rem; letter-spacing
         <div class="pick">
           <button class="pickbtn" id="pickA" type="button" data-team="0"></button>
           <button class="pickbtn" id="pickB" type="button" data-team="1"></button>
+          <button class="pickbtn" id="pickC" type="button" data-team="2" hidden></button>
+          <button class="pickbtn" id="pickD" type="button" data-team="3" hidden></button>
         </div>
       </div>
 
@@ -889,6 +1186,29 @@ button.chip { font: inherit; font-weight: 700; font-size: 0.8rem; letter-spacing
         </div>
       </div>
 
+      <div id="remoteCard" hidden>
+        <div class="padtop">
+          <span class="chip" style="border-color:var(--sun);color:var(--sun)">Remote control</span>
+          <span class="chip" id="rmRound"></span>
+          <span class="spacer"></span>
+          <span class="padscore" id="rmScores"></span>
+        </div>
+        <h2 class="tq" id="rmQ"></h2>
+        <p class="note" id="rmStatus" style="text-align:center"></p>
+        <ol class="mini rmlist" id="rmAnswers"></ol>
+        <div class="chips" id="rmWrong"></div>
+        <div class="row" id="rmButtons"></div>
+        <p class="note" style="text-align:center">Answers shown here are hidden from the class. Keep this screen to yourself.</p>
+        <div class="row" style="justify-content:flex-start"><button class="sbtn" id="rmLeave" type="button">Disconnect remote</button></div>
+      </div>
+
+      <div id="surveyCard" hidden>
+        <h2 class="tq" id="svTitle">Class survey</h2>
+        <p class="note" id="svNote" style="text-align:center"></p>
+        <form id="svForm" autocomplete="off" style="display:grid;gap:1rem"></form>
+        <div class="fb ok" id="svDone" hidden style="justify-self:center">Thanks! Your answers are in.</div>
+      </div>
+
       <div id="partyCard" hidden>
         <div class="padtop">
           <span class="chip" id="ppName"></span>
@@ -897,6 +1217,7 @@ button.chip { font: inherit; font-weight: 700; font-size: 0.8rem; letter-spacing
           <span class="padscore"><span id="ppRank"></span><span id="ppTotal"></span></span>
         </div>
         <h2 class="tq" id="ppQ"></h2>
+        <div class="pick" id="ppTeams" hidden></div>
         <div class="padmain">
           <div class="padleft">
             <ol class="mini" id="ppBoard"></ol>
@@ -909,6 +1230,7 @@ button.chip { font: inherit; font-weight: 700; font-size: 0.8rem; letter-spacing
               <input id="ppIn" type="text" maxlength="60" placeholder="Type an answer…" aria-label="Your answer" enterkeyhint="send">
               <button class="btn primary" type="submit">Send</button>
             </form>
+            <button class="btn" id="ppPass" type="button" hidden>Pass</button>
             <div class="fb" id="ppFb" hidden></div>
             <ul class="wrong" id="ppWrong"></ul>
           </div>
@@ -931,10 +1253,42 @@ button.chip { font: inherit; font-weight: 700; font-size: 0.8rem; letter-spacing
     <div class="final" id="finalScores"></div>
     <div class="row">
       <button class="btn sun" id="againBtn" type="button">Play again</button>
+      <button class="btn" id="winReport" type="button" data-opt="report">Mistake report</button>
       <button class="btn" id="winSetup" type="button">Setup</button>
     </div>
   </div>
 </div>
+<div id="modal" hidden>
+  <div class="acard" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+    <h3 id="modalTitle"></h3>
+    <div id="modalBody" class="modalbody"></div>
+    <div class="row" id="modalBtns" style="justify-content:flex-end"></div>
+  </div>
+</div>
+<div id="pauseScreen" hidden>
+  <div class="rays" aria-hidden="true"></div>
+  <div class="spcard"><div class="spbig">Paused</div><div class="spsub">The clock is stopped.</div><button class="btn sun" id="resumeFromPause" type="button">Resume</button></div>
+</div>
+<div id="soundPanel" hidden>
+  <label class="f">Sound effects<input type="range" id="fxVol" min="0" max="1" step="0.05"></label>
+  <label class="check"><input type="checkbox" id="musicOn"> Background music</label>
+  <label class="f">Music volume<input type="range" id="musicVol" min="0" max="1" step="0.05"></label>
+  <label class="check"><input type="checkbox" id="quietOn"> Quiet mode (no sound at all)</label>
+</div>
+<div id="tour" hidden>
+  <div class="tourhole" id="tourHole"></div>
+  <div class="tourbox" id="tourBox" role="dialog" aria-live="polite">
+    <div class="tourstep" id="tourStep"></div>
+    <h3 id="tourTitle"></h3>
+    <p id="tourText"></p>
+    <div class="row" style="justify-content:flex-end">
+      <button class="btn ghost" id="tourSkip" type="button">Skip</button>
+      <button class="btn" id="tourPrev" type="button">Back</button>
+      <button class="btn sun" id="tourNext" type="button">Next</button>
+    </div>
+  </div>
+</div>
+<div id="devPause" hidden><div class="spcard"><div class="spbig">Paused</div><div class="spsub">The host paused the game. Hang tight.</div></div></div>
 <div id="acceptBox" hidden>
   <div class="acard" role="dialog" aria-modal="true" aria-labelledby="acceptTitle">
     <h3 id="acceptTitle"></h3>
@@ -1149,7 +1503,8 @@ if (!lib || !Array.isArray(lib.sets) || !lib.sets.length || !lib.sets.every(s =>
 const saveLib = () => lsSet(LS_LIB, lib);
 const setById = id => lib.sets.find(s => s.id === id);
 
-const PREF_KEYS = ["teamA", "teamB", "rounds", "shuffle", "lastDouble", "answerTime", "stealTime", "topics", "sound", "mode", "pStrikes", "pTime", "speedBonus"];
+const PREF_KEYS = ["teamA", "teamB", "teamC", "teamD", "teamCount", "rounds", "shuffle", "lastDouble", "answerTime", "stealTime", "topics", "sound", "mode",
+  "pStrikes", "pTime", "speedBonus", "opt", "pTeams", "lightning", "lTime", "periodLabel", "fxVol", "musicOn", "musicVol", "quiet", "tourDone"];
 let prefs = Object.assign({ sound: true, teamA: "Pencils", teamB: "Erasers", rounds: 5, shuffle: true, lastDouble: true, devices: false, code: null,
   mode: "classic", pStrikes: 3, pTime: 90, speedBonus: 10,
   answerTime: 20, stealTime: 30, topics: [lib.sets[0].id], editSet: lib.sets[0].id }, lsGet(LS_PREF) || {});
@@ -1180,7 +1535,8 @@ const poolQs = () => prefs.topics.map(setById).filter(Boolean)
 const PREFIX = "survey-showdown-v1-";
 const CODE_CHARS = "ABCDEFGHJKMNPQRSTUVWXYZ23456789";
 const inClaude = !!window.claude;   // inside the Claude viewer, peer connections are blocked
-const teamCols = t => t === 0 ? ["#ff4fa3", "#ffd0e7", "#ffb547", "#ffffff"] : ["#3ec8ff", "#d3f4ff", "#ffb547", "#ffffff"];
+const teamCols = t => [["#ff4fa3", "#ffd0e7", "#ffb547", "#ffffff"], ["#3ec8ff", "#d3f4ff", "#ffb547", "#ffffff"],
+  ["#ffb547", "#ffe7a8", "#ff4fa3", "#ffffff"], ["#5ef2c2", "#d0fff2", "#3ec8ff", "#ffffff"]][t] || ["#ffb547", "#ffffff"];
 let game = lsGet(LS_GAME);
 if (game && !(Array.isArray(game.qs) && Array.isArray(game.teams))) game = null;
 let history = [];
@@ -1205,11 +1561,11 @@ function tone(freq, start, dur, type = "sine", vol = 0.25) {
   g.gain.setValueAtTime(0.0001, t);
   g.gain.exponentialRampToValueAtTime(vol, t + 0.02);
   g.gain.exponentialRampToValueAtTime(0.0001, t + dur);
-  o.connect(g).connect(c.destination);
+  o.connect(g).connect(fxOut());
   o.start(t); o.stop(t + dur + 0.05);
 }
 function sfx(kind) {
-  if (!prefs.sound) return;
+  if (!prefs.sound || prefs.quiet) return;
   if (kind === "ding") { tone(988, 0, 0.35, "triangle", 0.3); tone(1319, 0.09, 0.5, "triangle", 0.28); }
   else if (kind === "buzz") { tone(98, 0, 0.75, "sawtooth", 0.22); tone(104, 0, 0.75, "square", 0.12); }
   else if (kind === "bank") { [523, 659, 784].forEach((f, i) => tone(f, i * 0.09, 0.3, "triangle", 0.22)); }
@@ -1476,7 +1832,12 @@ const mult = () => {
   const base = Math.max(1, Number(curQ().m) || 1);
   return (game.lastDouble && game.round === game.qs.length - 1) ? Math.max(2, base) : base;
 };
-const other = t => 1 - t;
+// With 3 or 4 teams, "other" is the next team in order: it gets the steal and the next face-off try.
+const other = t => (t + 1) % (game && game.teams ? game.teams.length : 2);
+const TEAM_SELS = ["#teamA", "#teamB", "#teamC", "#teamD"];
+const TEAM_TONES = ["pink", "cyan", "sun", "mint"];
+const teamEl = t => $(TEAM_SELS[t] || "#teamA");
+const teamCount = () => (opt("multi") ? Math.min(4, Math.max(2, Number(prefs.teamCount) || 2)) : 2);
 
 function startGame() {
   if (prefs.mode === "party" && !inClaude) { startParty(); return; }
@@ -1486,9 +1847,12 @@ function startGame() {
   let idx = pool.map((_, i) => i);
   if (prefs.shuffle) shuffle(idx);
   idx = idx.slice(0, n);
+  const tnames = [prefs.teamA || "Team 1", prefs.teamB || "Team 2", prefs.teamC || "Team 3", prefs.teamD || "Team 4"];
+  const lightN = prefs.lightning && opt("lightning") ? 5 * teamCount() : 0;
   game = {
-    teams: [{ name: prefs.teamA || "Team A", score: 0 }, { name: prefs.teamB || "Team B", score: 0 }],
+    teams: tnames.slice(0, teamCount()).map(name => ({ name, score: 0 })),
     qs: idx.map(i => clone(pool[i])),
+    lightQs: pickLightning(pool, idx, lightN), report: [], wrongLog: [], startedAt: Date.now(),
     round: 0, control: 0, revealed: [], strikes: 0, pot: 0, phase: "play", last: null, over: false,
     faceoff: true, turn: null, faceoffMisses: 0, buzzBy: null, speedBonus: Number(prefs.speedBonus) || 0,
     lastDouble: !!prefs.lastDouble
@@ -1514,13 +1878,12 @@ function introRound() {
 
 function celebrate(L) {
   if (!game) return;
-  const teamEl = L.team === 0 ? $("#teamA") : $("#teamB");
-  const cols = L.team === 0 ? ["#ff4fa3", "#ffd0e7", "#ffb547", "#ffffff"] : ["#3ec8ff", "#d3f4ff", "#ffb547", "#ffffff"];
-  burstAt(teamEl, 80, cols);
-  const nm = game.teams[L.team].name, pts = `+${L.pts} points`;
+  const cols = teamCols(L.team);
+  burstAt(teamEl(L.team), 80, cols);
+  const nm = game.teams[L.team].name, pts = `+${L.pts} points`, tone = TEAM_TONES[L.team];
   if (L.how === "sweep") { rain(200); sfx("win"); splash({ big: "Clean sweep!", sub: `${nm} found every answer`, tag: pts, tone: "mint" }); }
-  else if (L.how === "steal") { rain(120, cols); splash({ big: "Stolen!", sub: `${nm} take the round`, tag: pts, tone: L.team === 0 ? "pink" : "cyan" }); }
-  else if (L.how === "defend") splash({ big: "Blocked!", sub: `${nm} keep the round`, tag: pts, tone: L.team === 0 ? "pink" : "cyan", ms: 2200 });
+  else if (L.how === "steal") { rain(120, cols); splash({ big: "Stolen!", sub: `${nm} take the round`, tag: pts, tone }); }
+  else if (L.how === "defend") splash({ big: "Blocked!", sub: `${nm} keep the round`, tag: pts, tone, ms: 2200 });
 }
 
 function act(fn) {
@@ -1625,8 +1988,8 @@ function reveal(i) {
     setTimeout(() => {
       if (!game || !game.teams) return;
       sfx("buzzin");
-      burstAt(w.team === 0 ? $("#teamA") : $("#teamB"), 60, teamCols(w.team));
-      splash({ big: "Speed bonus!", sub: `${game.teams[w.team].name} buzzed first and got it right`, tag: `+${w.amt} points`, tone: w.team === 0 ? "pink" : "cyan", ms: 2000 });
+      burstAt(teamEl(w.team), 60, teamCols(w.team));
+      splash({ big: "Speed bonus!", sub: `${game.teams[w.team].name} buzzed first and got it right`, tag: `+${w.amt} points`, tone: TEAM_TONES[w.team], ms: 2000 });
     }, 900);
   }
 }
@@ -1695,7 +2058,7 @@ function faceoffMiss(team) {
   act(() => {
     game.faceoffMisses = (game.faceoffMisses || 0) + 1;
     game.buzzBy = null;
-    if (game.faceoffMisses >= 2) { game.turn = null; game.faceoffMisses = 0; }
+    if (game.faceoffMisses >= game.teams.length) { game.turn = null; game.faceoffMisses = 0; }
     else game.turn = other(team);
   });
   setTimeout(() => toast(game.turn == null ? "Nobody found one. Buzzers are open again!" : `Not on the board. ${game.teams[game.turn].name}, your turn!`), 900);
@@ -1706,6 +2069,7 @@ function revealRest() {
   if (game.phase !== "done") { toast("Give out the round points first"); return; }
   const hidden = curQ().answers.map((_, i) => i).filter(i => !game.revealed.includes(i));
   if (!hidden.length) return;
+  if (!game.foundBefore) game.foundBefore = game.revealed.slice();   // for the mistake report
   history.push(JSON.stringify(game));
   hidden.forEach((i, k) => setTimeout(() => {
     if (!game || game.revealed.includes(i)) return;
@@ -1716,12 +2080,15 @@ function revealRest() {
 function nextRound() {
   if (!game || game.over) return;
   if (game.phase !== "done" && game.pot > 0) { toast("Give out the round points first"); return; }
+  recordClassicRound();
+  const toLightning = game.round >= game.qs.length - 1 && game.lightQs && game.lightQs.length && !game.lightning;
+  if (toLightning) { startLightning(); return; }
   act(() => {
     if (game.round >= game.qs.length - 1) { game.over = true; return; }
     game.round++;
     game.revealed = []; game.strikes = 0; game.pot = 0; game.phase = "play"; game.last = null;
-    game.control = game.round % 2;
-    game.faceoff = true; game.turn = null; game.faceoffMisses = 0; game.buzzBy = null;
+    game.control = game.round % game.teams.length;
+    game.faceoff = true; game.turn = null; game.faceoffMisses = 0; game.buzzBy = null; game.foundBefore = null;
   });
   if (game.over) showWinner(); else introRound();
 }
@@ -1737,6 +2104,7 @@ function checkGuess(text, team = null) {
   if (dup) { toast("That one is already on the board"); return "dup"; }
   if (game.phase === "done") { toast("Not on the board"); return "miss"; }
   lastMiss = { text: String(text).trim(), round: game.round, at: Date.now(), undone: false };
+  (game.wrongLog = game.wrongLog || []).push({ round: game.round, text: lastMiss.text });
   if (team != null && game.faceoff && game.phase === "play") { faceoffMiss(team); return "miss"; }
   strike();
   const said = lastMiss.text;
@@ -1789,18 +2157,29 @@ function hostStop() {
   if (peer) { try { peer.destroy(); } catch (e) {} }
   peer = null; net.status = "off"; renderNet();
 }
-function sendTo(conn, msg) { try { if (conn.open) conn.send(msg); } catch (e) {} }
+function sendTo(conn, msg) {
+  try {
+    if (!conn.open) return;
+    if (msg && /state$/.test(msg.t || "")) msg = { ...msg, paused: hostPaused };   // students see a "Paused" screen too
+    conn.send(msg);
+  } catch (e) {}
+}
 function broadcast() {
   if (!conns.size) return;
-  if (isParty()) { conns.forEach(c => sendTo(c, partyMsg(c._meta || {}))); return; }
-  const m = stateMsg(); conns.forEach(c => sendTo(c, m));
+  conns.forEach(c => { if (!(c._meta && c._meta.remote)) sendTo(c, hostMsgFor(c)); });
 }
-const hostMsgFor = conn => isParty() ? partyMsg(conn._meta || {}) : stateMsg();
+const hostMsgFor = conn => svs.open ? surveyMsg(conn._meta || {}) : isParty() ? partyMsg(conn._meta || {}) : stateMsg();
 
 function stateMsg() {
-  const teams = (game && game.teams && !(view !== "game" && game.over) ? game.teams : [{ name: prefs.teamA, score: 0 }, { name: prefs.teamB, score: 0 }])
+  const teams = (game && game.teams && !(view !== "game" && view !== "lightning" && game.over) ? game.teams
+    : [prefs.teamA, prefs.teamB, prefs.teamC, prefs.teamD].slice(0, teamCount()).map((n, i) => ({ name: n || `Team ${i + 1}`, score: 0 })))
     .map(t => ({ name: String(t.name || ""), score: t.score }));
   const base = { t: "state", teams };
+  if (game && game.teams && game.lightning && !game.over) {
+    const L = game.lightning, cur = L.phase === "live" ? lqFor(L.team, L.qi) : null;
+    return { ...base, mode: "light", team: L.team, phase: L.phase, q: cur ? cur.q : "", qi: L.qi,
+      timeLeft: L.phase === "live" ? (L.deadline != null ? Math.max(0, L.deadline - Date.now()) : L.paused) : null, timerPaused: L.paused != null, timerMax: L.secs };
+  }
   if (!game || view !== "game") return { ...base, mode: "lobby" };
   if (game.over) return { ...base, mode: "over" };
   const q = curQ(), rev = {};
@@ -1818,12 +2197,29 @@ function onDeviceData(conn, msg) {
   if (msg.t === "hello") {
     m.name = String(msg.name || "").replace(/[\u0000-\u001f]/g, "").trim().slice(0, 16);
     m.pid = String(msg.pid || "").replace(/[^a-z0-9]/gi, "").slice(0, 24) || conn.peer;
-    if (isParty()) partyHello(conn, m); else sendTo(conn, stateMsg());
+    if (msg.remote && opt("remote")) { remoteHello(conn, m); return; }
+    cleanName(conn, m, `Player ${Math.floor(100 + Math.random() * 900)}`);
+    if (svs.open) sendTo(conn, surveyMsg(m));
+    else if (isParty()) partyHello(conn, m); else sendTo(conn, stateMsg());
     renderNet();
+    return;
   }
-  else if (msg.t === "pguess") { if (isParty()) partyGuess(conn, m, String(msg.text || "").slice(0, 60)); }
+  if (m.remote === true) { if (msg.t === "rcmd") remoteCommand(String(msg.cmd || ""), msg.arg); return; }
+  if (m.remote) return;   // waiting for the host to allow it
+  if (msg.t === "sanswer") { surveyAnswer(conn, m, msg.ans); return; }
+  if (hostPaused) return;   // nothing counts while the game is paused
+  if (msg.t === "pguess") { if (isParty()) partyGuess(conn, m, String(msg.text || "").slice(0, 60)); }
+  else if (msg.t === "lguess") {
+    const text = String(msg.text || "").slice(0, 60);
+    if (isParty()) partyLightGuess(conn, m, text);
+    else if (game && game.lightning && game.lightning.phase === "live" && m.team === game.lightning.team) submitLightHost(text);
+  }
+  else if (msg.t === "pteam") {
+    const p = isParty() && game.players[m.pid];
+    if (p && game.teamMode && Number.isInteger(msg.team) && msg.team >= 0 && msg.team < game.teamMode) { p.team = msg.team; saveGame(); partyRender(); }
+  }
   else if (isParty()) return;
-  else if (msg.t === "team" && (msg.team === 0 || msg.team === 1)) { m.team = msg.team; sendTo(conn, stateMsg()); renderNet(); }
+  else if (msg.t === "team" && Number.isInteger(msg.team) && msg.team >= 0 && msg.team < (game && game.teams ? game.teams.length : teamCount())) { m.team = msg.team; sendTo(conn, stateMsg()); renderNet(); }
   else if (msg.t === "buzz") deviceBuzz(m);
   else if (msg.t === "answer") deviceAnswer(conn, m, String(msg.text || "").slice(0, 60));
 }
@@ -1833,8 +2229,8 @@ function deviceBuzz(m) {
   if (!(game.phase === "play" && game.faceoff && game.turn == null)) return;
   act(() => { game.turn = m.team; game.buzzBy = { team: m.team, name: m.name }; });
   sfx("buzzin");
-  burstAt(m.team === 0 ? $("#teamA") : $("#teamB"), 60, teamCols(m.team));
-  splash({ big: `${game.teams[m.team].name} buzzed in!`, sub: m.name ? `${m.name} was first. Type your answer.` : "Type your answer on your computer.", tone: m.team === 0 ? "pink" : "cyan", ms: 2000 });
+  burstAt(teamEl(m.team), 60, teamCols(m.team));
+  splash({ big: `${game.teams[m.team].name} buzzed in!`, sub: m.name ? `${m.name} was first. Type your answer.` : "Type your answer on your computer.", tone: TEAM_TONES[m.team], ms: 2000 });
 }
 
 function deviceAnswer(conn, m, text) {
@@ -1844,7 +2240,7 @@ function deviceAnswer(conn, m, text) {
   teamCooldown[m.team] = Date.now();
   const team = m.team;
   answerPending = true;
-  splash({ big: `“${text}”`, sub: `${game.teams[team].name}${m.name ? ` (${m.name})` : ""} say…`, tone: team === 0 ? "pink" : "cyan", ms: 1300 });
+  splash({ big: `“${text}”`, sub: `${game.teams[team].name}${m.name ? ` (${m.name})` : ""} say…`, tone: TEAM_TONES[team], ms: 1300 });
   setTimeout(() => {
     hideSplash();
     answerPending = false;
@@ -1896,15 +2292,17 @@ let boardKey = null, bumpTeam = null, potDelay = 0, pendingCelebrate = null;
 const devicesOn = () => prefs.devices && !inClaude;
 
 function show(v) {
+  if ((v === "game" || v === "party") && game && game.lightning && !game.over) v = "lightning";
   if (v === "game" && isParty()) v = "party";
   if (v === "party" && !isParty()) v = game ? "game" : "setup";
+  if (v === "lightning" && !(game && game.lightning)) v = "setup";
   view = v;
-  $("#setup").hidden = v !== "setup";
-  $("#game").hidden = v !== "game";
-  $("#party").hidden = v !== "party";
-  $("#editor").hidden = v !== "editor";
-  $("#team").hidden = v !== "team";
+  ["setup", "game", "party", "editor", "team", "help", "lightning", "surveyHost"].forEach(id => { $("#" + id).hidden = v !== id; });
+  $("#soundPanel").hidden = true;
   if (v === "team") renderTeam();
+  if (v === "help") $("#help").scrollTop = 0;
+  if (v === "surveyHost") renderSurveyHost();
+  if (v !== "team") $("#devPause").hidden = true;
   // The clock pauses while the host is away from the play screen.
   const playView = isParty() ? "party" : "game";
   const secs = isParty() ? game.roundSecs : timerSecs();
@@ -1913,15 +2311,24 @@ function show(v) {
     if (v === playView && game.autoPaused && game.paused != null) { game.deadline = Date.now() + game.paused; game.paused = null; game.autoPaused = false; saveGame(); }
     if (v === playView && game.deadline != null && game.deadline < Date.now()) { game.deadline = Date.now() + secs * 1000 + GRACE_MS; saveGame(); }
   }
-  const playing = v === "game" || v === "party";
+  const L = game && !game.over && game.lightning;
+  if (L && L.phase === "live") {
+    if (v !== "lightning" && L.deadline != null) { L.paused = Math.max(0, L.deadline - Date.now()); L.deadline = null; L.autoPaused = true; saveGame(); }
+    if (v === "lightning" && L.autoPaused && L.paused != null) { L.deadline = Date.now() + L.paused; L.paused = null; L.autoPaused = false; saveGame(); }
+  }
+  const playing = v === "game" || v === "party" || v === "lightning";
   $("#menuBtn").hidden = !playing;
   $("#undoBtn").hidden = v !== "game";
   $("#roundChip").hidden = !playing;
+  $("#helpBtn").textContent = v === "help" ? "Close help" : "Help";
   if (v === "setup") renderSetup();
   if (v === "game") renderGame();
   if (v === "party") partyRender();
+  if (v === "lightning") lightRender();
   if (v === "editor") renderEditor();
-  if (v !== "game" && v !== "party") { renderNet(); broadcast(); }
+  if (v !== "game" && v !== "party" && v !== "lightning") { renderNet(); broadcast(); sendRemote(); }
+  applyOpts();
+  syncMusic();
 }
 
 function xSvg() {
@@ -1943,13 +2350,17 @@ function renderGame() {
   $("#roundChip").textContent = `Round ${game.round + 1} of ${game.qs.length}` + (m > 1 ? ` · ${m === 2 ? "Double" : "Triple"} points` : "");
   $("#roundChip").classList.toggle("hot", m > 1);
 
-  ["#teamA", "#teamB"].forEach((sel, t) => {
+  const nT = game.teams.length;
+  $("#game .scoreline").classList.toggle("t3", nT === 3);
+  $("#game .scoreline").classList.toggle("t4", nT === 4);
+  TEAM_SELS.forEach((sel, t) => { $(sel).hidden = t >= nT; });
+  TEAM_SELS.slice(0, nT).forEach((sel, t) => {
     const b = $(sel), team = game.teams[t];
     b.querySelector(".tname").textContent = team.name;
     countTo(b.querySelector(".tscore"), team.score, bumpTeam === t ? 450 : 0);
     const buzzed = game.phase === "play" && game.faceoff && game.turn === t;
     const ctrl = game.phase === "play" && (game.faceoff ? (game.turn == null ? game.control === t && !devicesOn() : buzzed) : game.control === t);
-    const stealing = game.phase === "steal" && game.control !== t;
+    const stealing = game.phase === "steal" && t === other(game.control);
     b.classList.toggle("ctrl", ctrl);
     b.classList.toggle("steal", stealing);
     b.querySelector(".tag").textContent = buzzed ? "Buzzed in!" : ctrl ? "In control" : stealing ? "Steal chance" : game.phase === "play" ? "Tap to take control" : "";
@@ -2016,9 +2427,11 @@ function renderGame() {
 
   const done = game.phase === "done";
   $("#strikeBtn").disabled = done;
-  $("#awardA").hidden = $("#awardB").hidden = done || game.pot === 0;
-  $("#awardA").textContent = `Give points to ${game.teams[0].name}`;
-  $("#awardB").textContent = `Give points to ${game.teams[1].name}`;
+  ["#awardA", "#awardB", "#awardC", "#awardD"].forEach((s, t) => {
+    $(s).hidden = t >= nT || done || game.pot === 0;
+    if (t < nT) $(s).textContent = `Give points to ${game.teams[t].name}`;
+  });
+  renderWhy();
   $("#revealBtn").hidden = !done || game.revealed.length >= q.answers.length;
   $("#nextBtn").hidden = !done && !(game.pot === 0 && game.revealed.length === 0 && game.strikes === 0);
   $("#nextBtn").textContent = game.round >= game.qs.length - 1 ? "Final score →" : "Next round →";
@@ -2029,6 +2442,7 @@ function renderGame() {
   renderTimer();
   renderNet();
   broadcast();
+  sendRemote();
   if (pendingCelebrate) {
     const L = pendingCelebrate; pendingCelebrate = null;
     setTimeout(() => celebrate(L), L.how === "defend" ? 1350 : 750);
@@ -2036,13 +2450,15 @@ function renderGame() {
 }
 
 function showWinner() {
-  const [a, b] = game.teams;
-  $("#winTitle").textContent = a.score === b.score ? "It's a tie!" : `${a.score > b.score ? a.name : b.name} win!`;
-  $("#finalScores").className = "final";
+  const ranked = game.teams.slice().sort((x, y) => y.score - x.score);
+  const tie = ranked.length > 1 && ranked[0].score === ranked[1].score;
+  $("#winTitle").textContent = tie ? "It's a tie!" : `${ranked[0].name} win!`;
+  $("#finalScores").className = "final" + (game.teams.length > 2 ? " party" : "");
   $("#finalScores").innerHTML = game.teams.map(t => `<div>${esc(t.name)}<b>${t.score}</b></div>`).join("");
   $("#win").hidden = false;
   sfx("win");
   confetti();
+  gameFinished();
 }
 
 function confetti() {
@@ -2059,6 +2475,20 @@ function confetti() {
 function renderSetup() {
   $("#team-a").value = prefs.teamA;
   $("#team-b").value = prefs.teamB;
+  $("#team-c").value = prefs.teamC || "Team 3";
+  $("#team-d").value = prefs.teamD || "Team 4";
+  $("#teamCount").value = String(teamCount());
+  $("#lblTeamC").hidden = teamCount() < 3;
+  $("#lblTeamD").hidden = teamCount() < 4;
+  $("#multiNote").hidden = teamCount() < 3;
+  renderOptions(); applyOpts();
+  if (opt("history")) renderHistory();
+  $("#pTeams").value = String(prefs.pTeams || 0);
+  $("#lightningOn").checked = !!prefs.lightning;
+  $("#lTime").value = String(prefs.lTime || 45);
+  $("#lblLTime").hidden = !prefs.lightning;
+  if (document.activeElement !== $("#periodLabel")) $("#periodLabel").value = prefs.periodLabel || "";
+  $("#tourBanner").hidden = !!prefs.tourDone;
   fixTopics();
   const pool = poolQs();
   $("#topicList").innerHTML = lib.sets.map(s => {
@@ -2085,7 +2515,7 @@ function renderSetup() {
   $("#partyUnavailable").hidden = !inClaude;
   $("#teamsCard").hidden = party;
   ["#lblAnswerTime", "#lblStealTime", "#timerNote", "#devToggle"].forEach(s => { $(s).hidden = party; });
-  ["#lblStrikes", "#lblRoundTime", "#partyNote"].forEach(s => { $(s).hidden = !party; });
+  ["#lblStrikes", "#lblRoundTime", "#partyNote", "#lblPTeams"].forEach(s => { $(s).hidden = !party; });
   $("#pStrikes").value = String(prefs.pStrikes);
   $("#pTime").value = String(prefs.pTime);
   $("#speedBonus").value = String(prefs.speedBonus);
@@ -2132,6 +2562,7 @@ function renderEditor() {
           <input id="q-${qi}-a-${ai}-p" data-f="p" type="number" inputmode="numeric" min="0" max="100" value="${esc(a.p)}" aria-label="Points">
           <input id="q-${qi}-a-${ai}-alt" class="alt" data-f="alt" value="${esc(a.alt || "")}" placeholder="other words, comma separated" aria-label="Also accept">
           <button class="sbtn" type="button" data-act="delA" aria-label="Remove answer ${ai + 1}">✕</button>
+          <input id="q-${qi}-a-${ai}-why" class="whyin" data-f="why" data-opt="explain" value="${esc(a.why || "")}" maxlength="140" placeholder="Why? A short explanation shown after it's revealed (optional)" aria-label="Explanation for answer ${ai + 1}">
         </div>`).join("")}
       <div class="qmeta">
         <button class="sbtn" type="button" data-act="addA" ${q.answers.length >= 8 ? "disabled" : ""}>+ Answer</button>
@@ -2153,7 +2584,7 @@ function renderEditor() {
 }
 
 function toText(p) {
-  return p.map(q => [q.q + (Number(q.m) > 1 ? ` x${q.m}` : ""), ...q.answers.map(a => `${a.t} | ${a.p}` + (a.alt ? ` | ${a.alt}` : ""))].join("\n")).join("\n\n");
+  return p.map(q => [q.q + (Number(q.m) > 1 ? ` x${q.m}` : ""), ...q.answers.map(a => `${a.t} | ${a.p}` + (a.alt || a.why ? ` | ${a.alt || ""}` : "") + (a.why ? ` | ${a.why}` : ""))].join("\n")).join("\n\n");
 }
 function fromText(txt) {
   const out = [];
@@ -2165,15 +2596,15 @@ function fromText(txt) {
     if (mm) { m = Number(mm[1]); head = head.slice(0, mm.index); }
     const answers = [];
     lines.slice(1).forEach(line => {
-      let t, p, alt = "";
+      let t, p, alt = "", why = "";
       if (line.includes("|")) {
         const parts = line.split("|").map(s => s.trim());
-        t = parts[0]; p = parseInt(parts[1], 10); alt = parts.slice(2).join(", ");
+        t = parts[0]; p = parseInt(parts[1], 10); alt = parts[2] || ""; why = parts.slice(3).join(" | ");
       } else {
         const r = line.match(/^(.+?)[\s,:\-–—]+(\d+)$/);
         if (r) { t = r[1].trim(); p = parseInt(r[2], 10); } else { t = line; p = 0; }
       }
-      if (t && answers.length < 8) answers.push({ t, p: isNaN(p) ? 0 : p, alt });
+      if (t && answers.length < 8) answers.push({ t, p: isNaN(p) ? 0 : p, alt, why });
     });
     if (answers.length) {
       answers.sort((a, b) => b.p - a.p);
@@ -2197,10 +2628,11 @@ $("#board").addEventListener("click", e => {
   }
 });
 $("#strikeBtn").addEventListener("click", strike);
-$("#teamA").addEventListener("click", () => setControl(0));
-$("#teamB").addEventListener("click", () => setControl(1));
-$("#awardA").addEventListener("click", () => award(0));
-$("#awardB").addEventListener("click", () => award(1));
+TEAM_SELS.forEach((s, t) => $(s).addEventListener("click", () => setControl(t)));
+["#awardA", "#awardB", "#awardC", "#awardD"].forEach((s, t) => $(s).addEventListener("click", () => award(t)));
+$("#teamCount").addEventListener("change", e => { prefs.teamCount = Number(e.target.value); savePrefs(); renderSetup(); });
+$("#team-c").addEventListener("input", e => { prefs.teamC = e.target.value; savePrefs(); if (game && !game.over && game.teams && game.teams[2]) { game.teams[2].name = e.target.value || "Team 3"; saveGame(); } broadcast(); });
+$("#team-d").addEventListener("input", e => { prefs.teamD = e.target.value; savePrefs(); if (game && !game.over && game.teams && game.teams[3]) { game.teams[3].name = e.target.value || "Team 4"; saveGame(); } broadcast(); });
 $("#revealBtn").addEventListener("click", revealRest);
 $("#nextBtn").addEventListener("click", nextRound);
 $("#undoBtn").addEventListener("click", undo);
@@ -2210,9 +2642,20 @@ $("#guessForm").addEventListener("submit", e => {
 });
 $("#menuBtn").addEventListener("click", () => show("setup"));
 $("#soundBtn").addEventListener("click", () => {
-  prefs.sound = !prefs.sound; savePrefs(); syncSound(); if (prefs.sound) sfx("ding");
+  ctx();
+  if (opt("audio")) {
+    const p = $("#soundPanel");
+    if (p.hidden) { if (!prefs.sound) { prefs.sound = true; savePrefs(); syncSound(); } syncSoundPanel(); }
+    p.hidden = !p.hidden;
+    return;
+  }
+  prefs.sound = !prefs.sound; savePrefs(); syncSound(); syncMusic(); if (prefs.sound) sfx("ding");
 });
-function syncSound() { const b = $("#soundBtn"); b.setAttribute("aria-pressed", prefs.sound); b.textContent = prefs.sound ? "Sound on" : "Sound off"; }
+function syncSound() {
+  const b = $("#soundBtn"), on = prefs.sound && !prefs.quiet;
+  b.setAttribute("aria-pressed", on);
+  b.textContent = opt("audio") ? (prefs.quiet ? "Quiet" : prefs.musicOn ? "Sound ♪" : "Sound") : (prefs.sound ? "Sound on" : "Sound off");
+}
 $("#fsBtn").addEventListener("click", () => {
   const d = document;
   if (d.fullscreenElement) { d.exitFullscreen?.().catch(() => {}); return; }
@@ -2241,7 +2684,7 @@ document.addEventListener("keydown", e => {
   else if (k === "z") undo();
   else if (k === "n") nextRound();
   else if (k === "r") revealRest();
-  else if (k === "p") toggleTimerPause();
+  else if (k === "p") { if (opt("pause")) setPause(!hostPaused); else toggleTimerPause(); }
   else if (k === "g") { e.preventDefault(); $("#guessInput").focus(); }
 });
 
@@ -2403,10 +2846,13 @@ function startParty() {
   if (prefs.shuffle) shuffle(idx);
   const players = {};
   // Computers already connected from an earlier game stay in.
-  conns.forEach(c => { const m = c._meta; if (c.open && m && m.pid && !players[m.pid]) players[m.pid] = { name: m.name || `Player ${Object.keys(players).length + 1}`, total: 0, r: freshRound(), joined: Date.now() }; });
-  game = { mode: "party", qs: idx.slice(0, n).map(i => clone(pool[i])), round: 0, pphase: "lobby", players, kicked: [], over: false,
+  conns.forEach(c => { const m = c._meta; if (c.open && m && m.pid && !m.remote && !players[m.pid]) players[m.pid] = { name: m.name || `Player ${Object.keys(players).length + 1}`, total: 0, r: freshRound(), joined: Date.now(), team: null }; });
+  const used = idx.slice(0, n);
+  game = { mode: "party", qs: used.map(i => clone(pool[i])), round: 0, pphase: "lobby", players, kicked: [], over: false,
     lastDouble: !!prefs.lastDouble, strikeLimit: Number(prefs.pStrikes) || 0, roundSecs: Number(prefs.pTime) || 0, deadline: null, paused: null,
-    speedBonus: Number(prefs.speedBonus) || 0, firsts: {} };
+    speedBonus: Number(prefs.speedBonus) || 0, firsts: {},
+    teamMode: opt("teams") ? Number(prefs.pTeams) || 0 : 0,
+    lightQs: pickLightning(pool, used, prefs.lightning && opt("lightning") ? LQ : 0), report: [], startedAt: Date.now() };
   history = []; pBoardKey = null; saveGame();
   hostStart(); show("party"); keepAwake();
 }
@@ -2419,7 +2865,15 @@ function partyHello(conn, m) {
   if (game.kicked.includes(m.pid)) { sendTo(conn, { t: "kicked" }); setTimeout(() => { try { conn.close(); } catch (e) {} }, 400); return; }
   let p = game.players[m.pid];
   if (!p) {
-    p = game.players[m.pid] = { name: m.name || `Player ${Object.keys(game.players).length + 1}`, total: 0, r: freshRound(), joined: Date.now() };
+    const others = Object.values(game.players);
+    p = game.players[m.pid] = { name: m.name || `Player ${others.length + 1}`, total: 0, r: freshRound(), joined: Date.now(), team: null };
+    // Late-join help: someone joining mid-game starts with the average score so far.
+    const started = game.round > 0 || game.pphase !== "lobby" || game.lightning;
+    if (opt("catchup") && started && others.length) {
+      p.total = Math.floor(others.reduce((s, o) => s + o.total, 0) / others.length);
+      if (p.total) toast(`${p.name} joined late and starts with ${p.total} points`);
+    }
+    if (game.lightning) p.light = { i: 0, ans: [] };
     if (view === "party") sfx("buzzin");
   } else if (m.name) p.name = m.name;
   saveGame(); partyRender();
@@ -2464,16 +2918,31 @@ function partyMsg(m) {
   const msg = { t: "pstate", mode: game.over ? "over" : game.pphase, name: p ? p.name : (m.name || ""), total: p ? p.total : 0,
     rank: p ? ranked.findIndex(x => x.pid === m.pid) + 1 : 0, players: ranked.length, round: game.round + 1, rounds: game.qs.length,
     strikeLimit: game.strikeLimit };
+  if (game.teamMode) {
+    const st = teamStandings();
+    msg.teams = PTEAMS.slice(0, game.teamMode).map(t => t[0]);
+    msg.myTeam = p ? (p.team ?? null) : null;
+    const mine = st.find(t => t.i === msg.myTeam);
+    if (mine) Object.assign(msg, { teamRank: st.indexOf(mine) + 1, teamAvg: mine.avg, teamCol: mine.col });
+  }
+  if (game.lightning && !game.over) {
+    const L = game.lightning, li = p && p.light ? p.light.i : 0;
+    return { ...msg, mode: "lightning", lphase: L.phase, li, lq: L.phase === "live" && li < LQ ? game.lightQs[li % game.lightQs.length].q : "",
+      lans: p && p.light ? p.light.ans.map(a => [a.text, a.pts, a.t]) : [], done: li >= LQ,
+      tops: L.phase === "done" ? game.lightQs.slice(0, LQ).map(q => { const top = q.answers.slice().sort((a, b) => b.p - a.p)[0]; return [q.q, top.t, top.p]; }) : null,
+      timeLeft: L.phase === "live" ? (L.deadline != null ? Math.max(0, L.deadline - Date.now()) : L.paused) : null, timerPaused: L.paused != null, timerMax: L.secs };
+  }
   if (!game.over && game.pphase !== "lobby") {
     const q = curQ();
     Object.assign(msg, { q: q.q, n: q.answers.length, mult: mult(), found: {}, strikes: p ? p.r.strikes : 0, wrong: p ? p.r.wrong : [],
       pts: p ? p.r.pts : 0, done: p ? p.r.done : false });
     (p ? p.r.found : []).forEach(i => { msg.found[i] = [q.answers[i].t, q.answers[i].p, (game.firsts || {})[i] === m.pid]; });
     msg.bonus = p ? (p.r.bonus || 0) : 0;
-    if (game.pphase === "reveal") msg.all = q.answers.map(a => [a.t, a.p]);   // answers leave the board only after the round
+    if (game.pphase === "reveal") msg.all = q.answers.map(a => [a.t, a.p, opt("explain") ? String(a.why || "") : ""]);   // answers leave the board only after the round
     if (game.pphase === "live") Object.assign(msg, { timeLeft: timeLeftMs(), timerPaused: game.paused != null, timerMax: game.roundSecs });
   }
-  if (game.over) msg.top = ranked.slice(0, 3).map(x => ({ name: x.name, total: x.total }));
+  if (game.over) msg.top = game.teamMode ? teamStandings().slice(0, 3).map(t => ({ name: `${t.name} team`, total: t.avg }))
+    : ranked.slice(0, 3).map(x => ({ name: x.name, total: x.total }));
   return msg;
 }
 function partyBeginRound() {
@@ -2486,6 +2955,7 @@ function partyBeginRound() {
 function partyEndRound(why) {
   if (!isParty() || game.pphase !== "live") return;
   game.pphase = "reveal"; game.deadline = null; game.paused = null;
+  recordPartyRound();
   saveGame(); partyRender(); sfx("bank");
   const best = rankList().filter(p => p.r.pts > 0).sort((a, b) => b.r.pts - a.r.pts)[0];
   splash({ big: why === "time" ? "Time's up!" : "Round over!", sub: best ? `Top score this round: ${best.name} (+${best.r.pts})` : "Here are all the answers.",
@@ -2494,13 +2964,24 @@ function partyEndRound(why) {
 }
 function partyFinish() {
   if (!isParty()) return;
+  if (game.pphase === "reveal") recordPartyRound();
+  // A lightning round, if it's on, comes before the final results.
+  if (game.lightQs && game.lightQs.length && !game.lightning && Object.keys(game.players).length) { startPartyLightning(); return; }
   game.over = true; game.deadline = null; game.paused = null;
-  saveGame(); partyRender();
-  const top = rankList();
-  $("#winTitle").textContent = top.length ? `${top[0].name} wins!` : "Game over";
+  saveGame();
+  if (view === "lightning") show("party"); else partyRender();
   const fs = $("#finalScores"); fs.className = "final party";
-  fs.innerHTML = top.slice(0, 3).map((p, i) => `<div>${["1st", "2nd", "3rd"][i]} · ${esc(p.name)}<b>${p.total}</b></div>`).join("");
+  if (game.teamMode) {
+    const st = teamStandings();
+    $("#winTitle").textContent = st.length && st[0].n ? `${st[0].name} team wins!` : "Game over";
+    fs.innerHTML = st.slice(0, 3).map((t, i) => `<div>${["1st", "2nd", "3rd"][i]} · ${esc(t.name)} team<b>${t.avg}</b></div>`).join("");
+  } else {
+    const top = rankList();
+    $("#winTitle").textContent = top.length ? `${top[0].name} wins!` : "Game over";
+    fs.innerHTML = top.slice(0, 3).map((p, i) => `<div>${["1st", "2nd", "3rd"][i]} · ${esc(p.name)}<b>${p.total}</b></div>`).join("");
+  }
   $("#win").hidden = false; sfx("win"); confetti();
+  gameFinished();
 }
 function kickPlayer(pid) {
   if (!isParty()) return;
@@ -2577,10 +3058,11 @@ function partyRender() {
       const xs = lobby ? "" : "✕".repeat(p.r.strikes);
       const armed = kickArmed.pid === p.pid && Date.now() - kickArmed.at < 3000;
       return `<li class="lbrow${on.has(p.pid) ? "" : " off"}${!lobby && p.r.done ? " done" : ""}${bumpPid === p.pid ? " bump" : ""}">
-        <span class="rk">${i + 1}</span><span class="nm">${esc(p.name)}</span><span class="dots">${dots}</span><span class="xs">${xs}</span>
+        <span class="rk">${i + 1}</span><span class="nm">${teamDot(p)}${esc(p.name)}</span><span class="dots">${dots}</span><span class="xs">${xs}</span>
         <span class="rp">${!lobby && p.r.pts ? "+" + p.r.pts : ""}</span><span class="tot">${p.total}</span>
         <button class="kick${armed ? " armed" : ""}" type="button" data-pid="${esc(p.pid)}" aria-label="Remove ${esc(p.name)}">${armed ? "Remove?" : "✕"}</button></li>`;
     }).join("") : `<li class="empty">Nobody has joined yet.</li>`;
+    if (game.teamMode && ranked.length) list.insertAdjacentHTML("afterbegin", teamRowsHtml());
     bumpPid = null;
     // Status and buttons
     const doneCount = ranked.filter(p => on.has(p.pid) && p.r.done).length, onCount = ranked.filter(p => on.has(p.pid)).length;
@@ -2592,13 +3074,16 @@ function partyRender() {
     $("#pEnd").hidden = !live;
     $("#pNext").hidden = !reveal || last;
     $("#pFinish").hidden = lobby || live;
-    $("#pFinish").textContent = last ? "Final results →" : "End game";
+    const toLight = game.lightQs && game.lightQs.length && !game.lightning;
+    $("#pFinish").textContent = last ? (toLight ? "Lightning round →" : "Final results →") : "End game";
     $("#pFinish").className = "btn " + (last ? "primary" : "ghost");
     renderPartyTimer();
     renderReview();
+    renderPartyWhy();
     renderNet();
   }
   broadcast();
+  sendRemote();
 }
 
 /* Host review: accept a wrong guess after the round */
@@ -2647,6 +3132,7 @@ function acceptGroup(key, ai) {
     conns.forEach(c => { if (c._meta && c._meta.pid === pid) sendTo(c, { t: "result", r: "accepted" }); });
   });
   rememberAlias(q, ai, g.text);
+  recordPartyRound();
   saveGame(); partyRender(); sfx("ding");
   toast(n ? `“${g.text}” now counts as ${q.answers[ai].t}: +${pts} for ${n} player${n === 1 ? "" : "s"}`
           : `“${g.text}” now counts as ${q.answers[ai].t}. Those players already had it.`);
@@ -2669,7 +3155,13 @@ $("#pReviewList").addEventListener("click", e => { const b = e.target.closest(".
 $("#acceptList").addEventListener("click", e => { const b = e.target.closest("[data-ai]"); if (b && acceptKey) acceptGroup(acceptKey, Number(b.dataset.ai)); });
 $("#acceptCancel").addEventListener("click", () => { $("#acceptBox").hidden = true; acceptKey = null; });
 $("#acceptBox").addEventListener("click", e => { if (e.target.id === "acceptBox") { $("#acceptBox").hidden = true; acceptKey = null; } });
-document.addEventListener("keydown", e => { if (e.key === "Escape" && !$("#acceptBox").hidden) { $("#acceptBox").hidden = true; acceptKey = null; } });
+document.addEventListener("keydown", e => {
+  if (e.key !== "Escape") return;
+  if (!$("#acceptBox").hidden) { $("#acceptBox").hidden = true; acceptKey = null; }
+  if (!$("#modal").hidden) closeModal();
+  if (!$("#tour").hidden) tourEnd();
+  $("#soundPanel").hidden = true;
+});
 setInterval(() => {
   if (!isParty() || game.over || view !== "party") return;
   renderPartyTimer();
@@ -2704,7 +3196,7 @@ const join = Object.assign({ code: "", name: "", team: null, active: false }, ls
 let myPid = "p" + Math.random().toString(36).slice(2, 12);
 try { const s = sessionStorage.getItem("ss-pid"); if (s) myPid = s; else sessionStorage.setItem("ss-pid", myPid); } catch (e) {}
 let dpeer = null, dconn = null, dstate = null, dRetry = null, dEverConnected = false, fbTimer;
-let dpstate = null, dmode = "classic", dFails = 0;
+let dpstate = null, dmode = "classic", dFails = 0, drstate = null, dsstate = null;
 const saveJoin = () => lsSet(LS_JOIN, join);
 function setJoinStatus(msg, bad) { const s = $("#joinStatus"); s.textContent = msg; s.className = "note" + (bad ? " netbad" : ""); }
 
@@ -2738,7 +3230,7 @@ function openConn() {
   c.on("open", () => {
     if (c !== dconn) return;
     dEverConnected = true; dFails = 0; join.active = true; saveJoin(); setJoinStatus("");
-    c.send({ t: "hello", name: join.name, pid: myPid });
+    c.send({ t: "hello", name: join.name, pid: myPid, remote: !!($("#joinRemote") && $("#joinRemote").checked && opt("remote")) });
     if (join.team != null) c.send({ t: "team", team: join.team });
     renderTeam();
   });
@@ -2764,10 +3256,16 @@ function leaveJoin() {
 }
 function onHostData(msg) {
   if (!msg || typeof msg !== "object") return;
-  if (msg.t === "state" && Array.isArray(msg.teams) && msg.teams.length === 2) { dstate = msg; dmode = "classic"; renderTeam(); }
-  else if (msg.t === "pstate") { dpstate = msg; dmode = "party"; renderTeam(); }
+  if (msg.t === "state" && Array.isArray(msg.teams) && msg.teams.length >= 2) { dstate = msg; if (dmode !== "remote") dmode = "classic"; renderTeam(); }
+  else if (msg.t === "pstate") { dpstate = msg; if (dmode !== "remote") dmode = "party"; renderTeam(); }
+  else if (msg.t === "rstate") { drstate = msg; dmode = "remote"; renderTeam(); }
+  else if (msg.t === "rwait") { dmode = "remote"; drstate = null; setJoinStatus("Waiting for the board to approve this remote… Tap Allow on the big screen.", false); renderTeam(); }
+  else if (msg.t === "rdenied") { leaveJoin(); setJoinStatus("The board didn't allow this remote.", true); }
+  else if (msg.t === "sstate") { dsstate = msg; if (dmode !== "remote") dmode = "survey"; renderTeam(); }
+  else if (msg.t === "renamed") { join.name = String(msg.name || ""); saveJoin(); toast("Please use a school-appropriate name. You've been renamed."); }
   else if (msg.t === "result") showFb(msg.r, Number(msg.bonus) || 0);
   else if (msg.t === "kicked") { leaveJoin(); setJoinStatus("The host removed you from this game.", true); }
+  if (msg.paused != null) devicePause(!!msg.paused);
 }
 function showFb(r, bonus = 0) {
   const map = { hit: ["On the board!", "ok"], miss: ["Not on the board", "no"], dup: ["Already on the board", "wait"], turn: ["It's not your team's turn", "wait"], busy: ["One answer at a time", "wait"], timeout: ["Time's up!", "no"], accepted: ["The host accepted your answer!", "ok"] };
@@ -2789,26 +3287,33 @@ function doBuzz() {
 }
 function renderTeam() {
   if (view !== "team") return;
-  const party = dmode === "party" && !!dpstate;
-  const connected = !!(dconn && dconn.open && (party ? dpstate : dstate));
+  const st = { classic: dstate, party: dpstate, remote: drstate, survey: dsstate }[dmode];
+  const connected = !!(dconn && dconn.open && st);
   $("#joinCard").hidden = connected;
-  $("#partyCard").hidden = !connected || !party;
-  $("#pickCard").hidden = !connected || party || join.team != null;
-  $("#padCard").hidden = !connected || party || join.team == null;
-  if (connected && party) { renderParty(); return; }
+  $("#partyCard").hidden = !connected || dmode !== "party";
+  $("#remoteCard").hidden = !connected || dmode !== "remote";
+  $("#surveyCard").hidden = !connected || dmode !== "survey";
+  $("#pickCard").hidden = !connected || dmode !== "classic" || join.team != null;
+  $("#padCard").hidden = !connected || dmode !== "classic" || join.team == null;
+  $("#joinRemoteRow").hidden = !opt("remote");
+  if (connected && dmode === "party") { renderParty(); return; }
+  if (connected && dmode === "remote") { renderRemote(); return; }
+  if (connected && dmode === "survey") { renderSurveyPad(); return; }
   if (!connected) {
     if (document.activeElement !== $("#join-code")) $("#join-code").value = join.code;
     if (document.activeElement !== $("#join-name")) $("#join-name").value = join.name;
     return;
   }
-  const s = dstate, T = join.team;
-  $("#pickA").textContent = s.teams[0].name || "Team A";
-  $("#pickB").textContent = s.teams[1].name || "Team B";
+  const s = dstate;
+  if (join.team != null && join.team >= s.teams.length) { join.team = null; saveJoin(); }
+  const T = join.team;
+  ["#pickA", "#pickB", "#pickC", "#pickD"].forEach((sel, t) => { $(sel).hidden = t >= s.teams.length; if (s.teams[t]) $(sel).textContent = s.teams[t].name || `Team ${t + 1}`; });
+  $("#pickCard").hidden = T != null;
   if (T == null) return;
-  const them = s.teams[1 - T].name || "The other team";
-  $("#padCard").classList.toggle("b", T === 1);
+  const them = (s.turn != null && s.turn !== T && s.teams[s.turn] ? s.teams[s.turn].name : s.teams[(T + 1) % s.teams.length].name) || "The other team";
+  ["b", "c", "d"].forEach((c, k) => $("#padCard").classList.toggle(c, T === k + 1));
   $("#padTeam").textContent = (s.teams[T].name || "Your team") + (join.name ? ` · ${join.name}` : "");
-  $("#padScores").innerHTML = `<span class="a">${esc(s.teams[0].name)} ${Number(s.teams[0].score) || 0}</span><span class="b">${esc(s.teams[1].name)} ${Number(s.teams[1].score) || 0}</span>`;
+  $("#padScores").innerHTML = s.teams.map((tm, k) => `<span class="${"abcd"[k]}">${esc(tm.name)} ${Number(tm.score) || 0}</span>`).join("");
   let msg = "", showBuzz = false, showForm = false, sk = 0;
   if (s.mode === "lobby") {
     $("#padRound").textContent = "Waiting";
@@ -2816,11 +3321,18 @@ function renderTeam() {
     $("#padBoard").innerHTML = "";
     msg = "When a round starts, the buzzer lights up here. Be quick!";
   } else if (s.mode === "over") {
-    const [a, b] = s.teams;
+    const top = s.teams.slice().sort((x, y) => y.score - x.score);
     $("#padRound").textContent = "Game over";
-    $("#padQ").textContent = a.score === b.score ? "It's a tie!" : `${a.score > b.score ? a.name : b.name} win!`;
+    $("#padQ").textContent = top.length > 1 && top[0].score === top[1].score ? "It's a tie!" : `${top[0].name} win!`;
     $("#padBoard").innerHTML = "";
     msg = "Thanks for playing!";
+  } else if (s.mode === "light") {
+    const mine = s.team === T, live = s.phase === "live";
+    $("#padRound").textContent = "Lightning round";
+    $("#padQ").textContent = live ? (mine ? `${s.qi + 1}. ${s.q}` : `${s.teams[s.team].name} are answering…`) : s.phase === "ready" ? `${s.teams[s.team].name} go next` : "Lightning round";
+    $("#padBoard").innerHTML = "";
+    showForm = mine && live;
+    msg = showForm ? "Type each answer fast. The host can also type what you say." : mine && s.phase === "ready" ? "Your team is up. Get ready!" : "Watch the board.";
   } else {
     $("#padRound").textContent = `Round ${s.round} of ${s.rounds}` + (s.mult > 1 ? ` · ${s.mult === 2 ? "Double" : "Triple"} points` : "");
     $("#padQ").textContent = s.q;
@@ -2854,14 +3366,57 @@ function renderTeam() {
   const form = $("#ansForm"), wasHidden = form.hidden;
   form.hidden = !showForm;
   if (showForm && wasHidden) { $("#ansIn").value = ""; $("#ansIn").focus(); sfx("ding"); }
-  dTimer = (s.mode === "game" && s.timeLeft != null)
-    ? { until: Date.now() + s.timeLeft, left: s.timeLeft, paused: !!s.timerPaused, max: (Number(s.timerMax) || 1) * 1000, mine: s.turn === T }
+  dTimer = ((s.mode === "game" || s.mode === "light") && s.timeLeft != null)
+    ? { until: Date.now() + s.timeLeft, left: s.timeLeft, paused: !!s.timerPaused, max: (Number(s.timerMax) || 1) * 1000, mine: s.mode === "light" ? s.team === T : s.turn === T }
     : null;
   renderPadTimer();
 }
-function renderParty() {
+function partyPre() {
   const s = dpstate;
+  const pickT = !!(s.teams && s.myTeam == null && s.mode !== "over");
+  $("#ppTeams").hidden = !pickT;
+  ["#ppBoard", "#ppStrikes", "#ppWrong"].forEach(x => { $(x).hidden = pickT; });
+  $("#ppPass").hidden = true;
+  if (pickT) {
+    $("#ppName").textContent = s.name || join.name || "You";
+    $("#ppRound").textContent = "Pick a team"; $("#ppRank").textContent = ""; $("#ppTotal").textContent = "";
+    $("#ppQ").textContent = "Which team are you on?";
+    $("#ppMsg").textContent = "A team's score is the average of its players, so team sizes don't matter.";
+    $("#ppTeams").innerHTML = s.teams.map((n, i) => `<button class="pickbtn" type="button" data-pt="${i}" style="--tc:${PTEAMS[i][1]};--tc-glow:${PTEAMS[i][1]}66">${esc(n)}</button>`).join("");
+    $("#ppForm").hidden = true; $("#ppTimer").hidden = true; dTimer = null;
+    return true;
+  }
+  if (s.mode === "lightning") { renderPartyLightning(s); return true; }
+  return false;
+}
+let lastLi = -1;
+function renderPartyLightning(s) {
   $("#ppName").textContent = s.name || join.name || "You";
+  $("#ppRound").textContent = "Lightning round";
+  $("#ppRank").textContent = s.rank ? `#${s.rank} of ${s.players}` : "";
+  $("#ppTotal").textContent = `${Number(s.total) || 0} pts`;
+  const live = s.lphase === "live", lans = s.lans || [];
+  $("#ppQ").textContent = live && !s.done ? `${s.li + 1}. ${s.lq}` : s.lphase === "ready" ? "Lightning round! Get ready…" : live ? "All done! Waiting for the others…" : "Lightning round over";
+  $("#ppBoard").innerHTML = s.tops
+    ? s.tops.map((t, i) => { const mine = lans[i]; return `<li class="${mine && mine[1] ? "on" : "missed"}"><span>${i + 1}. ${esc(t[0])}</span><b>${mine ? mine[1] : 0}</b><small class="whyline">Top answer: ${esc(t[1])} (${t[2]}) · You said: ${esc(mine ? mine[0] : "nothing")}</small></li>`; }).join("")
+    : lans.map((a, i) => `<li class="${a[1] ? "on" : "missed"}"><span>${i + 1}. ${esc(a[0])}${a[2] && a[2].toLowerCase() !== String(a[0]).toLowerCase() ? ` → ${esc(a[2])}` : ""}</span><b>${a[1]}</b></li>`).join("");
+  $("#ppStrikes").innerHTML = ""; $("#ppWrong").innerHTML = "";
+  $("#ppMsg").textContent = live && !s.done ? "Type fast! Each answer scores its board points. Pass skips a question."
+    : s.lphase === "ready" ? "Five quick questions. Answer as many as you can before time runs out."
+    : `You scored ${lans.reduce((a, x) => a + (Number(x[1]) || 0), 0)} in the lightning round.`;
+  const form = $("#ppForm"), was = form.hidden, showF = live && !s.done;
+  form.hidden = !showF; $("#ppPass").hidden = !showF;
+  if (showF && (was || lastLi !== s.li)) { $("#ppIn").value = ""; $("#ppIn").focus(); }
+  lastLi = s.li;
+  dTimer = live && s.timeLeft != null ? { until: Date.now() + s.timeLeft, left: s.timeLeft, paused: !!s.timerPaused, max: (Number(s.timerMax) || 1) * 1000, mine: !s.done } : null;
+  renderPadTimer();
+}
+$("#ppTeams").addEventListener("click", e => { const b = e.target.closest("[data-pt]"); if (b && dconn && dconn.open) dconn.send({ t: "pteam", team: Number(b.dataset.pt) }); });
+$("#ppPass").addEventListener("click", () => { if (dconn && dconn.open) dconn.send({ t: "lguess", text: "" }); });
+function renderParty() {
+  if (partyPre()) return;
+  const s = dpstate;
+  $("#ppName").textContent = (s.name || join.name || "You") + (s.teams && s.myTeam != null ? ` · ${s.teams[s.myTeam]} team` : "");
   $("#ppRound").textContent = s.mode === "lobby" ? "Lobby" : s.mode === "over" ? "Game over"
     : `Round ${s.round} of ${s.rounds}` + (s.mult > 1 ? ` · ${s.mult === 2 ? "Double" : "Triple"} points` : "");
   $("#ppRank").textContent = s.rank ? `#${s.rank} of ${s.players}` : "";
@@ -2877,8 +3432,9 @@ function renderParty() {
     $("#ppQ").textContent = s.q;
     for (let i = 0; i < s.n; i++) {
       const f = s.found && s.found[i], a = s.all && s.all[i];
-      board += f ? `<li class="on"><span>${esc(f[0])}</span><b>${f[2] ? "⚡ " : ""}${esc(f[1])}</b></li>`
-        : a ? `<li class="missed"><span>${esc(a[0])}</span><b>${esc(a[1])}</b></li>`
+      const w = a && a[2] ? `<small class="whyline">${esc(a[2])}</small>` : "";
+      board += f ? `<li class="on"><span>${esc(f[0])}</span><b>${f[2] ? "⚡ " : ""}${esc(f[1])}</b>${w}</li>`
+        : a ? `<li class="missed"><span>${esc(a[0])}</span><b>${esc(a[1])}</b>${w}</li>`
         : `<li><span>${i + 1}</span></li>`;
     }
     strikes = s.strikeLimit > 0
@@ -2945,7 +3501,7 @@ $("#ppForm").addEventListener("submit", e => {
   e.preventDefault();
   const v = $("#ppIn").value.trim();
   if (!v || !dconn || !dconn.open) return;
-  dconn.send({ t: "pguess", text: v });
+  dconn.send({ t: dpstate && dpstate.mode === "lightning" ? "lguess" : "pguess", text: v });
   $("#ppIn").value = ""; $("#ppIn").focus();
 });
 $("#ppLeave").addEventListener("click", () => { leaveJoin(); setJoinStatus("You left the game."); });
@@ -2953,7 +3509,7 @@ $("#ansForm").addEventListener("submit", e => {
   e.preventDefault();
   const v = $("#ansIn").value.trim();
   if (!v || !dconn || !dconn.open) return;
-  dconn.send({ t: "answer", text: v });
+  dconn.send({ t: dstate && dstate.mode === "light" ? "lguess" : "answer", text: v });
   $("#ansIn").value = "";
   const fb = $("#padFb");
   fb.textContent = `Sent: “${v}”`; fb.className = "fb wait"; fb.hidden = false;
@@ -2969,7 +3525,7 @@ let gToken = null, gTokenExp = 0, gClient = null, gisLoading = null;
 
 function exportData() {
   const p = {}; PREF_KEYS.forEach(k => { p[k] = prefs[k]; });
-  return { app: "survey-showdown", version: 1, savedAt: new Date().toISOString(), library: lib, prefs: p, game: game && !game.over ? game : null };
+  return { app: "survey-showdown", version: 1, savedAt: new Date().toISOString(), library: lib, prefs: p, game: game && !game.over ? game : null, history: gameHistory.slice(0, 60) };
 }
 function importData(d) {
   if (!d || d.app !== "survey-showdown" || !d.library || !Array.isArray(d.library.sets)) return false;
@@ -2977,11 +3533,16 @@ function importData(d) {
   if (!sets.length) return false;
   lib = { sets: sets.map(s => ({ id: String(s.id || newId()).slice(0, 40), name: s.name.slice(0, 40),
     questions: s.questions.map(q => ({ q: String(q.q), m: [1, 2, 3].includes(Number(q.m)) ? Number(q.m) : 1,
-      answers: q.answers.slice(0, 8).map(a => ({ t: String(a.t), p: Number(a.p) || 0, alt: String(a.alt || "") })) })) })) };
+      answers: q.answers.slice(0, 8).map(a => ({ t: String(a.t), p: Number(a.p) || 0, alt: String(a.alt || ""), why: String(a.why || "") })) })) })) };
   saveLib();
   if (d.prefs && typeof d.prefs === "object") { PREF_KEYS.forEach(k => { if (k in d.prefs) prefs[k] = d.prefs[k]; }); }
+  if (Array.isArray(d.history)) {
+    const have = new Set(gameHistory.map(h => h.id));
+    gameHistory = gameHistory.concat(d.history.filter(h => h && h.id && !have.has(h.id) && Array.isArray(h.results))).sort((a, b) => b.at - a.at);
+    saveHistory();
+  }
   prefs.editSet = lib.sets[0].id; fixTopics(); savePrefs(); syncSound();
-  if (d.game && Array.isArray(d.game.qs) && Array.isArray(d.game.teams) && d.game.teams.length === 2) {
+  if (d.game && Array.isArray(d.game.qs) && ((Array.isArray(d.game.teams) && d.game.teams.length >= 2) || d.game.mode === "party")) {
     game = d.game; game.deadline = null; game.paused = null; history = []; boardKey = null; saveGame();
   }
   show(view === "editor" ? "editor" : "setup");
@@ -3093,11 +3654,933 @@ $("#fileOpen").addEventListener("change", e => {
 });
 if (!inClaude && GOOGLE_CLIENT_ID) loadGis().catch(() => {});
 
+/* =====================================================================
+   OPTIONAL FEATURES (each can be turned off in Setup → Options)
+   ===================================================================== */
+const OPT_DEFS = [
+  ["Teaching", "explain", "Explanation cards", "Show a short “why” for answers after they're revealed. Add them in the editor."],
+  ["Teaching", "survey", "Class survey mode", "Students answer your questions first; the app builds boards from their real answers."],
+  ["Teaching", "report", "Mistake report", "After a game, see the most-missed answers and the most common wrong guesses."],
+  ["Teaching", "ai", "Make questions with AI", "Draft questions from a topic or notes with Claude. Needs an Anthropic API key."],
+  ["Teaching", "sheet", "Import from a spreadsheet", "Paste rows from Google Sheets or Excel, or open a CSV file."],
+  ["Running the game", "remote", "Host remote", "Run the game from your phone, with the hidden answers on it."],
+  ["Running the game", "lightning", "Lightning round", "Finish a game with five quick questions against the clock."],
+  ["Running the game", "audio", "Sound and music settings", "Volume controls, background music and quiet mode."],
+  ["Running the game", "pause", "Pause screen", "Cover the board and stop the clocks with one tap."],
+  ["Teams and fairness", "teams", "Teams in Everyone plays", "Several computers share one team score."],
+  ["Teams and fairness", "filter", "Name filter", "Automatically replaces inappropriate player names."],
+  ["Teams and fairness", "catchup", "Late-join help", "Players who join mid-game start with the average score so far."],
+  ["Teams and fairness", "multi", "3 or 4 teams", "Play the two-team game with up to four teams."],
+  ["Saving and sharing", "share", "Share topics by link", "Send another teacher a link that adds your topic to their game."],
+  ["Saving and sharing", "library", "Topic library", "Browse ready-made topics and add them in one tap."],
+  ["Saving and sharing", "history", "Game history", "Keep final scores and mistake reports from past games."],
+  ["Saving and sharing", "classroom", "Google Classroom button", "Post the join link or a topic link to a class."]
+];
+function opt(k) { return !prefs.opt || prefs.opt[k] !== false; }
+function applyOpts() {
+  let css = "";
+  OPT_DEFS.forEach(([, k]) => { if (!opt(k)) css += `[data-opt~="${k}"]{display:none!important}`; });
+  let st = document.getElementById("optStyle");
+  if (!st) { st = document.createElement("style"); st.id = "optStyle"; document.head.appendChild(st); }
+  st.textContent = css;
+  $("#pauseBtn").hidden = !(opt("pause") && ["game", "party", "lightning"].includes(view));
+}
+function renderOptions() {
+  const groups = {};
+  OPT_DEFS.forEach(([g, k, label, d]) => {
+    (groups[g] = groups[g] || []).push(`<label class="optitem"><input type="checkbox" data-optk="${k}"${opt(k) ? " checked" : ""}><b>${label}</b><span>${d}</span></label>`);
+  });
+  $("#optList").innerHTML = Object.entries(groups).map(([g, items]) => `<div class="optgroup"><h4>${g}</h4>${items.join("")}</div>`).join("");
+}
+$("#optList").addEventListener("change", e => {
+  const k = e.target.dataset.optk; if (!k) return;
+  prefs.opt = Object.assign({}, prefs.opt, { [k]: e.target.checked }); savePrefs(); applyOpts();
+  if (k === "audio") { syncSound(); syncMusic(); }
+  if (k === "multi" || k === "teams" || k === "lightning" || k === "history") renderSetup();
+});
+
+/* ---------- Simple modal ---------- */
+function modal(title, bodyHtml, buttons) {
+  $("#modalTitle").textContent = title;
+  $("#modalBody").innerHTML = bodyHtml;
+  const box = $("#modalBtns"); box.innerHTML = "";
+  (buttons && buttons.length ? buttons : [{ label: "Close" }]).forEach(b => {
+    const el = document.createElement("button");
+    el.type = "button"; el.className = "btn " + (b.cls || ""); el.textContent = b.label;
+    el.addEventListener("click", () => { if (!b.keep) closeModal(); if (b.fn) b.fn(); });
+    box.appendChild(el);
+  });
+  $("#modal").hidden = false;
+  box.lastElementChild && box.lastElementChild.focus();
+}
+function closeModal() { $("#modal").hidden = true; }
+$("#modal").addEventListener("click", e => { if (e.target.id === "modal") closeModal(); });
+
+/* ---------- Pause screen ---------- */
+let hostPaused = false;
+function clockOwner() { return game && game.lightning && game.lightning.phase === "live" ? game.lightning : game; }
+function setPause(on) {
+  if (!game || game.over) on = false;
+  hostPaused = on;
+  $("#pauseScreen").hidden = !on;
+  $("#pauseBtn").textContent = on ? "Resume" : "Pause";
+  const c = clockOwner();
+  if (c) {
+    if (on && c.deadline != null) { c.paused = Math.max(0, c.deadline - Date.now()); c.deadline = null; c.pauseHeld = true; }
+    if (!on && c.pauseHeld && c.paused != null) { c.deadline = Date.now() + c.paused; c.paused = null; c.pauseHeld = false; }
+    saveGame();
+  }
+  syncMusic();
+  if (view === "game") renderGame(); else if (view === "party") partyRender(); else if (view === "lightning") lightRender();
+  if (!["game", "party"].includes(view)) broadcast();
+}
+function devicePause(on) { $("#devPause").hidden = !on || view !== "team"; }
+$("#pauseBtn").addEventListener("click", () => setPause(!hostPaused));
+$("#resumeFromPause").addEventListener("click", () => setPause(false));
+
+/* ---------- Sound and music settings ---------- */
+let fxNode = null, musNode = null, musTimer = null, musStep = 0;
+function fxOut() {
+  const c = ctx();
+  if (!fxNode) { fxNode = c.createGain(); fxNode.connect(c.destination); }
+  fxNode.gain.value = prefs.quiet ? 0 : (opt("audio") ? Number(prefs.fxVol ?? 1) : 1);
+  return fxNode;
+}
+const PROG = [[48, 60, 64, 67], [45, 57, 60, 64], [41, 53, 57, 60], [43, 55, 59, 62]];   // an original I–vi–IV–V loop
+const hz = n => 440 * Math.pow(2, (n - 69) / 12);
+function musicNote(f, t, dur, type, vol) {
+  const c = actx; if (!c || !musNode) return;
+  const o = c.createOscillator(), g = c.createGain();
+  o.type = type; o.frequency.value = f;
+  g.gain.setValueAtTime(0.0001, t); g.gain.exponentialRampToValueAtTime(vol, t + 0.02); g.gain.exponentialRampToValueAtTime(0.0001, t + dur);
+  o.connect(g).connect(musNode); o.start(t); o.stop(t + dur + 0.05);
+}
+function musicStep() {
+  const c = actx; if (!c) return;
+  const chord = PROG[Math.floor(musStep / 8) % 4], k = musStep % 8, t = c.currentTime + 0.03;
+  if (k % 4 === 0) musicNote(hz(chord[0] - 12), t, 0.5, "triangle", 0.22);
+  musicNote(hz([chord[1], chord[2], chord[3], chord[2]][k % 4] + 12), t, 0.16, "square", 0.05);
+  if (k === 6) musicNote(hz(chord[3] + 12), t, 0.12, "triangle", 0.06);
+  musStep++;
+}
+function syncMusic() {
+  const want = !!(actx && opt("audio") && prefs.musicOn && prefs.sound && !prefs.quiet && !hostPaused && ["game", "party", "lightning"].includes(view));
+  if (want) {
+    if (!musNode) { musNode = actx.createGain(); musNode.connect(actx.destination); }
+    musNode.gain.value = 0.6 * Number(prefs.musicVol ?? 0.4);
+    if (!musTimer) musTimer = setInterval(musicStep, 200);
+  } else if (musTimer) { clearInterval(musTimer); musTimer = null; }
+}
+function syncSoundPanel() {
+  $("#fxVol").value = String(prefs.fxVol ?? 1);
+  $("#musicOn").checked = !!prefs.musicOn;
+  $("#musicVol").value = String(prefs.musicVol ?? 0.4);
+  $("#quietOn").checked = !!prefs.quiet;
+}
+$("#fxVol").addEventListener("input", e => { prefs.fxVol = Number(e.target.value); savePrefs(); fxOut(); });
+$("#fxVol").addEventListener("change", () => sfx("ding"));
+$("#musicOn").addEventListener("change", e => { prefs.musicOn = e.target.checked; savePrefs(); ctx(); syncMusic(); syncSound(); });
+$("#musicVol").addEventListener("input", e => { prefs.musicVol = Number(e.target.value); savePrefs(); syncMusic(); });
+$("#quietOn").addEventListener("change", e => { prefs.quiet = e.target.checked; savePrefs(); fxOut(); syncSound(); syncMusic(); });
+document.addEventListener("pointerdown", e => {
+  const p = $("#soundPanel");
+  if (!p.hidden && !p.contains(e.target) && e.target.id !== "soundBtn") p.hidden = true;
+});
+
+/* ---------- Explanation cards ---------- */
+function renderWhy() {
+  const box = $("#whyBox");
+  if (!opt("explain") || !game || !game.teams || game.over) { box.hidden = true; return; }
+  const q = curQ();
+  const last = game.revealed.slice().reverse().find(i => q.answers[i] && String(q.answers[i].why || "").trim());
+  if (last == null) { box.hidden = true; return; }
+  box.hidden = false;
+  box.innerHTML = `<b>${esc(q.answers[last].t)}:</b> ${esc(q.answers[last].why)}`;
+}
+function renderPartyWhy() {
+  const box = $("#pWhy");
+  if (!opt("explain") || !isParty() || game.pphase !== "reveal" || game.over) { box.hidden = true; return; }
+  const items = curQ().answers.filter(a => String(a.why || "").trim());
+  box.hidden = !items.length;
+  box.innerHTML = items.map(a => `<div><b>${esc(a.t)}:</b> ${esc(a.why)}</div>`).join("");
+}
+
+/* ---------- Spreadsheet import ---------- */
+function parseDelimited(text) {
+  const src = String(text).replace(/\r\n?/g, "\n");
+  const delim = src.includes("\t") ? "\t" : ",";
+  const rows = []; let row = [], cell = "", q = false;
+  for (let i = 0; i < src.length; i++) {
+    const ch = src[i];
+    if (q) {
+      if (ch === '"' && src[i + 1] === '"') { cell += '"'; i++; }
+      else if (ch === '"') q = false;
+      else cell += ch;
+    } else if (ch === '"' && cell === "") q = true;
+    else if (ch === delim) { row.push(cell); cell = ""; }
+    else if (ch === "\n") { row.push(cell); rows.push(row); row = []; cell = ""; }
+    else cell += ch;
+  }
+  if (cell !== "" || row.length) { row.push(cell); rows.push(row); }
+  return rows.filter(r => r.some(c => String(c).trim()));
+}
+function sheetToQuestions(text) {
+  const rows = parseDelimited(text);
+  if (rows.length && /question/i.test(rows[0][0] || "") && /answer/i.test(rows[0][1] || "")) rows.shift();
+  const out = []; let cur = null;
+  rows.forEach(r => {
+    const [qq, a, p, alt, why] = r.map(c => String(c || "").trim());
+    if (qq) { cur = { q: qq, m: 1, answers: [] }; out.push(cur); }
+    if (cur && a && cur.answers.length < 8) cur.answers.push({ t: a.slice(0, 60), p: Math.max(0, parseInt(p, 10) || 0), alt: alt || "", why: why || "" });
+  });
+  return out.filter(x => x.answers.length).map(x => { x.answers.sort((a, b) => b.p - a.p); return x; });
+}
+function addImported(list, asNew, label) {
+  if (!list.length) return 0;
+  if (asNew) {
+    const s = { id: newId(), name: label, questions: list };
+    lib.sets.push(s); prefs.editSet = s.id; savePrefs(); saveLib();
+  } else { pack = pack.concat(list); savePack(); }
+  renderEditor();
+  return list.length;
+}
+const todayLabel = () => new Date().toLocaleDateString([], { month: "short", day: "numeric" });
+$("#sheetAdd").addEventListener("click", () => {
+  const n = addImported(sheetToQuestions($("#sheetIn").value), false);
+  $("#sheetStatus").textContent = n ? `Added ${n} question${n === 1 ? "" : "s"} to “${edSet().name}”.` : "No questions found. Check the columns: Question, Answer, Points, Also accept, Explanation.";
+});
+$("#sheetNew").addEventListener("click", () => {
+  const n = addImported(sheetToQuestions($("#sheetIn").value), true, `Imported ${todayLabel()}`);
+  $("#sheetStatus").textContent = n ? `Made a new topic with ${n} question${n === 1 ? "" : "s"}. Rename it above.` : "No questions found. Check the columns: Question, Answer, Points, Also accept, Explanation.";
+});
+$("#sheetTemplate").addEventListener("click", () => {
+  const t = "Question\tAnswer\tPoints\tAlso accept\tExplanation\nName a primary color\tRed\t40\t\tOne of the three paint primaries\n\tBlue\t35\t\t\n\tYellow\t25\t\t";
+  $("#sheetIn").value = t;
+  try { navigator.clipboard.writeText(t).then(() => toast("Template copied. Paste it into a new spreadsheet."), () => toast("Template is in the box. Copy it from there.")); } catch (e) { toast("Template is in the box. Copy it from there."); }
+});
+$("#sheetFile").addEventListener("change", e => {
+  const f = e.target.files[0]; if (!f) return;
+  const r = new FileReader(); r.onload = () => { $("#sheetIn").value = String(r.result); $("#sheetStatus").textContent = `Loaded “${f.name}”. Choose Add or New topic.`; };
+  r.readAsText(f); e.target.value = "";
+});
+
+/* ---------- Share topics by link, and Google Classroom ---------- */
+const baseUrl = () => location.origin + location.pathname;
+const b64url = buf => btoa(String.fromCharCode(...new Uint8Array(buf))).replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/, "");
+const unb64url = s => Uint8Array.from(atob(s.replace(/-/g, "+").replace(/_/g, "/")), c => c.charCodeAt(0));
+async function encodeTopic(set) {
+  const json = JSON.stringify({ v: 1, name: set.name, questions: set.questions });
+  const stream = new Blob([json]).stream().pipeThrough(new CompressionStream("deflate-raw"));
+  return b64url(await new Response(stream).arrayBuffer());
+}
+async function decodeTopic(code) {
+  const stream = new Blob([unb64url(code)]).stream().pipeThrough(new DecompressionStream("deflate-raw"));
+  return JSON.parse(await new Response(stream).text());
+}
+function classroomShare(url, title) {
+  const a = document.createElement("a");
+  a.href = "https://classroom.google.com/share?url=" + encodeURIComponent(url) + "&title=" + encodeURIComponent(title);
+  a.target = "_blank"; a.rel = "noopener"; document.body.appendChild(a); a.click(); a.remove();
+}
+async function shareCurrentTopic(toClassroom) {
+  try {
+    const link = `${baseUrl()}#topic=${await encodeTopic(edSet())}`;
+    if (toClassroom) { classroomShare(link, `Survey Showdown topic: ${edSet().name}`); return; }
+    const out = $("#shareOut"); out.hidden = false; out.value = link; out.focus(); out.select();
+    try { await navigator.clipboard.writeText(link); toast("Link copied. Anyone who opens it can add this topic."); }
+    catch (e) { toast("Link is selected. Press Ctrl+C to copy."); }
+  } catch (e) { toast("This browser can't make share links. Try Chrome or Edge."); }
+}
+$("#shareTopic").addEventListener("click", () => shareCurrentTopic(false));
+$("#shareTopicClassroom").addEventListener("click", () => shareCurrentTopic(true));
+const joinLink = () => `${baseUrl()}#join-${prefs.code || ""}`;
+$("#classroomBtn").addEventListener("click", () => classroomShare(joinLink(), "Join our Survey Showdown game"));
+$("#pClassroom").addEventListener("click", () => classroomShare(joinLink(), "Join our Survey Showdown game"));
+async function checkSharedTopic() {
+  const h = location.hash;
+  if (!h.startsWith("#topic=")) return false;
+  try { window.history.replaceState(null, "", location.pathname + location.search); } catch (e) {}
+  try {
+    const d = await decodeTopic(h.slice(7));
+    if (!d || !Array.isArray(d.questions) || !validQs(d.questions)) throw new Error("bad");
+    const name = String(d.name || "Shared topic").slice(0, 40);
+    modal(`Add “${name}”?`, `<p>Someone shared a topic with ${d.questions.length} question${d.questions.length === 1 ? "" : "s"}. Add it to your topics?</p>`, [
+      { label: "Not now", cls: "ghost" },
+      { label: "Add topic", cls: "sun", fn: () => {
+        const taken = lib.sets.some(s => s.name === name);
+        lib.sets.push({ id: newId(), name: taken ? `${name} (shared)` : name, questions: d.questions.map(q => ({ q: String(q.q), m: Number(q.m) || 1, answers: q.answers.slice(0, 8).map(a => ({ t: String(a.t), p: Number(a.p) || 0, alt: String(a.alt || ""), why: String(a.why || "") })) })) });
+        saveLib(); renderSetup(); toast(`Added “${name}”. Tick it under Topics to play.`);
+      } }
+    ]);
+  } catch (e) { toast("That share link didn't work. Ask for a fresh link."); }
+  return true;
+}
+
+/* ---------- Topic library ---------- */
+const W = (q, a) => ({ q, m: 1, answers: a.map(([t, p, alt, why]) => ({ t, p, alt: alt || "", why: why || "" })) });
+const LIBRARY = [
+  { id: "lib-biology", name: "Biology", questions: [
+    W("Name a part of a cell", [["Nucleus", 34, "nuclei", "Holds the cell's DNA"], ["Cell membrane", 22, "membrane, plasma membrane", "Controls what enters and leaves"], ["Mitochondria", 18, "mitochondrion", "Makes energy (ATP) for the cell"], ["Cytoplasm", 12, "", "Jelly-like fluid inside the cell"], ["Ribosome", 8, "ribosomes", "Builds proteins"], ["Cell wall", 6, "", "Rigid outer layer in plant cells"]]),
+    W("Name something living things need to survive", [["Water", 32, "h2o", "Every cell needs water to work"], ["Food", 26, "nutrients, energy", "Supplies energy and building materials"], ["Oxygen", 18, "air, o2", "Used to release energy from food"], ["Shelter", 12, "home, habitat", "Protection from weather and predators"], ["Sunlight", 8, "sun, light", "Powers photosynthesis in plants"], ["Space", 4, "room", "Room to find food and grow"]]),
+    W("Name an organ system in the human body", [["Digestive", 26, "digestion", "Breaks down food"], ["Circulatory", 22, "cardiovascular, heart", "Moves blood around the body"], ["Respiratory", 18, "lungs, breathing", "Brings in oxygen"], ["Nervous", 16, "brain, nerves", "Sends signals around the body"], ["Skeletal", 10, "bones, skeleton", "Supports and protects the body"], ["Muscular", 8, "muscles", "Lets the body move"]]),
+    W("Name something that can cause a disease", [["Virus", 36, "viruses", "Like flu and COVID-19"], ["Bacteria", 30, "germs, bacterium", "Like strep throat"], ["Fungus", 12, "fungi, mold", "Like athlete's foot"], ["Parasite", 10, "parasites, worms", "Lives on or in a host"], ["Poor diet", 7, "diet, bad food", "Can lead to deficiency diseases"], ["Genes", 5, "genetics, dna", "Some diseases are inherited"]])
+  ] },
+  { id: "lib-chemistry", name: "Chemistry", questions: [
+    W("Name an element on the periodic table", [["Oxygen", 26, "o", "Atomic number 8"], ["Hydrogen", 22, "h", "The lightest element"], ["Carbon", 16, "c", "Basis of life on Earth"], ["Gold", 12, "au", "Symbol Au, from Latin aurum"], ["Iron", 10, "fe", "Symbol Fe"], ["Helium", 8, "he", "Makes balloons float"], ["Nitrogen", 6, "n", "About 78% of air"]]),
+    W("Name a part of an atom", [["Proton", 36, "protons", "Positive charge, in the nucleus"], ["Electron", 32, "electrons", "Negative charge, orbits the nucleus"], ["Neutron", 26, "neutrons", "No charge, in the nucleus"], ["Nucleus", 6, "", "The dense center of the atom"]]),
+    W("Name something that is a chemical change", [["Burning", 32, "fire, combustion, burn", "Makes new substances like ash and CO2"], ["Rusting", 24, "rust, corrosion", "Iron reacts with oxygen"], ["Cooking", 18, "baking, cooking food", "Heat changes food's chemistry"], ["Rotting", 12, "decay, rot, spoiling", "Microbes break things down"], ["Digesting food", 8, "digestion", "Enzymes break food apart"], ["Fireworks", 6, "explosion", "Fast reactions that release light"]]),
+    W("Name an acid or a base found at home", [["Vinegar", 28, "", "Acetic acid"], ["Lemon juice", 24, "lemon, citrus", "Citric acid"], ["Baking soda", 18, "", "A mild base"], ["Bleach", 12, "", "A strong base; never mix with acids"], ["Soap", 10, "", "Usually basic"], ["Soda", 8, "pop, cola", "Contains carbonic and phosphoric acid"]])
+  ] },
+  { id: "lib-worldhistory", name: "World History", questions: [
+    W("Name an ancient civilization", [["Egypt", 30, "egyptians, ancient egypt", "Built pyramids along the Nile"], ["Rome", 24, "romans, roman empire", "Empire around the Mediterranean"], ["Greece", 20, "greeks, ancient greece", "Birthplace of democracy"], ["Maya", 10, "mayans, mayan", "Built cities in Central America"], ["China", 8, "chinese, ancient china", "Built the Great Wall"], ["Mesopotamia", 8, "sumer, sumerians", "Early writing (cuneiform)"]]),
+    W("Name a famous world leader from history", [["Napoleon", 22, "napoleon bonaparte", "French emperor"], ["Julius Caesar", 20, "caesar", "Roman leader"], ["Winston Churchill", 16, "churchill", "UK prime minister in WWII"], ["Gandhi", 14, "mahatma gandhi", "Led India's independence movement"], ["Nelson Mandela", 14, "mandela", "First Black president of South Africa"], ["Cleopatra", 14, "", "Last active ruler of Ptolemaic Egypt"]]),
+    W("Name a cause of World War I", [["Assassination of Franz Ferdinand", 34, "franz ferdinand, archduke, assassination", "The spark in 1914"], ["Alliances", 24, "alliance system", "Pulled many nations in"], ["Nationalism", 18, "", "Intense national pride and rivalry"], ["Imperialism", 14, "empires, colonies", "Competition for colonies"], ["Militarism", 10, "arms race, military", "Build-up of armies and navies"]]),
+    W("Name an invention that changed the world", [["Printing press", 24, "printing, gutenberg", "Spread books and ideas"], ["Internet", 22, "", "Connected the world"], ["Electricity", 16, "light bulb, lightbulb", "Powered modern life"], ["Wheel", 14, "", "Transport and machines"], ["Steam engine", 12, "", "Powered the Industrial Revolution"], ["Telephone", 12, "phone", "Instant long-distance talk"]])
+  ] },
+  { id: "lib-civics", name: "Civics & Government", questions: [
+    W("Name one of the three branches of U.S. government", [["Legislative", 36, "congress, legislature", "Makes the laws"], ["Executive", 34, "president", "Carries out the laws"], ["Judicial", 30, "courts, supreme court, judiciary", "Interprets the laws"]]),
+    W("Name a right or duty of a U.S. citizen", [["Voting", 34, "vote", "Citizens 18+ can vote"], ["Jury duty", 22, "serve on a jury, jury", "Serving when called"], ["Paying taxes", 18, "taxes", "Funds public services"], ["Free speech", 14, "speech, freedom of speech", "Protected by the First Amendment"], ["Obeying laws", 12, "follow laws, laws", "A basic responsibility"]]),
+    W("Name something the federal government does", [["Makes laws", 26, "laws", "Through Congress"], ["Collects taxes", 20, "taxes", "Mostly income taxes"], ["Runs the military", 18, "military, defense, army", "Defends the country"], ["Prints money", 14, "money, currency", "Through the Treasury"], ["Makes treaties", 12, "treaties, foreign policy", "Deals with other countries"], ["Runs the mail", 10, "mail, post office", "The U.S. Postal Service"]]),
+    W("Name a way people can take part in democracy", [["Vote", 40, "voting", "Choose leaders"], ["Protest", 18, "march, protesting", "Peaceful assembly is protected"], ["Contact officials", 14, "write to congress, call representative", "Tell leaders your views"], ["Run for office", 12, "run for election", "Become a leader"], ["Volunteer", 10, "campaign", "Help campaigns and communities"], ["Sign a petition", 6, "petition", "Ask government for change"]])
+  ] },
+  { id: "lib-finance", name: "Personal Finance", questions: [
+    W("Name something people budget money for", [["Rent", 26, "housing, mortgage", "Usually the biggest expense"], ["Food", 22, "groceries", "A need every month"], ["Gas", 14, "transportation, car", "Getting to work and school"], ["Bills", 14, "utilities, phone bill", "Electricity, water, phone"], ["Savings", 12, "saving", "Pay yourself first"], ["Entertainment", 12, "fun, going out", "Wants, not needs"]]),
+    W("Name a way to save money", [["Cook at home", 26, "cooking, eat at home", "Cheaper than eating out"], ["Use coupons", 18, "coupons, discounts", "Lower prices"], ["Make a budget", 18, "budget", "Plan spending ahead"], ["Buy used", 14, "thrift, secondhand", "Thrift stores and resale"], ["Open a savings account", 14, "savings account, bank", "Earn interest"], ["Skip impulse buys", 10, "impulse buying", "Wait before you buy"]]),
+    W("Name something that affects your credit score", [["Paying bills on time", 36, "on time payments, late payments", "The biggest factor"], ["Debt", 24, "credit card debt, how much you owe", "Lower balances help"], ["Credit history length", 16, "credit history, age of credit", "Longer is better"], ["New credit", 12, "opening cards, applying for credit", "Many applications can lower it"], ["Credit mix", 12, "types of credit", "Different kinds of loans"]]),
+    W("Name a way to earn money as a teenager", [["Part-time job", 34, "job, work", "Retail, food service, etc."], ["Babysitting", 20, "", "Caring for kids"], ["Mowing lawns", 14, "lawn care, yard work", "Seasonal work"], ["Selling things online", 12, "reselling, selling online", "Clothes, crafts, collectibles"], ["Tutoring", 10, "", "Help younger students"], ["Allowance", 10, "chores", "Money for chores at home"]])
+  ] },
+  { id: "lib-compsci", name: "Computer Science", questions: [
+    W("Name a programming language", [["Python", 30, "", "Popular for beginners and data"], ["JavaScript", 22, "js", "Runs in web browsers"], ["Java", 18, "", "Used for Android apps"], ["C++", 10, "c plus plus, cpp", "Fast; used in games"], ["HTML", 10, "", "Technically a markup language"], ["Scratch", 10, "", "Block-based coding"]]),
+    W("Name a part of a computer", [["Keyboard", 22, "", "Input device"], ["CPU", 20, "processor", "The computer's brain"], ["Monitor", 18, "screen, display", "Output device"], ["Mouse", 14, "", "Input device"], ["Hard drive", 14, "storage, ssd", "Stores files long term"], ["RAM", 12, "memory", "Short-term working memory"]]),
+    W("Name a way to stay safe online", [["Strong passwords", 32, "password, passwords", "Long and unique"], ["Don't share personal info", 24, "privacy, personal information", "Keep address and phone private"], ["Two-factor authentication", 16, "2fa, two factor", "A second step to log in"], ["Avoid strange links", 14, "phishing, suspicious links", "Phishing tricks people"], ["Antivirus", 8, "anti virus", "Blocks malware"], ["Update software", 6, "updates", "Fixes security holes"]]),
+    W("Name something a computer program uses", [["Variables", 28, "variable", "Store values"], ["Loops", 24, "loop, for loop, while loop", "Repeat steps"], ["If statements", 20, "conditionals, if", "Make decisions"], ["Functions", 16, "function, methods", "Reusable blocks of code"], ["Lists", 12, "arrays, array, list", "Hold many values"]])
+  ] }
+];
+function openLibrary() {
+  const all = [...STARTER, ...LIBRARY];
+  const rows = all.map(s => {
+    const have = !!setById(s.id);
+    return `<div class="hrow"><div><b>${esc(s.name)}</b><small>${s.questions.length} questions${LIBRARY.includes(s) ? " · with explanations" : ""}</small></div>
+      <button class="btn ${have ? "ghost" : "sun"}" type="button" data-lib="${esc(s.id)}"${have ? " disabled" : ""}>${have ? "Added ✓" : "Add"}</button></div>`;
+  }).join("");
+  modal("Topic library", `<p class="note">Ready-made topics. Points are made up for practice; edit anything after you add it.</p><div class="hist">${rows}</div>`);
+  $("#modalBody").onclick = e => {
+    const b = e.target.closest("[data-lib]"); if (!b) return;
+    const s = all.find(x => x.id === b.dataset.lib); if (!s || setById(s.id)) return;
+    lib.sets.push({ id: s.id, name: s.name, questions: clone(s.questions) }); saveLib();
+    b.disabled = true; b.textContent = "Added ✓"; b.className = "btn ghost";
+    renderSetup(); toast(`Added “${s.name}”`);
+  };
+}
+$("#libraryBtn").addEventListener("click", openLibrary);
+
+/* ---------- Name filter ---------- */
+const BAD_SUB = atob("ZnVjayxzaGl0LGJpdGNoLGN1bnQsbmlnZyxmYWdnLHdob3JlLHNsdXQscGVuaXMsdmFnaW4scG9ybixkaWxkbyxyYXBpc3QsbmF6aSxoaXRsZXIscmV0YXJkLGhvcm55LGJvb2IsdGl0dGllLHB1c3N5LGJhc3RhcmQsYXNzaG9sZSxqYWNrYXNzLGR1bWJhc3MsdHdhdCxjaGluayxtb2xlc3QsbWlsZixqaXp6LGJsb3dqb2IsaGFuZGpvYixzY3JvdHVtLHRlc3RpY2xlLG5pcHBsZSxvcmdhc20sa2tr").split(",");
+const BAD_WORD = new Set(atob("YXNzLHNleCxhbmFsLGN1bSx0aXQsdGl0cyxob2UsaG9lcyx3dGYsc3RmdSxkaWNrLGRpY2tzLHRob3Qsc3BpYyxraWtlLGZhZyxuaWcscmFwZSxzZXh5LG51ZGUsbmFrZWQsYnV0dCxwb29wLHBlZSxmYXJ0LHBlZG8sY29jayxjb2NrcyxhbnVzLHdhbms=").split(","));
+function nameIsBad(name) {
+  const lower = String(name || "").toLowerCase().replace(/[0@4]/g, m => ({ "0": "o", "@": "a", "4": "a" })[m])
+    .replace(/[1!|]/g, "i").replace(/3/g, "e").replace(/[5$]/g, "s").replace(/7/g, "t");
+  const words = lower.split(/[^a-z]+/).filter(Boolean);
+  if (words.some(w => BAD_WORD.has(w) || BAD_WORD.has(w.replace(/(.)\1+/g, "$1")))) return true;
+  const joined = words.join(""), collapsed = joined.replace(/(.)\1+/g, "$1");
+  return BAD_SUB.some(b => joined.includes(b) || (!/(.)\1/.test(b) && collapsed.includes(b)));
+}
+function cleanName(conn, m, fallback) {
+  if (!opt("filter") || !m.name || !nameIsBad(m.name)) return;
+  m.name = fallback; sendTo(conn, { t: "renamed", name: fallback });
+  toast("A player name was blocked and replaced.");
+}
+
+/* ---------- Mistake report and game history ---------- */
+const LS_HIST = "ss-history-v1";
+let gameHistory = lsGet(LS_HIST) || [];
+if (!Array.isArray(gameHistory)) gameHistory = [];
+const saveHistory = () => lsSet(LS_HIST, gameHistory.slice(0, 60));
+function groupWrong(texts) {
+  const m = new Map();
+  texts.forEach(t => { const k = toks(t).join(" ") || String(t).toLowerCase(); if (!m.has(k)) m.set(k, { text: t, n: 0 }); m.get(k).n++; });
+  return [...m.values()].sort((a, b) => b.n - a.n).slice(0, 8);
+}
+function recordClassicRound() {
+  if (!game || !game.teams || game.lightning) return;
+  const q = curQ(), found = game.foundBefore || game.revealed;
+  game.report = game.report || [];
+  game.report[game.round] = { q: q.q, topic: q.topic || "", of: 1,
+    answers: q.answers.map((a, i) => ({ t: a.t, p: a.p, found: found.includes(i) ? 1 : 0 })),
+    wrong: groupWrong((game.wrongLog || []).filter(w => w.round === game.round).map(w => w.text)) };
+  saveGame();
+}
+function recordPartyRound() {
+  if (!isParty() || game.pphase === "lobby") return;
+  const q = curQ(), ps = Object.values(game.players);
+  game.report = game.report || [];
+  game.report[game.round] = { q: q.q, topic: q.topic || "", of: ps.length,
+    answers: q.answers.map((a, i) => ({ t: a.t, p: a.p, found: ps.filter(p => p.r.found.includes(i)).length })),
+    wrong: groupWrong(ps.flatMap(p => p.r.wrong || [])) };
+  saveGame();
+}
+function reportHtml(report) {
+  const rounds = (report || []).filter(Boolean);
+  if (!rounds.length) return `<p class="note">No rounds were recorded for this game.</p>`;
+  return rounds.map((r, k) => {
+    const rows = r.answers.slice().sort((a, b) => (a.found / (r.of || 1)) - (b.found / (r.of || 1))).map(a => {
+      const pct = Math.round(100 * a.found / (r.of || 1));
+      return `<tr><td>${esc(a.t)}</td><td style="width:40%"><div class="bar${pct < 34 ? " low" : ""}"><i style="width:${pct}%"></i></div></td><td>${r.of > 1 ? pct + "% found" : (a.found ? "Found" : "Missed")}</td></tr>`;
+    }).join("");
+    const wrong = r.wrong && r.wrong.length ? `<p class="note">Common wrong guesses: ${r.wrong.map(w => `${esc(w.text)}${w.n > 1 ? ` (×${w.n})` : ""}`).join(", ")}</p>` : "";
+    return `<div class="pq"><b>${k + 1}. ${esc(r.q)}</b><table><tr><th>Answer</th><th></th><th></th></tr>${rows}</table>${wrong}</div>`;
+  }).join("");
+}
+function showReport(report, title) {
+  modal(title || "Mistake report", `<p class="note">Answers are listed from most missed to most found, so you can see what to reteach.</p>${reportHtml(report)}`);
+}
+function gameFinished() {
+  if (!game || game.recorded) return;
+  game.recorded = true;
+  if (isParty()) recordPartyRound();
+  saveGame();
+  if (!opt("history")) return;
+  const results = isParty()
+    ? (game.teamMode ? teamStandings().map(t => ({ name: t.name, score: t.avg })) : rankList().map(p => ({ name: p.name, score: p.total })))
+    : game.teams.map(t => ({ name: t.name, score: t.score })).sort((a, b) => b.score - a.score);
+  gameHistory.unshift({ id: newId(), at: Date.now(), label: prefs.periodLabel || "", mode: isParty() ? "Everyone plays" : `${game.teams.length} teams`,
+    topics: [...new Set(game.qs.map(q => q.topic).filter(Boolean))].join(", "), results: results.slice(0, 40), report: game.report || [] });
+  saveHistory();
+}
+function renderHistory() {
+  const box = $("#historyList");
+  if (!gameHistory.length) { box.innerHTML = `<p class="note">Finished games show up here with their scores and mistake reports.</p>`; $("#historyClear").hidden = true; return; }
+  $("#historyClear").hidden = false;
+  box.innerHTML = gameHistory.slice(0, 15).map(h => {
+    const d = new Date(h.at).toLocaleString([], { weekday: "short", month: "short", day: "numeric", hour: "numeric", minute: "2-digit" });
+    const w = h.results[0];
+    return `<div class="hrow"><div><b>${esc(h.label ? h.label + " · " : "")}${esc(d)}</b><small>${esc(h.mode)}${h.topics ? " · " + esc(h.topics) : ""}${w ? ` · Winner: ${esc(w.name)} (${w.score})` : ""}</small></div>
+      <div class="row"><button class="sbtn" type="button" data-hist="${esc(h.id)}">Details</button><button class="sbtn danger" type="button" data-histdel="${esc(h.id)}">Delete</button></div></div>`;
+  }).join("");
+}
+$("#historyList").addEventListener("click", e => {
+  const d = e.target.closest("[data-hist]"), x = e.target.closest("[data-histdel]");
+  if (d) {
+    const h = gameHistory.find(g => g.id === d.dataset.hist); if (!h) return;
+    const table = `<table><tr><th>Place</th><th>Name</th><th>Score</th></tr>${h.results.map((r, i) => `<tr><td>${i + 1}</td><td>${esc(r.name)}</td><td>${r.score}</td></tr>`).join("")}</table>`;
+    modal(`${h.label ? h.label + " · " : ""}${new Date(h.at).toLocaleDateString()}`, `<div class="pq">${table}</div>${opt("report") ? reportHtml(h.report) : ""}`);
+  }
+  if (x) {
+    if (x.classList.contains("armed")) { gameHistory = gameHistory.filter(g => g.id !== x.dataset.histdel); saveHistory(); renderHistory(); }
+    else { x.classList.add("armed"); x.textContent = "Tap again"; setTimeout(() => { if (x.isConnected) { x.classList.remove("armed"); x.textContent = "Delete"; } }, 3000); }
+  }
+});
+$("#historyClear").addEventListener("click", e => {
+  const b = e.currentTarget;
+  if (b.classList.contains("armed")) { gameHistory = []; saveHistory(); renderHistory(); b.classList.remove("armed"); b.textContent = "Clear history"; return; }
+  b.classList.add("armed"); b.textContent = "Tap again to delete all history";
+  setTimeout(() => { b.classList.remove("armed"); b.textContent = "Clear history"; }, 3000);
+});
+$("#periodLabel").addEventListener("input", e => { prefs.periodLabel = e.target.value; savePrefs(); });
+$("#pTeams").addEventListener("change", e => { prefs.pTeams = Number(e.target.value); savePrefs(); });
+$("#lightningOn").addEventListener("change", e => { prefs.lightning = e.target.checked; savePrefs(); renderSetup(); });
+$("#lTime").addEventListener("change", e => { prefs.lTime = Number(e.target.value); savePrefs(); });
+$("#winReport").addEventListener("click", () => { if (game) showReport(game.report, "Mistake report"); });
+
+/* ---------- Teams in Everyone plays ---------- */
+const PTEAMS = [["Red", "#ff5a5f"], ["Blue", "#3ec8ff"], ["Gold", "#ffb547"], ["Green", "#5ef2c2"], ["Purple", "#8f7dff"], ["Pink", "#ff4fa3"]];
+function teamStandings() {
+  if (!isParty() || !game.teamMode) return [];
+  return PTEAMS.slice(0, game.teamMode).map(([name, col], i) => {
+    const mem = Object.values(game.players).filter(p => p.team === i);
+    const sum = mem.reduce((s, p) => s + p.total, 0), rsum = mem.reduce((s, p) => s + p.r.pts, 0);
+    return { i, name, col, n: mem.length, avg: mem.length ? Math.round(sum / mem.length) : 0, round: mem.length ? Math.round(rsum / mem.length) : 0 };
+  }).sort((a, b) => b.avg - a.avg || b.n - a.n);
+}
+function teamRowsHtml() {
+  return teamStandings().map((t, k) => `<li class="lbrow lbteam" style="--tcol:${t.col}"><span class="rk">${k + 1}</span><span class="nm">${t.name} team</span><span class="dots"></span><span class="xs"></span><span class="rp">${t.n} player${t.n === 1 ? "" : "s"}</span><span class="tot">${t.avg}</span><span></span></li>`).join("")
+    + `<li class="lbdiv">Players · team score is the average of its players</li>`;
+}
+const teamDot = p => isParty() && game.teamMode && p.team != null && PTEAMS[p.team] ? `<i style="display:inline-block;width:.6rem;height:.6rem;border-radius:50%;background:${PTEAMS[p.team][1]};margin-right:.35rem"></i>` : "";
+
+/* ---------- Host remote ---------- */
+const remoteConns = () => [...conns].filter(c => c.open && c._meta && c._meta.remote === true);
+function sendRemote() { const rc = remoteConns(); if (!rc.length) return; const m = remoteMsg(); rc.forEach(c => sendTo(c, m)); }
+const visBtn = (id, cmd) => (!$(id).hidden ? [[cmd, $(id).textContent]] : []);
+function remoteMsg() {
+  const base = { t: "rstate", paused: hostPaused };
+  const pauseBtn = opt("pause") && game && !game.over ? [["pause", hostPaused ? "Resume" : "Pause"]] : [];
+  if (!game || game.over) return { ...base, mode: "idle", q: game && game.over ? "Game over" : "No game running", status: "Start a game on the board.", btns: [] };
+  if (game.lightning) {
+    const L = game.lightning;
+    const cur = !isParty() && L.phase === "live" ? lqFor(L.team, L.qi) : null;
+    return { ...base, mode: "lightning", q: cur ? cur.q : "Lightning round", status: $("#lStatus").textContent,
+      answers: cur ? cur.answers.map(a => ({ t: a.t, p: a.p, on: true })) : [],
+      scores: isParty() ? rankList().slice(0, 5).map(p => `${p.name} ${p.total}`) : game.teams.map(t => `${t.name} ${t.score}`),
+      btns: [...visBtn("#lStart", "lStart"), ...visBtn("#lPass", "lPass"), ...visBtn("#lStop", "lStop"), ...visBtn("#lNext", "lNext"), ...pauseBtn] };
+  }
+  const q = curQ();
+  if (isParty()) {
+    const counts = q.answers.map((_, i) => Object.values(game.players).filter(p => p.r.found.includes(i)).length);
+    return { ...base, mode: "party", round: game.round + 1, rounds: game.qs.length, q: game.pphase === "lobby" ? "Lobby: waiting for players" : q.q,
+      answers: game.pphase === "lobby" ? [] : q.answers.map((a, i) => ({ t: a.t, p: a.p, on: game.pphase === "reveal", n: counts[i] })),
+      wrong: game.pphase === "reveal" ? wrongGroups().map(g => ({ key: g.key, text: g.text, n: g.who.length })) : [],
+      status: $("#pStatus").textContent, scores: rankList().slice(0, 5).map(p => `${p.name} ${p.total}`),
+      btns: [...visBtn("#pStart", "pStart"), ...visBtn("#pEnd", "pEnd"), ...visBtn("#pNext", "pNext"), ...visBtn("#pFinish", "pFinish"), ...pauseBtn] };
+  }
+  return { ...base, mode: "classic", round: game.round + 1, rounds: game.qs.length, q: q.q,
+    answers: q.answers.map((a, i) => ({ t: a.t, p: a.p, on: game.revealed.includes(i) })),
+    status: $("#status").textContent, scores: game.teams.map(t => `${t.name} ${t.score}`),
+    btns: [...(game.phase !== "done" ? [["strike", "✕ Strike"]] : []), ["undo", "Undo"], ...visBtn("#reopenBtn", "reopen"), ...visBtn("#revealBtn", "revealRest"), ...visBtn("#nextBtn", "next"), ...pauseBtn] };
+}
+function remoteCommand(cmd, arg) {
+  if (cmd === "pause") { setPause(!hostPaused); return; }
+  if (!game || game.over) return;
+  if (game.lightning) {
+    const id = { lStart: "#lStart", lStop: "#lStop", lNext: "#lNext", lPass: "#lPass" }[cmd];
+    if (id && !$(id).hidden) $(id).click();
+    return;
+  }
+  if (isParty()) {
+    const id = { pStart: "#pStart", pEnd: "#pEnd", pNext: "#pNext", pFinish: "#pFinish" }[cmd];
+    if (id && !$(id).hidden) $(id).click();
+    if (cmd === "accept" && arg && game.pphase === "reveal" && curQ().answers[Number(arg.ai)]) acceptGroup(String(arg.key), Number(arg.ai));
+    return;
+  }
+  if (cmd === "reveal" && Number.isInteger(arg) && arg >= 0 && arg < curQ().answers.length) reveal(arg);
+  else if (cmd === "strike") strike();
+  else if (cmd === "undo") undo();
+  else if (cmd === "reopen") reopenBuzzers();
+  else if (cmd === "revealRest") revealRest();
+  else if (cmd === "next") nextRound();
+}
+function remoteHello(conn, m) {
+  m.remote = "pending";
+  sendTo(conn, { t: "rwait" });
+  modal("Allow a remote control?", `<p><b>${esc(m.name || "A device")}</b> wants to control this game and see the hidden answers. Only allow your own phone or computer.</p>`, [
+    { label: "Deny", cls: "ghost", fn: () => { sendTo(conn, { t: "rdenied" }); setTimeout(() => { try { conn.close(); } catch (e) {} }, 300); } },
+    { label: "Allow", cls: "sun", fn: () => { m.remote = true; sendRemote(); toast("Remote control connected"); } }
+  ]);
+}
+// Remote, on the teacher's phone
+function renderRemote() {
+  const s = drstate;
+  $("#rmRound").textContent = s.mode === "idle" ? "Waiting" : s.mode === "lightning" ? "Lightning round" : `Round ${s.round} of ${s.rounds}`;
+  $("#rmScores").textContent = (s.scores || []).join(" · ");
+  $("#rmQ").textContent = s.q || "";
+  $("#rmStatus").textContent = (s.paused ? "Paused. " : "") + (s.status || "");
+  $("#rmAnswers").innerHTML = (s.answers || []).map((a, i) =>
+    `<li class="${a.on ? "on" : "hidden"}" data-i="${i}"><span>${i + 1}. ${esc(a.t)}${a.n != null ? ` <small>(${a.n} found)</small>` : ""}</span><b>${a.p}</b></li>`).join("");
+  $("#rmWrong").innerHTML = (s.wrong || []).map(w => `<button class="gchip" type="button" data-key="${esc(w.key)}">${esc(w.text)}<small>×${w.n}</small></button>`).join("");
+  $("#rmButtons").innerHTML = (s.btns || []).map(([c, l]) =>
+    `<button class="btn ${c === "strike" || c === "pEnd" || c === "lStop" ? "strike" : /^(next|pNext|pStart|lStart|lNext|pFinish)$/.test(c) ? "primary" : ""}" type="button" data-cmd="${c}">${esc(l)}</button>`).join("");
+}
+const rsend = (cmd, arg) => { if (dconn && dconn.open) dconn.send({ t: "rcmd", cmd, arg }); };
+$("#rmButtons").addEventListener("click", e => { const b = e.target.closest("[data-cmd]"); if (b) rsend(b.dataset.cmd); });
+$("#rmAnswers").addEventListener("click", e => {
+  const li = e.target.closest("li.hidden[data-i]");
+  if (li && drstate && drstate.mode === "classic") rsend("reveal", Number(li.dataset.i));
+});
+$("#rmWrong").addEventListener("click", e => {
+  const b = e.target.closest(".gchip"); if (!b || !drstate) return;
+  const key = b.dataset.key;
+  modal(`Count “${b.firstChild.textContent}” as…`, (drstate.answers || []).map((a, i) => `<button class="btn" type="button" data-ai="${i}" style="justify-content:space-between;display:flex">${esc(a.t)} <b>${a.p}</b></button>`).join(""), [{ label: "Cancel", cls: "ghost" }]);
+  $("#modalBody").onclick = ev => { const x = ev.target.closest("[data-ai]"); if (!x) return; rsend("accept", { key, ai: Number(x.dataset.ai) }); closeModal(); };
+});
+$("#rmLeave").addEventListener("click", () => { leaveJoin(); setJoinStatus("Remote disconnected."); });
+
+/* ---------- Lightning round ---------- */
+const LQ = 5;
+function pickLightning(pool, used, n) {
+  if (!n || !pool.length) return [];
+  const rest = shuffle(pool.map((_, i) => i).filter(i => !used.includes(i)));
+  const again = shuffle(used.slice());
+  const pick = rest.slice(0, n);
+  for (let k = 0; pick.length < n && again.length; k++) pick.push(again[k % again.length]);
+  return pick.map(i => clone(pool[i]));
+}
+const lqFor = (team, i) => game.lightQs[(team * LQ + i) % game.lightQs.length];
+function lightScore(q, text) {
+  const r = pickMatch(q.answers, text, []);
+  return r.hit >= 0 ? { hit: r.hit, pts: q.answers[r.hit].p, t: q.answers[r.hit].t } : { hit: -1, pts: 0, t: "" };
+}
+function lightIntro() {
+  sfx("intro");
+  const L = game.lightning;
+  splash({ big: "Lightning round!", sub: isParty() ? `Everyone answers ${LQ} quick questions in ${L.secs} seconds` : `${game.teams[L.team].name}: ${LQ} quick questions in ${L.secs} seconds`, tag: "Each answer scores its board points", tone: "sun", ms: 3200 });
+}
+function startLightning() {
+  hideSplash();
+  game.lightning = { phase: "ready", team: 0, qi: 0, res: game.teams.map(() => []), secs: Number(prefs.lTime) || 45, deadline: null, paused: null };
+  saveGame(); show("lightning"); lightIntro();
+}
+function startPartyLightning() {
+  game.lightning = { phase: "ready", secs: Number(prefs.lTime) || 45, deadline: null, paused: null };
+  Object.values(game.players).forEach(p => { p.light = { i: 0, ans: [] }; });
+  saveGame(); show("lightning"); lightIntro();
+}
+function lightBegin() {
+  const L = game.lightning; if (!L || L.phase !== "ready") return;
+  L.phase = "live"; L.qi = 0; L.deadline = Date.now() + L.secs * 1000 + 800; L.paused = null;
+  if (isParty()) Object.values(game.players).forEach(p => { p.light = { i: 0, ans: [] }; });
+  saveGame(); lightRender(); sfx("buzzin");
+  if (!isParty()) setTimeout(() => $("#lIn").focus(), 50);
+}
+function submitLightHost(text) {
+  const L = game && game.lightning; if (!L || L.phase !== "live" || isParty() || hostPaused) return;
+  const q = lqFor(L.team, L.qi), said = String(text || "").trim();
+  const s = said ? lightScore(q, said) : { hit: -1, pts: 0, t: "" };
+  L.res[L.team].push({ text: said || "(pass)", ...s });
+  sfx(s.pts ? "ding" : "buzz");
+  L.qi++;
+  if (L.qi >= LQ) lightTeamDone(); else { saveGame(); lightRender(); }
+}
+function lightTeamDone() {
+  const L = game.lightning; if (L.phase !== "live") return;
+  L.phase = "teamdone"; L.deadline = null; L.paused = null;
+  while (L.res[L.team].length < LQ) L.res[L.team].push({ text: "(no answer)", hit: -1, pts: 0, t: "" });
+  const total = L.res[L.team].reduce((s, r) => s + r.pts, 0);
+  game.teams[L.team].score += total;
+  saveGame(); lightRender(); sfx("bank");
+  burst(innerWidth / 2, innerHeight / 3, 80, teamCols(L.team));
+  splash({ big: `+${total} points`, sub: `${game.teams[L.team].name} finished the lightning round`, tone: TEAM_TONES[L.team], ms: 2400 });
+}
+function lightPartyDone() {
+  const L = game.lightning; if (L.phase !== "live") return;
+  L.phase = "done"; L.deadline = null; L.paused = null;
+  saveGame(); lightRender(); sfx("bank");
+  const best = rankList().map(p => ({ n: p.name, s: p.light ? p.light.ans.reduce((a, r) => a + r.pts, 0) : 0 })).sort((a, b) => b.s - a.s)[0];
+  splash({ big: "Time's up!", sub: best && best.s ? `Best lightning round: ${best.n} (+${best.s})` : "Here are the top answers", tone: "sun", ms: 2600 });
+}
+function lightNext() {
+  const L = game.lightning;
+  if (!isParty() && L.phase === "teamdone" && L.team < game.teams.length - 1) {
+    L.team++; L.qi = 0; L.phase = "ready"; saveGame(); lightRender(); lightIntro(); return;
+  }
+  if (isParty()) { partyFinish(); return; }
+  game.over = true; saveGame(); lightRender(); showWinner();
+}
+function partyLightGuess(conn, m, text) {
+  const p = game.players[m.pid], L = game.lightning;
+  if (!p || !L || L.phase !== "live" || !p.light || p.light.i >= LQ) return;
+  const now = Date.now(); if (now - (conn._lastGuess || 0) < 400) return; conn._lastGuess = now;
+  const q = game.lightQs[p.light.i % game.lightQs.length], said = String(text || "").trim();
+  const s = said ? lightScore(q, said) : { hit: -1, pts: 0, t: "" };
+  p.light.ans.push({ text: said || "(pass)", ...s }); p.light.i++; p.total += s.pts;
+  if (s.pts) bumpPid = m.pid;
+  saveGame(); sendTo(conn, { t: "result", r: s.pts ? "hit" : said ? "miss" : "pass" }); lightRender();
+  const on = onlinePids(), act = Object.entries(game.players).filter(([pid]) => on.has(pid));
+  if (act.length && act.every(([, pl]) => pl.light && pl.light.i >= LQ)) setTimeout(() => { if (game.lightning && game.lightning.phase === "live") lightPartyDone(); }, 900);
+}
+function renderLightTimer() {
+  const el = $("#lTimer"), L = game && game.lightning;
+  const left = !L || L.phase !== "live" ? null : L.deadline != null ? Math.max(0, L.deadline - Date.now()) : L.paused;
+  if (left == null) { el.hidden = true; return; }
+  const sec = Math.min(L.secs, Math.ceil(left / 1000));
+  el.hidden = false;
+  el.style.setProperty("--p", Math.max(0, Math.min(100, left / (L.secs * 1000) * 100)).toFixed(1));
+  el.classList.toggle("paused", L.paused != null);
+  el.classList.toggle("warn", L.paused == null && sec <= 10);
+  el.firstElementChild.textContent = L.paused != null ? "PAUSED" : sec;
+  if (L.paused == null && sec <= 5 && sec > 0 && sec !== lastTickSec) { lastTickSec = sec; if (prefs.sound) tone(sec <= 3 ? 1200 : 900, 0, 0.08, "square", 0.06); }
+  if (sec > 5) lastTickSec = -1;
+}
+function lightRender() {
+  if (!game || !game.lightning || view !== "lightning") { broadcast(); sendRemote(); return; }
+  const L = game.lightning, party = isParty(), team = party ? null : game.teams[L.team];
+  $("#roundChip").textContent = "Lightning round"; $("#roundChip").classList.add("hot");
+  $("#lTitle").innerHTML = `<small>Lightning round · ${L.secs} seconds</small>${party ? "Everyone answers on their own computer" : esc(team.name) + (L.phase === "ready" ? ", get ready!" : "")}`;
+  let rows = "";
+  for (let i = 0; i < LQ; i++) {
+    if (party) {
+      const q = game.lightQs[i % game.lightQs.length], top = q.answers.slice().sort((a, b) => b.p - a.p)[0];
+      const answered = Object.values(game.players).filter(p => p.light && p.light.i > i).length, show = L.phase === "done";
+      rows += `<div class="lrow${show ? " got" : ""}"><span class="ln">${i + 1}</span><span class="lq">${L.phase === "ready" ? "• • •" : esc(q.q)}</span><span class="la">${show ? esc(top.t) : L.phase === "live" ? `${answered} answered` : ""}</span><span class="lp">${show ? top.p : ""}</span></div>`;
+    } else {
+      const q = lqFor(L.team, i), r = L.res[L.team][i], cur = L.phase === "live" && i === L.qi;
+      const shown = r && r.t && norm(r.t) !== norm(r.text) ? ` → ${esc(r.t)}` : "";
+      rows += `<div class="lrow${cur ? " cur" : ""}${r && r.pts ? " got" : ""}${r && !r.pts ? " zero" : ""}"><span class="ln">${i + 1}</span><span class="lq">${L.phase === "ready" ? "• • •" : esc(q.q)}</span><span class="la">${r ? esc(r.text) + shown : ""}</span><span class="lp">${r ? r.pts : ""}</span></div>`;
+    }
+  }
+  $("#lBoard").innerHTML = rows;
+  if (party) {
+    const ranked = rankList();
+    $("#lSideTitle").textContent = "Leaderboard"; $("#lSideCount").textContent = `${ranked.length} player${ranked.length === 1 ? "" : "s"}`;
+    $("#lList").innerHTML = ranked.map((p, k) => `<li class="lbrow${bumpPid === p.pid ? " bump" : ""}"><span class="rk">${k + 1}</span><span class="nm">${teamDot(p)}${esc(p.name)}</span><span class="dots">${Array.from({ length: LQ }, (_, j) => `<i class="${p.light && p.light.ans[j] && p.light.ans[j].pts ? "on" : ""}"></i>`).join("")}</span><span class="xs"></span><span class="rp">${p.light && p.light.ans.length ? "+" + p.light.ans.reduce((s, r) => s + r.pts, 0) : ""}</span><span class="tot">${p.total}</span><span></span></li>`).join("") || `<li class="empty">No players.</li>`;
+    bumpPid = null;
+  } else {
+    $("#lSideTitle").textContent = "Scores"; $("#lSideCount").textContent = "";
+    $("#lList").innerHTML = game.teams.map((t, k) => {
+      const sub = L.res[k].reduce((s, r) => s + r.pts, 0);
+      return `<li class="lbrow lbteam" style="--tcol:var(--${TEAM_TONES[k]})"><span class="rk">${k + 1}</span><span class="nm">${esc(t.name)}</span><span class="dots"></span><span class="xs"></span><span class="rp">${L.res[k].length ? "+" + sub : ""}</span><span class="tot">${t.score}</span><span></span></li>`;
+    }).join("");
+  }
+  const live = L.phase === "live", last = party || L.team >= game.teams.length - 1;
+  $("#lForm").hidden = party || !live; $("#lPass").hidden = party || !live;
+  $("#lStart").hidden = L.phase !== "ready";
+  $("#lStart").textContent = party ? "Start the lightning round" : `Start the clock for ${team.name}`;
+  $("#lStop").hidden = !live;
+  $("#lNext").hidden = !(L.phase === "done" || L.phase === "teamdone") || game.over;
+  $("#lNext").textContent = last ? "Final results →" : `Next: ${game.teams[L.team + 1].name} →`;
+  const finished = party ? Object.values(game.players).filter(p => p.light && p.light.i >= LQ).length : 0;
+  $("#lStatus").textContent = game.over ? "Game over." :
+    L.phase === "ready" ? (party ? "Players answer five questions on their own computers. Each answer scores its board points." : `Questions stay hidden until the clock starts. ${team.name} says each answer out loud (or types it on their computer); the host types it here.`) :
+    live ? (party ? `${finished} of ${Object.keys(game.players).length} finished.` : "Type each answer and press Enter. Pass skips a question.") :
+    party ? "Top answers for each question." : `${team.name} scored ${L.res[L.team].reduce((s, r) => s + r.pts, 0)} in the lightning round.`;
+  renderLightTimer();
+  broadcast(); sendRemote();
+}
+setInterval(() => {
+  const L = game && game.lightning;
+  if (!L || game.over || view !== "lightning") return;
+  renderLightTimer();
+  if (L.phase === "live" && L.deadline != null && L.deadline <= Date.now()) { if (isParty()) lightPartyDone(); else lightTeamDone(); }
+}, 250);
+$("#lStart").addEventListener("click", lightBegin);
+$("#lStop").addEventListener("click", () => { if (isParty()) lightPartyDone(); else lightTeamDone(); });
+$("#lNext").addEventListener("click", lightNext);
+$("#lPass").addEventListener("click", () => submitLightHost(""));
+$("#lForm").addEventListener("submit", e => { e.preventDefault(); const v = $("#lIn").value.trim(); if (!v) return; $("#lIn").value = ""; submitLightHost(v); $("#lIn").focus(); });
+$("#lTimer").addEventListener("click", () => {
+  const L = game && game.lightning; if (!L || L.phase !== "live") return;
+  if (L.paused != null) { L.deadline = Date.now() + L.paused; L.paused = null; } else if (L.deadline != null) { L.paused = Math.max(0, L.deadline - Date.now()); L.deadline = null; }
+  saveGame(); lightRender();
+});
+
+/* ---------- Class survey ---------- */
+const svs = { open: false, qs: [], per: 3, resp: {}, built: null };
+function surveyMsg(m) { return { t: "sstate", qs: svs.qs, per: svs.per, done: !!(m && m.pid && svs.resp[m.pid]) }; }
+function renderSurveyHost() {
+  const sel = $("#svTopic");
+  sel.innerHTML = `<option value="">A new topic: “Class survey ${esc(todayLabel())}”</option>` + lib.sets.map(s => `<option value="${esc(s.id)}">${esc(s.name)}</option>`).join("");
+  $("#svSetup").hidden = svs.open || !!svs.built;
+  $("#svLive").hidden = !svs.open;
+  $("#svResult").hidden = !svs.built;
+  if (svs.open) {
+    $("#svCode").textContent = prefs.code || "·····";
+    $("#svUrl").textContent = (location.host + location.pathname).replace(/index\.html$/, "");
+    $("#svNet").textContent = $("#netStatus").textContent;
+    const n = Object.keys(svs.resp).length;
+    $("#svCounts").innerHTML = `<div class="hrow"><div><b>${n} student${n === 1 ? "" : "s"} answered</b><small>${esc(Object.values(svs.resp).map(r => r.name).filter(Boolean).slice(-12).join(", "))}</small></div></div>`
+      + svs.qs.map((q, i) => `<div class="hrow"><div><b>${esc(q)}</b><small>${Object.values(svs.resp).reduce((s, r) => s + (r.ans[i] || []).filter(Boolean).length, 0)} answers so far</small></div></div>`).join("");
+  }
+  if (svs.built) {
+    $("#svBoards").innerHTML = svs.built.map((b, qi) => `<div class="pq"><label><input type="checkbox" data-svq="${qi}" checked> ${esc(b.q)} <small class="note">(${b.people} answered)</small></label>
+      <ul>${b.answers.map((a, ai) => `<li><label><input type="checkbox" data-svq="${qi}" data-sva="${ai}" checked> ${esc(a.t)} · ${a.p} pts ${a.alt ? `<small>also: ${esc(a.alt)}</small>` : ""}</label></li>`).join("") || "<li>No answers yet</li>"}</ul></div>`).join("");
+  }
+}
+function buildSurvey() {
+  const people = Object.values(svs.resp);
+  svs.built = svs.qs.map((q, qi) => {
+    const groups = [];
+    let answered = 0;
+    people.forEach(r => {
+      const list = (r.ans[qi] || []).map(s => String(s || "").trim()).filter(Boolean);
+      if (list.length) answered++;
+      const seen = new Set();
+      list.forEach(text => {
+        const tk = toks(text); if (!tk.length) return;
+        let g = groups.find(x => x.key === tk.join(" ") || scoreCand(tk, x.toks) >= 80 || scoreCand(x.toks, tk) >= 80);
+        if (!g) { g = { key: tk.join(" "), toks: tk, n: 0, forms: {} }; groups.push(g); }
+        if (seen.has(g)) return;   // one vote per student per group
+        seen.add(g); g.n++;
+        const f = text.toLowerCase(); g.forms[f] = (g.forms[f] || 0) + 1;
+      });
+    });
+    const top = groups.sort((a, b) => b.n - a.n).slice(0, 8).filter(g => g.n > 0);
+    return { q, people: answered, answers: top.map(g => {
+      const forms = Object.entries(g.forms).sort((a, b) => b[1] - a[1]).map(f => f[0]);
+      const label = forms[0].replace(/\b\w/g, c => c.toUpperCase());
+      return { t: label.slice(0, 50), p: Math.max(1, Math.round(100 * g.n / Math.max(1, answered))), alt: forms.slice(1, 7).join(", "), why: "" };
+    }) };
+  });
+}
+$("#surveyBtn").addEventListener("click", () => { show("surveyHost"); });
+$("#svBack").addEventListener("click", () => { if (svs.open) { svs.open = false; broadcast(); } show("setup"); });
+$("#svOpen").addEventListener("click", () => {
+  const qs = $("#svQs").value.split("\n").map(s => s.trim()).filter(Boolean).slice(0, 10);
+  if (!qs.length) { toast("Write at least one question, one per line"); return; }
+  if (inClaude) { toast("Surveys need the game opened in a regular browser, such as the GitHub Pages site."); return; }
+  Object.assign(svs, { open: true, qs, per: Number($("#svPer").value) || 3, resp: {}, built: null });
+  hostStart(); renderSurveyHost(); broadcast();
+});
+$("#svBuild").addEventListener("click", () => {
+  if (!Object.keys(svs.resp).length) { toast("No answers yet. Wait for students to send theirs."); return; }
+  svs.open = false; buildSurvey(); broadcast(); renderSurveyHost();
+});
+$("#svAgain").addEventListener("click", () => { svs.built = null; svs.open = false; renderSurveyHost(); });
+$("#svSave").addEventListener("click", () => {
+  if (!svs.built) return;
+  const keepQ = new Set([...document.querySelectorAll("[data-svq]:not([data-sva]):checked")].map(x => Number(x.dataset.svq)));
+  const keepA = new Set([...document.querySelectorAll("[data-sva]:checked")].map(x => x.dataset.svq + ":" + x.dataset.sva));
+  const qs = svs.built.map((b, qi) => keepQ.has(qi) ? { q: b.q, m: 1, answers: b.answers.filter((_, ai) => keepA.has(qi + ":" + ai)) } : null)
+    .filter(x => x && x.answers.length);
+  if (!qs.length) { toast("Nothing selected to save"); return; }
+  let target = setById($("#svTopic").value);
+  if (!target) { target = { id: newId(), name: `Class survey ${todayLabel()}`, questions: [] }; lib.sets.push(target); }
+  target.questions.push(...qs); saveLib();
+  if (!prefs.topics.includes(target.id)) { prefs.topics.push(target.id); savePrefs(); }
+  toast(`Saved ${qs.length} question${qs.length === 1 ? "" : "s"} to “${target.name}”. It's ticked in Topics, ready to play.`);
+  svs.built = null; show("setup");
+});
+// Survey on a student's computer
+let svKey = "";
+function renderSurveyPad() {
+  const s = dsstate;
+  $("#svNote").textContent = s.done ? "" : `Give up to ${s.per} answer${s.per === 1 ? "" : "s"} for each question. Your answers are anonymous to the class.`;
+  $("#svDone").hidden = !s.done;
+  $("#svForm").hidden = !!s.done;
+  const key = JSON.stringify([s.qs, s.per]);
+  if (key === svKey) return;
+  svKey = key;
+  $("#svForm").innerHTML = s.qs.map((q, i) => `<fieldset class="pq" style="display:grid;gap:.4rem"><b>${esc(q)}</b>${Array.from({ length: s.per }, (_, k) =>
+    `<input type="text" maxlength="40" data-svi="${i}" placeholder="Answer ${k + 1}" style="padding:.5rem .7rem;border-radius:.5rem;border:.12rem solid var(--line);background:rgba(0,0,0,.3);color:var(--ink)">`).join("")}</fieldset>`).join("")
+    + `<button class="btn sun" type="submit">Send my answers</button>`;
+}
+$("#svForm").addEventListener("submit", e => {
+  e.preventDefault();
+  if (!dsstate || !dconn || !dconn.open) return;
+  const ans = dsstate.qs.map((_, i) => [...document.querySelectorAll(`[data-svi="${i}"]`)].map(x => x.value.trim().slice(0, 40)).filter(Boolean));
+  if (!ans.some(a => a.length)) { toast("Type at least one answer"); return; }
+  dconn.send({ t: "sanswer", ans });
+});
+function surveyAnswer(conn, m, ans) {
+  if (!svs.open || !m.pid || !Array.isArray(ans)) return;
+  svs.resp[m.pid] = { name: m.name || "", ans: svs.qs.map((_, i) => (Array.isArray(ans[i]) ? ans[i] : []).slice(0, svs.per).map(x => String(x || "").slice(0, 40))) };
+  sendTo(conn, surveyMsg(m));
+  if (view === "surveyHost") renderSurveyHost();
+}
+
+/* ---------- Make questions with AI (Claude) ---------- */
+const AI_MODEL = "claude-opus-5-5";
+const AI_SDK = "https://cdn.jsdelivr.net/npm/@anthropic-ai/sdk@1.6.0/+esm";
+let aiDraft = null;
+const AI_SCHEMA = {
+  type: "object", additionalProperties: false, required: ["questions"],
+  properties: { questions: { type: "array", items: {
+    type: "object", additionalProperties: false, required: ["q", "answers"],
+    properties: { q: { type: "string" }, answers: { type: "array", items: {
+      type: "object", additionalProperties: false, required: ["t", "p", "alt", "why"],
+      properties: { t: { type: "string" }, p: { type: "integer" }, alt: { type: "string" }, why: { type: "string" } } } } } } } }
+};
+const AI_SYSTEM = `You write questions for Survey Showdown, a classroom game where teams guess the most popular answers to a survey-style prompt. The players are high school students and the teacher will use the questions for review.
+
+Each question is an open prompt with many acceptable answers, usually starting with "Name a..." or "Name something...". Give 5 to 8 answers per question, ordered from the most to the least likely answer a class would give. Points are whole numbers that go down from first to last and add up to 100 or less; they estimate how many of 100 students would say that answer. Keep each answer short (1 to 4 words).
+
+For each answer, "alt" is a comma-separated list of other wordings students might type that should count: synonyms, abbreviations, plural or singular forms, and common misspellings. Use an empty string if there are none. Do not put a wording in "alt" that belongs to another answer on the same board.
+
+"why" is one plain sentence under 15 words that teaches something about that answer; it is shown after the answer is revealed.
+
+Everything must be accurate and appropriate for a school classroom. If the teacher gives notes, base the questions on those notes.`;
+function aiRenderPreview() {
+  const box = $("#aiPreview");
+  if (!aiDraft) { box.innerHTML = ""; $("#aiAddHere").hidden = $("#aiAddNew").hidden = true; return; }
+  box.innerHTML = aiDraft.map(q => `<div class="pq"><b>${esc(q.q)}</b><ul>${q.answers.map(a => `<li>${esc(a.t)} · ${a.p} pts${a.alt ? ` <small>also: ${esc(a.alt)}</small>` : ""}${a.why ? `<br><small>${esc(a.why)}</small>` : ""}</li>`).join("")}</ul></div>`).join("");
+  $("#aiAddHere").hidden = $("#aiAddNew").hidden = false;
+}
+async function aiGenerate() {
+  const key = $("#aiKey").value.trim(), topic = $("#aiPrompt").value.trim(), st = $("#aiStatus");
+  if (!topic) { st.textContent = "Describe a topic or paste notes first."; return; }
+  if (!/^sk-ant-/.test(key)) { st.textContent = "Paste an Anthropic API key (it starts with sk-ant-). Get one at console.anthropic.com."; return; }
+  try { if ($("#aiRemember").checked) localStorage.setItem("ss-ai-key", key); else localStorage.removeItem("ss-ai-key"); } catch (e) {}
+  const btn = $("#aiGo"); btn.disabled = true; aiDraft = null; aiRenderPreview();
+  st.textContent = "Drafting questions with Claude… this usually takes 20 to 60 seconds.";
+  try {
+    const { default: Anthropic } = await import(AI_SDK);
+    const client = new Anthropic({ apiKey: key, dangerouslyAllowBrowser: true });
+    const resp = await client.beta.messages.create({
+      model: AI_MODEL,
+      max_tokens: 16000,
+      betas: ["server-side-fallback-2026-07-01"],
+      fallbacks: "default",
+      output_config: { effort: "medium", format: { type: "json_schema", schema: AI_SCHEMA } },
+      system: AI_SYSTEM,
+      messages: [{ role: "user", content: `Write ${$("#aiCount").value} questions for a ${$("#aiLevel").value} class.\n\nTopic or notes:\n${topic}` }]
+    });
+    if (resp.stop_reason === "refusal") { st.textContent = "Claude declined that request. Try rewording the topic."; return; }
+    if (resp.stop_reason === "max_tokens") { st.textContent = "The answer was cut off. Ask for fewer questions and try again."; return; }
+    const text = resp.content.filter(b => b.type === "text").map(b => b.text).join("");
+    const data = JSON.parse(text);
+    aiDraft = (data.questions || []).map(q => ({ q: String(q.q || "").trim(), m: 1,
+      answers: (q.answers || []).slice(0, 8).map(a => ({ t: String(a.t || "").trim().slice(0, 60), p: Math.max(0, Math.round(Number(a.p) || 0)), alt: String(a.alt || ""), why: String(a.why || "").trim() })).filter(a => a.t) }))
+      .filter(q => q.q && q.answers.length);
+    st.textContent = aiDraft.length ? `Drafted ${aiDraft.length} question${aiDraft.length === 1 ? "" : "s"}. Check them, then add them.` : "No usable questions came back. Try again.";
+    aiRenderPreview();
+  } catch (e) {
+    const s = e && e.status;
+    st.textContent = s === 401 ? "That API key wasn't accepted. Check it at console.anthropic.com."
+      : s === 429 ? "Too many requests right now. Wait a minute and try again."
+      : s === 400 ? "The request was rejected (" + (e.message || "bad request") + ")."
+      : s >= 500 ? "Claude's service had a problem. Try again in a minute."
+      : e instanceof SyntaxError ? "The reply couldn't be read. Try again."
+      : "Couldn't reach Claude. Check the internet connection (some school networks block it).";
+  } finally { btn.disabled = false; }
+}
+$("#aiGo").addEventListener("click", aiGenerate);
+$("#aiAddHere").addEventListener("click", () => { if (!aiDraft) return; const n = addImported(aiDraft, false); aiDraft = null; aiRenderPreview(); $("#aiStatus").textContent = `Added ${n} question${n === 1 ? "" : "s"} to “${edSet().name}”.`; });
+$("#aiAddNew").addEventListener("click", () => {
+  if (!aiDraft) return;
+  const name = ($("#aiPrompt").value.trim().split(/[\n:.]/)[0] || "AI questions").slice(0, 36);
+  const n = addImported(aiDraft, true, name); aiDraft = null; aiRenderPreview();
+  $("#aiStatus").textContent = `Made a new topic “${name}” with ${n} question${n === 1 ? "" : "s"}.`;
+});
+try { const k = localStorage.getItem("ss-ai-key"); if (k) { $("#aiKey").value = k; $("#aiRemember").checked = true; } } catch (e) {}
+
+/* ---------- Help and tour ---------- */
+let helpReturn = "setup";
+$("#helpBtn").addEventListener("click", () => { if (view === "help") { show(helpReturn); return; } helpReturn = view === "team" ? "team" : view; show("help"); });
+$("#helpBack").addEventListener("click", () => show(helpReturn || "setup"));
+$("#help").addEventListener("click", e => {
+  const a = e.target.closest(".helpnav a"); if (!a) return;
+  e.preventDefault(); const t = document.querySelector(a.getAttribute("href")); if (t) t.scrollIntoView({ behavior: "smooth", block: "start" });
+});
+const TOUR = [
+  ["#modePick", "Pick a game mode", "Two teams play the classic face-off on the big board. Everyone plays lets every student or group play on their own computer, with a live leaderboard."],
+  ["#topicList", "Choose topics", "Tick one or more topics. Rounds are drawn from those questions. The library and class surveys add more."],
+  ["#rounds", "Set up the game", "Rounds, timers, speed bonus and the optional lightning round live here."],
+  ["#devCard", "Student computers", "Turn this on so teams can buzz in and answer from their own computers with a join code."],
+  ["#editBtn", "Make it your own", "Write your own questions, paste from a spreadsheet, or have Claude draft them from your notes."],
+  ["#optCard", "Options", "Turn features on or off to keep the screens simple."],
+  ["#driveCard", "Save your work", "Keep your topics, settings and history in Google Drive or a backup file."],
+  ["#startBtn", "Start playing", "When you're ready, start the game. Press Full screen for the classroom display."],
+  ["#helpBtn", "Help any time", "Open Help for how-tos, troubleshooting and keyboard shortcuts. You can retake this tour from there."]
+];
+let tourAt = -1;
+function tourShow(i) {
+  if (i < 0 || i >= TOUR.length) { tourEnd(); return; }
+  tourAt = i;
+  const [sel, title, text] = TOUR[i];
+  let el = $(sel);
+  if (sel === "#rounds") el = el.closest(".card");
+  if (!el || el.offsetParent === null) { tourShow(i + 1); return; }
+  $("#tour").hidden = false;
+  $("#tourStep").textContent = `Step ${i + 1} of ${TOUR.length}`;
+  $("#tourTitle").textContent = title; $("#tourText").textContent = text;
+  $("#tourPrev").hidden = i === 0;
+  $("#tourNext").textContent = i === TOUR.length - 1 ? "Done" : "Next";
+  el.scrollIntoView({ block: "center", behavior: "smooth" });
+  setTimeout(() => {
+    const r = el.getBoundingClientRect(), pad = 8, hole = $("#tourHole"), box = $("#tourBox");
+    Object.assign(hole.style, { left: r.left - pad + "px", top: r.top - pad + "px", width: r.width + pad * 2 + "px", height: r.height + pad * 2 + "px" });
+    const bh = box.offsetHeight || 180, bw = box.offsetWidth || 360;
+    const below = r.bottom + 16 + bh < innerHeight;
+    box.style.top = (below ? r.bottom + 16 : Math.max(12, r.top - bh - 16)) + "px";
+    box.style.left = Math.min(innerWidth - bw - 12, Math.max(12, r.left)) + "px";
+    $("#tourNext").focus();
+  }, 380);
+}
+function tourStart() { hideSplash(); $("#tourBanner").hidden = true; prefs.tourDone = true; savePrefs(); if (view !== "setup") show("setup"); setTimeout(() => tourShow(0), 60); }
+function tourEnd() { $("#tour").hidden = true; tourAt = -1; }
+$("#tourStart").addEventListener("click", tourStart);
+$("#helpTour").addEventListener("click", tourStart);
+$("#tourDismiss").addEventListener("click", () => { prefs.tourDone = true; savePrefs(); $("#tourBanner").hidden = true; });
+$("#tourNext").addEventListener("click", () => tourShow(tourAt + 1));
+$("#tourPrev").addEventListener("click", () => tourShow(tourAt - 1));
+$("#tourSkip").addEventListener("click", tourEnd);
+addEventListener("resize", () => { if (tourAt >= 0) tourShow(tourAt); });
+
 /* ---------- Boot ---------- */
 function start(data) {
   if (data && data.game) game = data.game;
   syncSound();
   sparkleBg();
+  applyOpts();
+  if (location.hash.startsWith("#topic=")) checkSharedTopic();
   const h = location.hash.replace(/^#/, "");
   if (!inClaude && (/^join/i.test(h) || join.active)) {
     const c = /^join/i.test(h) ? h.slice(4).replace(/^[-=]/, "").toUpperCase().replace(/[^A-Z0-9]/g, "") : "";
