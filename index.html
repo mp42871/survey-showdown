@@ -936,7 +936,7 @@ const SAMPLE = [
   { q: "Name a reason a student might be late to school", m: 1, a: [
     ["Overslept", 38, "slept in, alarm, woke up late, sleeping, sleep"],
     ["Missed the bus", 20, "bus, bus was late"],
-    ["Traffic", 15, "cars, road"],
+    ["Traffic", 15, "traffic jam, road, rush hour"],
     ["Couldn't find something", 9, "lost shoes, keys, lost something, lost"],
     ["Stopped for breakfast", 7, "breakfast, food, coffee"],
     ["Car trouble", 5, "car broke down, flat tire, car"] ] },
@@ -1126,6 +1126,12 @@ if (!Array.isArray(prefs.seenStarters)) prefs.seenStarters = libWasNew ? STARTER
   if (fresh.length) { fresh.forEach(s => lib.sets.push({ id: s.id, name: s.name, questions: clone(s.questions) })); saveLib(); }
   prefs.seenStarters = STARTER.map(s => s.id);
   lsSet(LS_PREF, prefs);
+  // Older School life copies let "cars" count as Traffic, which stole guesses meant for Car trouble.
+  let fixed = false;
+  lib.sets.forEach(s => s.questions.forEach(q => q.answers.forEach(a => {
+    if (a.t === "Traffic" && a.alt === "cars, road") { a.alt = "traffic jam, road, rush hour"; fixed = true; }
+  })));
+  if (fixed) saveLib();
 }
 function fixTopics() {
   if (!Array.isArray(prefs.topics)) prefs.topics = [];
@@ -1302,26 +1308,132 @@ function norm(s) {
     .split(/\s+/).filter(Boolean)
     .map(w => (w.length > 3 && w.endsWith("s") && !w.endsWith("ss")) ? w.slice(0, -1) : w).join(" ");
 }
-function lev(a, b) {
-  if (a === b) return 0;
-  const m = a.length, n = b.length; if (!m) return n; if (!n) return m;
-  let prev = Array.from({ length: n + 1 }, (_, i) => i);
-  for (let i = 1; i <= m; i++) {
-    const cur = [i];
-    for (let j = 1; j <= n; j++) cur[j] = Math.min(prev[j] + 1, cur[j - 1] + 1, prev[j - 1] + (a[i - 1] === b[j - 1] ? 0 : 1));
-    prev = cur;
+/* ---------- Answer matching ----------
+   Both the guess and every accepted wording are reduced to simple word forms first:
+   lowercase, no punctuation, filler words dropped, number words as digits, common
+   synonyms merged (tv/television, mom/mother…), and word endings trimmed
+   (cookies → cookie, studying → study). Then each answer gets a score:
+     100  same words              96  same letters, spacing aside ("home work")
+     ~85  a typo or two ("calculater", "pencel")
+     ~80  all the answer's words are in the guess, any order ("sauce cranberry", "i think pencils")
+     ~65  the guess is a distinctive part of a longer answer ("nuggets" → Chicken nuggets)
+   The best-scoring answer wins, so a close typo never beats an exact match elsewhere on the board. */
+const STOP = new Set("a an the my some your his her their our its this that these those of to for in on at with and or i me we you he she they is are was were be been just really very like um uh so maybe think".split(" "));
+const NUM = { zero: "0", one: "1", two: "2", three: "3", four: "4", five: "5", six: "6", seven: "7", eight: "8", nine: "9", ten: "10",
+  eleven: "11", twelve: "12", thirteen: "13", fourteen: "14", fifteen: "15", sixteen: "16", seventeen: "17", eighteen: "18",
+  nineteen: "19", twenty: "20", thirty: "30", forty: "40", fifty: "50", hundred: "100" };
+const SYN = {};
+[["tv", "television", "televisions", "telly", "tvs"], ["phone", "phones", "cellphone", "cellphones", "cell", "smartphone", "smartphones", "mobile"],
+ ["mom", "mother", "mothers", "mum", "mommy", "mama", "momma", "moms"], ["dad", "father", "fathers", "daddy", "papa", "dads"],
+ ["kid", "kids", "child", "children"], ["car", "cars", "automobile", "auto"], ["bike", "bikes", "bicycle", "bicycles"],
+ ["movie", "movies", "film", "films"], ["computer", "computers", "laptop", "laptops", "pc", "chromebook", "chromebooks"],
+ ["fridge", "refrigerator"], ["soda", "pop", "sodas"], ["burger", "burgers", "hamburger", "hamburgers", "cheeseburger", "cheeseburgers"],
+ ["math", "maths", "mathematics"], ["christmas", "xmas"], ["ok", "okay"], ["bathroom", "restroom", "toilet", "washroom"],
+ ["photo", "photos", "picture", "pictures", "pic", "pics"], ["doctor", "doctors", "doc"], ["teacher", "teachers", "instructor"],
+ ["advertis", "ad", "ads", "advert", "adverts", "advertisement", "advertisements", "advertising"],
+ ["color", "colour"], ["favorite", "favourite"], ["center", "centre"], ["theater", "theatre"], ["labor", "labour"],
+ ["vegetable", "vegetables", "veggie", "veggies"], ["usa", "us", "america"], ["homework", "hw"], ["gift", "gifts", "present", "presents"],
+ ["money", "cash"], ["sleep", "sleeping", "slept", "nap"], ["store", "stores", "shop", "shops"], ["friend", "friends", "bff", "buddy", "buddies"]
+].forEach(g => g.forEach(w => { SYN[w] = g[0]; }));
+function stem(w) {
+  if (/^\d+$/.test(w) || w.length <= 3) return w;
+  if (w.length > 4 && w.endsWith("ies")) w = w.slice(0, -3) + "i";
+  else if (w.length > 4 && /(ss|x|z|ch|sh)es$/.test(w)) w = w.slice(0, -2);
+  else if (w.endsWith("s") && !/(ss|us|is)$/.test(w)) w = w.slice(0, -1);
+  if (w.length > 5 && w.endsWith("ing")) w = w.slice(0, -3);
+  else if (w.length > 4 && w.endsWith("ed") && !w.endsWith("eed")) w = w.slice(0, -2);
+  if (w.length > 3 && w.endsWith("y")) w = w.slice(0, -1) + "i";
+  if (w.length > 3 && w.endsWith("e")) w = w.slice(0, -1);
+  return w;
+}
+const GENERIC = new Set(["time", "work", "thing", "stuff", "people", "person", "good", "bad", "make", "get", "day", "new", "old", "big",
+  "small", "free", "place", "way", "lot", "something", "anything", "everything", "nothing", "other", "more", "most"].map(stem));
+function toks(s) {
+  const raw = String(s || "").toLowerCase().replace(/&/g, " and ").replace(/['’`]/g, "")
+    .replace(/united states( of america)?/g, " usa ").replace(/[^a-z0-9]+/g, " ").trim().split(" ").filter(Boolean);
+  const merged = []; let run = "";   // "u s a" → "usa", "p e" → "pe"
+  for (const w of raw) {
+    if (w.length === 1 && /[a-z]/.test(w)) run += w;
+    else { if (run) { merged.push(run); run = ""; } merged.push(w); }
   }
-  return prev[n];
+  if (run) merged.push(run);
+  const conv = w => SYN[w] || stem(NUM[w] || w);
+  const out = merged.map(w => NUM[w] || w).filter(w => !STOP.has(w)).map(conv);
+  return out.length ? out : merged.map(conv);
 }
-function cands(a) {
-  return [a.t, ...String(a.t).split(/\s+or\s+|\//), ...String(a.alt || "").split(",")].map(norm).filter(Boolean);
+function osa(a, b) {   // edit distance that also counts swapped neighbours as one typo
+  const m = a.length, n = b.length, d = [];
+  for (let i = 0; i <= m; i++) { d[i] = [i]; }
+  for (let j = 1; j <= n; j++) d[0][j] = j;
+  for (let i = 1; i <= m; i++) for (let j = 1; j <= n; j++) {
+    const c = a[i - 1] === b[j - 1] ? 0 : 1;
+    d[i][j] = Math.min(d[i - 1][j] + 1, d[i][j - 1] + 1, d[i - 1][j - 1] + c);
+    if (i > 1 && j > 1 && a[i - 1] === b[j - 2] && a[i - 2] === b[j - 1]) d[i][j] = Math.min(d[i][j], d[i - 2][j - 2] + 1);
+  }
+  return d[m][n];
 }
-function similar(g, c) {
-  if (g === c) return true;
-  if (g.length >= 4 && c.split(" ").includes(g)) return true;
-  if (c.length >= 4 && (" " + g + " ").includes(" " + c + " ")) return true;
-  const tol = c.length < 5 ? 0 : c.length < 9 ? 1 : 2;
-  return lev(g, c) <= tol;
+// How many typos a word of this length can have: none under 4 letters, then 1, 2 from 6 letters, 3 from 10.
+const typoTol = len => len >= 10 ? 3 : len >= 6 ? 2 : len >= 4 ? 1 : 0;
+function near(g, c) {
+  if (g === c) return 0;
+  if (/\d/.test(g) || /\d/.test(c) || g.length < 3) return -1;
+  const tol = typoTol(c.length);
+  if (!tol || Math.abs(g.length - c.length) > tol) return -1;
+  const d = osa(g, c);
+  if (d > tol || (d >= 2 && g[0] !== c[0])) return -1;   // bigger slips must still start with the right letter
+  return d;
+}
+function scoreCand(gt, ct) {
+  if (!gt.length || !ct.length) return 0;
+  if (gt.join(" ") === ct.join(" ")) return 100;
+  const gs = gt.join(""), cs = ct.join("");
+  if (gs === cs) return 96;
+  let best = 0;
+  const dw = near(gs, cs); if (dw > 0) best = 90 - 5 * dw;
+  if (gt.length <= ct.length + 2) {   // the answer's words are in the guess, any order, few extra words
+    const used = new Set(); let sum = 0, missed = 0;
+    for (const c of ct) {
+      let bi = -1, bd = 99;
+      gt.forEach((g, i) => { if (used.has(i)) return; const d = near(g, c); if (d >= 0 && d < bd) { bd = d; bi = i; } });
+      if (bi < 0) { missed++; continue; }
+      used.add(bi); sum += bd;
+    }
+    const extra = gt.length - used.size;
+    if (!missed) best = Math.max(best, 82 - 3 * sum - 2 * Math.max(0, gt.length - ct.length));
+    // Long titles: one word off is still the same answer ("the grinch who stole christmas").
+    else if (missed === 1 && ct.length >= 3 && extra <= 1) best = Math.max(best, 72 - 3 * sum);
+  }
+  if (gt.length < ct.length) {   // the guess is a distinctive part of a longer answer
+    const used = new Set(); let sum = 0, ok = true, strong = false;
+    for (const g of gt) {
+      let bi = -1, bd = 99;
+      ct.forEach((c, i) => { if (used.has(i)) return; const d = near(g, c); if (d >= 0 && d < bd) { bd = d; bi = i; } });
+      if (bi < 0) { ok = false; break; }
+      used.add(bi); sum += bd;
+      if (g.length >= 4 && !GENERIC.has(g)) strong = true;
+    }
+    if (ok && strong) best = Math.max(best, 60 + 10 * gt.length / ct.length - 3 * sum);
+  }
+  return best;
+}
+const candCache = new WeakMap();
+function answerToks(a) {
+  const key = a.t + "|" + (a.alt || "");
+  const hit = candCache.get(a); if (hit && hit.key === key) return hit.list;
+  const list = [a.t, ...String(a.t).split(/\s+or\s+|\//), ...String(a.alt || "").split(",")].map(toks).filter(t => t.length);
+  candCache.set(a, { key, list });
+  return list;
+}
+// Returns the answer a guess means: { hit: index or -1, dup: true when it's an answer already found }.
+function pickMatch(answers, text, taken) {
+  const gt = toks(text);
+  if (!gt.length) return { hit: -1, dup: false };
+  const ranked = answers.map((a, i) => ({ i, s: Math.max(0, ...answerToks(a).map(ct => scoreCand(gt, ct))) }))
+    .filter(x => x.s > 0).sort((x, y) => y.s - x.s);
+  if (!ranked.length) return { hit: -1, dup: false };
+  if (!taken.includes(ranked[0].i)) return { hit: ranked[0].i, dup: false };
+  const alt = ranked.find(x => !taken.includes(x.i) && x.s >= ranked[0].s - 5);
+  return alt ? { hit: alt.i, dup: false } : { hit: -1, dup: true };
 }
 
 /* ---------- Game logic ---------- */
@@ -1569,12 +1681,7 @@ function checkGuess(text, team = null) {
   if (!g) return "none";
   if (team == null && game.faceoff && game.turn != null) team = game.turn;
   const q = curQ();
-  let hit = -1, dup = false;
-  q.answers.forEach((a, i) => {
-    if (cands(a).some(c => similar(g, c))) {
-      if (game.revealed.includes(i)) dup = true; else if (hit < 0) hit = i;
-    }
-  });
+  const { hit, dup } = pickMatch(q.answers, text, game.revealed);
   if (hit >= 0) { reveal(hit); return "hit"; }
   if (dup) { toast("That one is already on the board"); return "dup"; }
   if (game.phase === "done") { toast("Not on the board"); return "miss"; }
@@ -2247,8 +2354,7 @@ function partyGuess(conn, m, text) {
   if (!p || game.over || game.pphase !== "live" || p.r.done) return;
   const now = Date.now(); if (now - (conn._lastGuess || 0) < 600) return; conn._lastGuess = now;
   const q = curQ(), g = norm(text); if (!g) return;
-  let hit = -1, dup = false;
-  q.answers.forEach((a, i) => { if (cands(a).some(c => similar(g, c))) { if (p.r.found.includes(i)) dup = true; else if (hit < 0) hit = i; } });
+  const { hit, dup } = pickMatch(q.answers, text, p.r.found);
   let r;
   if (hit >= 0) {
     const pts = q.answers[hit].p * mult();
