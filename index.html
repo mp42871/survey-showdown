@@ -438,6 +438,67 @@ button.chip { font: inherit; font-weight: 700; font-size: 0.8rem; letter-spacing
 .timer.big::before { inset: 0.5rem; }
 .timer.big span { font-size: 2.4rem; }
 
+/* Game mode picker */
+.modes { display: grid; grid-template-columns: repeat(auto-fit, minmax(16rem, 1fr)); gap: 0.8rem; }
+.mode { display: grid; grid-template-columns: auto 1fr; gap: 0.2rem 0.6rem; align-items: center; padding: 0.8rem 1rem; border-radius: 0.8rem; border: 0.15rem solid var(--line); background: rgba(0,0,0,0.25); cursor: pointer; }
+.mode input { width: 1.2rem; height: 1.2rem; accent-color: var(--sun); margin: 0; }
+.mode b { font-family: var(--display); font-weight: 400; color: var(--ink); font-size: 1.1rem; }
+.mode span { grid-column: 2; color: var(--muted); font-size: 0.85rem; }
+.mode:has(input:checked) { border-color: var(--sun); background: rgba(255,181,71,0.12); box-shadow: 0 0 1.2rem rgba(255,181,71,0.25); }
+.mode:has(input:disabled) { opacity: 0.45; cursor: not-allowed; }
+
+/* Everyone plays: host screen */
+#party { display: grid; grid-template-rows: auto minmax(0, 1fr) auto; gap: 0.7rem; }
+.phead { display: flex; align-items: center; justify-content: center; gap: 1rem; }
+.pmain { display: grid; grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr); gap: 1.2rem; min-height: 0; }
+#pBoard { margin: 0.55rem; }
+.lobby { display: grid; place-content: center; justify-items: center; text-align: center; gap: 0.6rem; border-radius: 1rem; background: rgba(0,0,0,0.3); border: 0.12rem solid var(--line); padding: 1rem; }
+.lobby .label { font-size: 0.8rem; font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase; color: var(--muted); }
+.lobby .code { font-family: var(--display); font-weight: 400; font-size: 6rem; line-height: 1; letter-spacing: 0.14em; color: var(--sun); text-shadow: 0 0.3rem 0 #a85a00, 0 0 2.5rem rgba(255,181,71,0.6); }
+.lobby p { margin: 0; font-size: 1.15rem; max-width: 30ch; text-wrap: balance; }
+.lobby p b { color: var(--mint); }
+.tile .cnt { position: absolute; right: 0.7rem; top: 50%; transform: translateY(-50%); font-size: 0.75rem; font-weight: 700; background: rgba(94,242,194,0.18); color: var(--mint); padding: 0.1rem 0.55rem; border-radius: 99rem; white-space: nowrap; }
+.back .cnt { position: static; transform: none; margin-right: 0.6rem; background: rgba(8,42,33,0.15); color: var(--mint-ink); }
+.lb { display: flex; flex-direction: column; min-height: 0; border-radius: 1rem; background: rgba(0,0,0,0.32); border: 0.12rem solid var(--line); padding: 0.7rem 0.8rem; }
+.lb h3 { margin: 0 0 0.5rem; font-family: var(--display); font-weight: 400; color: var(--sun); font-size: 1.15rem; display: flex; justify-content: space-between; align-items: baseline; gap: 0.5rem; }
+.lb h3 small { font-family: var(--body); font-size: 0.75rem; color: var(--muted); font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; }
+.lb ol { list-style: none; margin: 0; padding: 0; display: grid; gap: 0.3rem; overflow-y: auto; min-height: 0; align-content: start; }
+.lb ol.two { grid-template-columns: 1fr 1fr; }
+.lb .empty { color: var(--muted); text-align: center; padding: 1rem; font-weight: 700; }
+.lbrow { display: grid; grid-template-columns: 1.7rem minmax(0, 1fr) auto auto auto 3.4rem 1.6rem; gap: 0.5rem; align-items: center; padding: 0.3rem 0.5rem 0.3rem 0.6rem; border-radius: 0.5rem; background: linear-gradient(90deg, rgba(143,125,255,0.2), rgba(0,0,0,0.15)); font-weight: 700; }
+.lb ol.two .lbrow { grid-template-columns: 1.5rem minmax(0, 1fr) auto 3rem 1.6rem; }
+.lb ol.two .lbrow .dots { display: none; }
+.lbrow .rk { font-family: var(--display); color: var(--muted); text-align: center; }
+.lbrow:nth-child(1) .rk { color: var(--sun); }
+.lbrow:nth-child(2) .rk { color: #dcdcf5; }
+.lbrow:nth-child(3) .rk { color: #e3a46a; }
+.lbrow:nth-child(1) { background: linear-gradient(90deg, rgba(255,181,71,0.3), rgba(0,0,0,0.15)); }
+.lbrow .nm { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.lbrow .dots { display: flex; gap: 0.15rem; }
+.lbrow .dots i { width: 0.55rem; height: 0.55rem; border-radius: 50%; background: rgba(255,255,255,0.18); }
+.lbrow .dots i.on { background: var(--mint); box-shadow: 0 0 0.4rem var(--mint); }
+.lbrow .xs { color: var(--coral); font-family: var(--display); font-size: 0.8rem; min-width: 1.6rem; letter-spacing: -0.05em; }
+.lbrow .rp { color: var(--mint); font-size: 0.85rem; min-width: 2.4rem; text-align: right; }
+.lb ol.two .lbrow .rp { display: none; }
+.lbrow .tot { font-family: var(--display); font-weight: 400; text-align: right; font-variant-numeric: tabular-nums; }
+.lbrow.off { opacity: 0.45; }
+.lbrow.done .nm::after { content: " ✓"; color: var(--mint); }
+.lbrow.bump { animation: lbBump .9s ease; }
+@keyframes lbBump { 30% { background: rgba(94,242,194,0.45); transform: scale(1.02); } }
+.kick { border: 0; background: transparent; color: var(--muted); font-weight: 700; border-radius: 0.3rem; padding: 0.1rem 0.3rem; font-size: 0.8rem; min-height: 1.4rem; }
+.kick.armed { background: var(--coral); color: #2b0507; white-space: nowrap; }
+
+/* Everyone plays: player screen */
+#partyCard { display: grid; gap: 1rem; }
+#ppName { border-color: var(--sun); color: var(--sun); }
+#ppForm { display: flex; gap: 0.5rem; width: 100%; flex-wrap: wrap; }
+#ppForm input { flex: 1 1 12rem; min-width: 0; font-size: 1.3rem; padding: 0.7rem 1rem; border-radius: 0.7rem; border: 0.15rem solid var(--mint); background: rgba(0,0,0,0.35); box-shadow: 0 0 1.2rem rgba(94,242,194,0.3); }
+.mini li.missed { background: rgba(255,255,255,0.05); color: var(--ink); border: 0.1rem dashed rgba(255,255,255,0.3); text-transform: uppercase; }
+.mini li.missed b { color: var(--muted); }
+.wrong { list-style: none; margin: 0; padding: 0; display: flex; flex-wrap: wrap; gap: 0.4rem; justify-content: center; }
+.wrong li { background: rgba(255,90,95,0.16); color: #ffb3b5; border: 0.1rem solid rgba(255,90,95,0.5); border-radius: 99rem; padding: 0.2rem 0.75rem; font-weight: 700; text-decoration: line-through; }
+.final.party > div b { color: var(--sun) !important; text-shadow: 0 0 1.2rem rgba(255,181,71,0.6) !important; }
+
 /* Strikes and splashes */
 #xo { background: radial-gradient(ellipse at center, rgba(255,90,95,0.3), rgba(10,6,24,0.8)); }
 .shake { animation: shake .5s; }
@@ -475,6 +536,10 @@ button.chip { font: inherit; font-weight: 700; font-size: 0.8rem; letter-spacing
   .board { margin: 0.55rem 0.3rem; }
   .padmain { grid-template-columns: 1fr; }
   .padright { order: -1; }
+  #party { grid-template-rows: auto auto auto; }
+  .pmain { grid-template-columns: 1fr; }
+  .lobby .code { font-size: 3.4rem; }
+  .lb ol.two { grid-template-columns: 1fr; }
 }
 
 @media (max-width: 700px) {
@@ -542,6 +607,15 @@ button.chip { font: inherit; font-weight: 700; font-size: 0.8rem; letter-spacing
       </div>
 
       <div class="card">
+        <h3>Game mode</h3>
+        <div class="modes" id="modePick">
+          <label class="mode"><input type="radio" name="mode" value="classic"><b>Two teams</b><span>The classic face-off on the big board. Teams can also buzz in from their computers.</span></label>
+          <label class="mode"><input type="radio" name="mode" value="party"><b>Everyone plays</b><span>Every student or group plays each round on their own computer. The board shows a live leaderboard.</span></label>
+        </div>
+        <p class="note" id="partyUnavailable" hidden>Everyone plays needs the game opened in a regular web browser, such as the GitHub Pages site.</p>
+      </div>
+
+      <div class="card" id="teamsCard">
         <h3>Teams</h3>
         <div class="grid2">
           <label class="f">Left team<input type="text" id="team-a" maxlength="24" autocomplete="off"></label>
@@ -566,16 +640,24 @@ button.chip { font: inherit; font-weight: 700; font-size: 0.8rem; letter-spacing
             <label class="check"><input type="checkbox" id="shuffle"> Shuffle the questions</label>
             <label class="check"><input type="checkbox" id="lastDouble"> Last round is worth double</label>
           </div>
-          <label class="f">Time to answer<select id="answerTime">
+          <label class="f" id="lblStrikes" hidden>Wrong answers allowed per round<select id="pStrikes">
+            <option value="1">1</option><option value="2">2</option><option value="3">3</option><option value="5">5</option><option value="0">Unlimited</option>
+          </select></label>
+          <label class="f" id="lblRoundTime" hidden>Round time<select id="pTime">
+            <option value="0">No time limit</option><option value="30">30 seconds</option><option value="45">45 seconds</option><option value="60">1 minute</option>
+            <option value="90">90 seconds</option><option value="120">2 minutes</option><option value="180">3 minutes</option><option value="300">5 minutes</option>
+          </select></label>
+          <label class="f" id="lblAnswerTime">Time to answer<select id="answerTime">
             <option value="0">No time limit</option><option value="10">10 seconds</option><option value="15">15 seconds</option>
             <option value="20">20 seconds</option><option value="30">30 seconds</option><option value="45">45 seconds</option><option value="60">1 minute</option>
           </select></label>
-          <label class="f">Time to steal<select id="stealTime">
+          <label class="f" id="lblStealTime">Time to steal<select id="stealTime">
             <option value="0">No time limit</option><option value="15">15 seconds</option><option value="20">20 seconds</option>
             <option value="30">30 seconds</option><option value="45">45 seconds</option><option value="60">1 minute</option><option value="90">90 seconds</option>
           </select></label>
         </div>
-        <p class="note">When time runs out, the team gets a strike. During a steal, running out of time means the steal fails. Tap the timer on the board to pause it.</p>
+        <p class="note" id="partyNote" hidden>A player's round ends when they find every answer or use up their wrong answers. The round ends for everyone when time runs out, everyone is done, or you end it.</p>
+        <p class="note" id="timerNote">When time runs out, the team gets a strike. During a steal, running out of time means the steal fails. Tap the timer on the board to pause it.</p>
         <div class="row" style="justify-content:flex-start">
           <button class="btn sun" id="startBtn" type="button">Start new game</button>
         </div>
@@ -584,10 +666,11 @@ button.chip { font: inherit; font-weight: 700; font-size: 0.8rem; letter-spacing
 
       <div class="card" id="devCard">
         <h3>Team devices</h3>
-        <label class="check"><input type="checkbox" id="devices"> Let teams buzz in and answer from their own computers</label>
+        <label class="check" id="devToggle"><input type="checkbox" id="devices"> Let teams buzz in and answer from their own computers</label>
         <div id="devInfo" hidden style="display:grid;gap:0.6rem">
           <div class="joinbox">
             <div><span class="label">Join code</span><b id="joinCode">·····</b></div>
+            <button class="sbtn" id="newCodeBtn" type="button">New code</button>
             <p class="note" id="netStatus"></p>
           </div>
           <p class="note">On each team computer, open this same game file or web address and choose <b>Join a game</b>, then type the code. Each team can have one computer or many. At the start of each round the buzzers open; the first team to buzz types their answer, and the board checks it.</p>
@@ -659,6 +742,37 @@ button.chip { font: inherit; font-weight: 700; font-size: 0.8rem; letter-spacing
     </div>
   </section>
 
+  <!-- EVERYONE PLAYS: host screen -->
+  <section class="view" id="party" hidden>
+    <div class="phead">
+      <h2 class="question" id="pQuestion"></h2>
+      <button class="timer" id="pTimer" type="button" hidden aria-label="Round timer. Tap to pause."><span></span></button>
+    </div>
+    <div class="pmain">
+      <div class="lobby" id="pLobby">
+        <span class="label">Join code</span>
+        <b class="code" id="pCode">·····</b>
+        <p>On your computer, go to <b id="pUrl"></b>, choose <b>Join a game</b> and type the code.</p>
+        <p class="note" id="pNet"></p>
+        <button class="sbtn" id="pNewCode" type="button">New code</button>
+      </div>
+      <div class="board" id="pBoard" hidden></div>
+      <div class="lb">
+        <h3><span>Leaderboard</span><small id="lbCount"></small></h3>
+        <ol id="lbList"></ol>
+      </div>
+    </div>
+    <div class="controls">
+      <div class="status" id="pStatus" aria-live="polite"></div>
+      <div class="row">
+        <button class="btn sun" id="pStart" type="button">Start round 1</button>
+        <button class="btn strike" id="pEnd" type="button" hidden>End round</button>
+        <button class="btn primary" id="pNext" type="button" hidden>Next round →</button>
+        <button class="btn ghost" id="pFinish" type="button" hidden>End game</button>
+      </div>
+    </div>
+  </section>
+
   <!-- EDITOR -->
   <section class="view scroll" id="editor" hidden>
     <div class="panel">
@@ -702,7 +816,7 @@ button.chip { font: inherit; font-weight: 700; font-size: 0.8rem; letter-spacing
         <h3>Join a game</h3>
         <div class="grid2">
           <label class="f">Join code (shown on the board)<input type="text" id="join-code" class="codein" maxlength="5" autocomplete="off" autocapitalize="characters" spellcheck="false"></label>
-          <label class="f">Your name (optional)<input type="text" id="join-name" maxlength="16" autocomplete="off"></label>
+          <label class="f">Your name or team name<input type="text" id="join-name" maxlength="16" autocomplete="off"></label>
         </div>
         <div class="row" style="justify-content:flex-start">
           <button class="btn sun" id="joinBtn" type="button">Join</button>
@@ -746,6 +860,35 @@ button.chip { font: inherit; font-weight: 700; font-size: 0.8rem; letter-spacing
         <div class="row" style="justify-content:flex-start">
           <button class="sbtn" id="switchTeam" type="button">Switch team</button>
           <button class="sbtn" id="leaveGame" type="button">Leave game</button>
+        </div>
+      </div>
+
+      <div id="partyCard" hidden>
+        <div class="padtop">
+          <span class="chip" id="ppName"></span>
+          <span class="chip" id="ppRound"></span>
+          <span class="spacer"></span>
+          <span class="padscore"><span id="ppRank"></span><span id="ppTotal"></span></span>
+        </div>
+        <h2 class="tq" id="ppQ"></h2>
+        <div class="padmain">
+          <div class="padleft">
+            <ol class="mini" id="ppBoard"></ol>
+            <div class="strikes" id="ppStrikes"></div>
+          </div>
+          <div class="padright">
+            <div class="padmsg" id="ppMsg"></div>
+            <div class="timer big" id="ppTimer" hidden><span></span></div>
+            <form id="ppForm" autocomplete="off" hidden>
+              <input id="ppIn" type="text" maxlength="60" placeholder="Type an answer…" aria-label="Your answer" enterkeyhint="send">
+              <button class="btn primary" type="submit">Send</button>
+            </form>
+            <div class="fb" id="ppFb" hidden></div>
+            <ul class="wrong" id="ppWrong"></ul>
+          </div>
+        </div>
+        <div class="row" style="justify-content:flex-start">
+          <button class="sbtn" id="ppLeave" type="button">Leave game</button>
         </div>
       </div>
     </div>
@@ -972,8 +1115,9 @@ if (!lib || !Array.isArray(lib.sets) || !lib.sets.length || !lib.sets.every(s =>
 const saveLib = () => lsSet(LS_LIB, lib);
 const setById = id => lib.sets.find(s => s.id === id);
 
-const PREF_KEYS = ["teamA", "teamB", "rounds", "shuffle", "lastDouble", "answerTime", "stealTime", "topics", "sound"];
+const PREF_KEYS = ["teamA", "teamB", "rounds", "shuffle", "lastDouble", "answerTime", "stealTime", "topics", "sound", "mode", "pStrikes", "pTime"];
 let prefs = Object.assign({ sound: true, teamA: "Pencils", teamB: "Erasers", rounds: 5, shuffle: true, lastDouble: true, devices: false, code: null,
+  mode: "classic", pStrikes: 3, pTime: 90,
   answerTime: 20, stealTime: 30, topics: [lib.sets[0].id], editSet: lib.sets[0].id }, lsGet(LS_PREF) || {});
 // New starter topics reach teachers who already have a library, once; a topic they delete stays deleted.
 if (!Array.isArray(prefs.seenStarters)) prefs.seenStarters = libWasNew ? STARTER.map(s => s.id) : ORIGINAL_STARTERS.slice();
@@ -1189,6 +1333,7 @@ const mult = () => {
 const other = t => 1 - t;
 
 function startGame() {
+  if (prefs.mode === "party" && !inClaude) { startParty(); return; }
   const pool = poolQs();
   if (!pool.length) { toast("The topics you picked have no questions yet"); return; }
   const n = Math.min(Number(prefs.rounds) || 5, pool.length);
@@ -1274,7 +1419,8 @@ function toggleTimerPause() {
   else if (game.deadline != null) { game.paused = Math.max(0, game.deadline - Date.now()); game.deadline = null; toast("Timer paused"); }
   else return;
   game.autoPaused = false;
-  saveGame(); renderGame();
+  saveGame();
+  if (isParty()) partyRender(); else renderGame();
 }
 function renderTimer() {
   const el = $("#timer");
@@ -1452,7 +1598,7 @@ function hostStart() {
   const p = peer = new Peer(PREFIX + prefs.code, { debug: 0 });
   p.on("open", () => { peerRetries = 0; net.status = "live"; renderNet(); });
   p.on("connection", conn => {
-    conn.on("open", () => { conns.add(conn); sendTo(conn, stateMsg()); renderNet(); });
+    conn.on("open", () => { conns.add(conn); sendTo(conn, hostMsgFor(conn)); renderNet(); });
     conn.on("data", d => onDeviceData(conn, d));
     conn.on("close", () => { conns.delete(conn); renderNet(); });
     conn.on("error", () => { conns.delete(conn); renderNet(); });
@@ -1481,10 +1627,15 @@ function hostStop() {
   peer = null; net.status = "off"; renderNet();
 }
 function sendTo(conn, msg) { try { if (conn.open) conn.send(msg); } catch (e) {} }
-function broadcast() { if (!conns.size) return; const m = stateMsg(); conns.forEach(c => sendTo(c, m)); }
+function broadcast() {
+  if (!conns.size) return;
+  if (isParty()) { conns.forEach(c => sendTo(c, partyMsg(c._meta || {}))); return; }
+  const m = stateMsg(); conns.forEach(c => sendTo(c, m));
+}
+const hostMsgFor = conn => isParty() ? partyMsg(conn._meta || {}) : stateMsg();
 
 function stateMsg() {
-  const teams = (game && !(view !== "game" && game.over) ? game.teams : [{ name: prefs.teamA, score: 0 }, { name: prefs.teamB, score: 0 }])
+  const teams = (game && game.teams && !(view !== "game" && game.over) ? game.teams : [{ name: prefs.teamA, score: 0 }, { name: prefs.teamB, score: 0 }])
     .map(t => ({ name: String(t.name || ""), score: t.score }));
   const base = { t: "state", teams };
   if (!game || view !== "game") return { ...base, mode: "lobby" };
@@ -1501,14 +1652,21 @@ function stateMsg() {
 function onDeviceData(conn, msg) {
   if (!msg || typeof msg !== "object") return;
   const m = conn._meta || (conn._meta = { name: "", team: null });
-  if (msg.t === "hello") { m.name = String(msg.name || "").replace(/[\u0000-\u001f]/g, "").slice(0, 16); sendTo(conn, stateMsg()); }
+  if (msg.t === "hello") {
+    m.name = String(msg.name || "").replace(/[\u0000-\u001f]/g, "").trim().slice(0, 16);
+    m.pid = String(msg.pid || "").replace(/[^a-z0-9]/gi, "").slice(0, 24) || conn.peer;
+    if (isParty()) partyHello(conn, m); else sendTo(conn, stateMsg());
+    renderNet();
+  }
+  else if (msg.t === "pguess") { if (isParty()) partyGuess(conn, m, String(msg.text || "").slice(0, 60)); }
+  else if (isParty()) return;
   else if (msg.t === "team" && (msg.team === 0 || msg.team === 1)) { m.team = msg.team; sendTo(conn, stateMsg()); renderNet(); }
   else if (msg.t === "buzz") deviceBuzz(m);
   else if (msg.t === "answer") deviceAnswer(conn, m, String(msg.text || "").slice(0, 60));
 }
 
 function deviceBuzz(m) {
-  if (!game || view !== "game" || game.over || m.team == null) return;
+  if (!game || isParty() || view !== "game" || game.over || m.team == null) return;
   if (!(game.phase === "play" && game.faceoff && game.turn == null)) return;
   act(() => { game.turn = m.team; game.buzzBy = { team: m.team, name: m.name }; });
   sfx("buzzin");
@@ -1517,7 +1675,7 @@ function deviceBuzz(m) {
 }
 
 function deviceAnswer(conn, m, text) {
-  if (!game || view !== "game" || game.over || m.team == null || !text.trim()) return;
+  if (!game || isParty() || view !== "game" || game.over || m.team == null || !text.trim()) return;
   if (turnTeam() !== m.team) { sendTo(conn, { t: "result", r: "turn" }); return; }
   if (Date.now() - teamCooldown[m.team] < 2600) { sendTo(conn, { t: "result", r: "busy" }); return; }
   teamCooldown[m.team] = Date.now();
@@ -1534,15 +1692,16 @@ function deviceAnswer(conn, m, text) {
 }
 
 function renderNet() {
-  const on = prefs.devices && !inClaude;
+  const on = netOn();
   let a = 0, b = 0, n = 0;
   conns.forEach(c => { if (!c.open) return; n++; if (c._meta?.team === 0) a++; else if (c._meta?.team === 1) b++; });
-  const names = game && !game.over ? game.teams : [{ name: prefs.teamA }, { name: prefs.teamB }];
+  const names = game && !game.over && game.teams ? game.teams : [{ name: prefs.teamA }, { name: prefs.teamB }];
   $("#devInfo").hidden = !on;
   $("#joinCode").textContent = on && prefs.code ? prefs.code : "·····";
   const st = $("#netStatus");
   st.className = "note";
   st.textContent =
+    net.status === "live" && prefs.mode === "party" ? (n ? `${n} computer${n === 1 ? "" : "s"} connected.` : "Ready. Waiting for players to join.") :
     net.status === "live" ? (n ? `${n} computer${n === 1 ? "" : "s"} connected: ${names[0].name} ${a}, ${names[1].name} ${b}` + (n - a - b ? `, ${n - a - b} picking a team` : "") : "Ready. Waiting for team computers to join.") :
     net.status === "connecting" ? "Starting…" :
     net.status === "reconnecting" ? "Reconnecting…" :
@@ -1551,8 +1710,21 @@ function renderNet() {
   st.classList.toggle("netok", net.status === "live");
   st.classList.toggle("netbad", net.status === "error" || net.status === "nolib");
   const chip = $("#netChip");
-  chip.hidden = !(on && view === "game");
+  chip.hidden = !(on && (view === "game" || view === "party"));
   chip.textContent = `Code ${prefs.code || "…"} · ${n} joined`;
+  if (view === "party") { const pn = $("#pNet"); pn.textContent = st.textContent; pn.className = st.className; $("#pCode").textContent = prefs.code || "·····"; }
+}
+const netOn = () => !inClaude && (prefs.devices || prefs.mode === "party");
+let codeArmed = 0;
+function changeCode(btn) {
+  if (conns.size && Date.now() - codeArmed > 3000) {
+    codeArmed = Date.now(); btn.textContent = "Tap again: joined computers must rejoin";
+    setTimeout(() => { btn.textContent = "New code"; }, 3000); return;
+  }
+  codeArmed = 0; btn.textContent = "New code";
+  hostStop(); prefs.code = newCode(); peerRetries = 0; savePrefs(); hostStart(); renderNet();
+  if (isParty()) partyRender();
+  toast(`New join code: ${prefs.code}`);
 }
 
 /* ---------- Rendering ---------- */
@@ -1561,24 +1733,32 @@ let boardKey = null, bumpTeam = null, potDelay = 0, pendingCelebrate = null;
 const devicesOn = () => prefs.devices && !inClaude;
 
 function show(v) {
+  if (v === "game" && isParty()) v = "party";
+  if (v === "party" && !isParty()) v = game ? "game" : "setup";
   view = v;
   $("#setup").hidden = v !== "setup";
   $("#game").hidden = v !== "game";
+  $("#party").hidden = v !== "party";
   $("#editor").hidden = v !== "editor";
   $("#team").hidden = v !== "team";
   if (v === "team") renderTeam();
+  // The clock pauses while the host is away from the play screen.
+  const playView = isParty() ? "party" : "game";
+  const secs = isParty() ? game.roundSecs : timerSecs();
   if (game && !game.over) {
-    if (v !== "game" && game.deadline != null) { game.paused = Math.max(0, game.deadline - Date.now()); game.deadline = null; game.autoPaused = true; saveGame(); }
-    if (v === "game" && game.autoPaused && game.paused != null) { game.deadline = Date.now() + game.paused; game.paused = null; game.autoPaused = false; saveGame(); }
-    if (v === "game" && game.deadline != null && game.deadline < Date.now()) { game.deadline = Date.now() + timerSecs() * 1000 + GRACE_MS; saveGame(); }
+    if (v !== playView && game.deadline != null) { game.paused = Math.max(0, game.deadline - Date.now()); game.deadline = null; game.autoPaused = true; saveGame(); }
+    if (v === playView && game.autoPaused && game.paused != null) { game.deadline = Date.now() + game.paused; game.paused = null; game.autoPaused = false; saveGame(); }
+    if (v === playView && game.deadline != null && game.deadline < Date.now()) { game.deadline = Date.now() + secs * 1000 + GRACE_MS; saveGame(); }
   }
-  if (v !== "game") { renderNet(); broadcast(); }
-  $("#menuBtn").hidden = v !== "game";
+  const playing = v === "game" || v === "party";
+  $("#menuBtn").hidden = !playing;
   $("#undoBtn").hidden = v !== "game";
-  $("#roundChip").hidden = v !== "game";
+  $("#roundChip").hidden = !playing;
   if (v === "setup") renderSetup();
-  if (v === "game") { renderGame(); }
+  if (v === "game") renderGame();
+  if (v === "party") partyRender();
   if (v === "editor") renderEditor();
+  if (v !== "game" && v !== "party") { renderNet(); broadcast(); }
 }
 
 function xSvg() {
@@ -1695,6 +1875,7 @@ function renderGame() {
 function showWinner() {
   const [a, b] = game.teams;
   $("#winTitle").textContent = a.score === b.score ? "It's a tie!" : `${a.score > b.score ? a.name : b.name} win!`;
+  $("#finalScores").className = "final";
   $("#finalScores").innerHTML = game.teams.map(t => `<div>${esc(t.name)}<b>${t.score}</b></div>`).join("");
   $("#win").hidden = false;
   sfx("win");
@@ -1736,10 +1917,22 @@ function renderSetup() {
   $("#devUnavailable").hidden = !inClaude;
   $("#joinRow").hidden = inClaude;
   renderNet();
+  const party = prefs.mode === "party" && !inClaude;
+  document.querySelectorAll("#modePick input").forEach(r => { r.checked = r.value === (party ? "party" : "classic"); r.disabled = inClaude && r.value === "party"; });
+  $("#partyUnavailable").hidden = !inClaude;
+  $("#teamsCard").hidden = party;
+  ["#lblAnswerTime", "#lblStealTime", "#timerNote", "#devToggle"].forEach(s => { $(s).hidden = party; });
+  ["#lblStrikes", "#lblRoundTime", "#partyNote"].forEach(s => { $(s).hidden = !party; });
+  $("#pStrikes").value = String(prefs.pStrikes);
+  $("#pTime").value = String(prefs.pTime);
   const live = game && !game.over;
   $("#resumeCard").hidden = !live;
-  $("#startBtn").textContent = live ? "Start a new game instead" : "Start new game";
-  if (live) {
+  $("#startBtn").textContent = live ? "Start a new game instead" : party ? "Open the lobby" : "Start new game";
+  $("#scoreALabel").parentElement.hidden = !!(live && isParty());
+  if (live && isParty()) {
+    const n = Object.keys(game.players).length;
+    $("#resumeBtn").textContent = game.pphase === "lobby" ? `Back to the lobby (${n} joined)` : `Resume Everyone plays (round ${game.round + 1} of ${game.qs.length}, ${n} players)`;
+  } else if (live) {
     $("#scoreALabel").firstChild.textContent = `${game.teams[0].name} score`;
     $("#scoreBLabel").firstChild.textContent = `${game.teams[1].name} score`;
     $("#score-a").value = game.teams[0].score;
@@ -1877,13 +2070,21 @@ document.addEventListener("keydown", e => {
 });
 
 // Setup
-$("#team-a").addEventListener("input", e => { prefs.teamA = e.target.value; savePrefs(); if (game && !game.over) { game.teams[0].name = e.target.value || "Team A"; saveGame(); } broadcast(); renderNet(); });
-$("#team-b").addEventListener("input", e => { prefs.teamB = e.target.value; savePrefs(); if (game && !game.over) { game.teams[1].name = e.target.value || "Team B"; saveGame(); } broadcast(); renderNet(); });
+$("#team-a").addEventListener("input", e => { prefs.teamA = e.target.value; savePrefs(); if (game && !game.over && game.teams) { game.teams[0].name = e.target.value || "Team A"; saveGame(); } broadcast(); renderNet(); });
+$("#team-b").addEventListener("input", e => { prefs.teamB = e.target.value; savePrefs(); if (game && !game.over && game.teams) { game.teams[1].name = e.target.value || "Team B"; saveGame(); } broadcast(); renderNet(); });
 $("#devices").addEventListener("change", e => {
   prefs.devices = e.target.checked; savePrefs();
-  if (prefs.devices) hostStart(); else hostStop();
+  if (netOn()) hostStart(); else if (!(isParty() && !game.over)) hostStop();
   renderNet();
 });
+$("#modePick").addEventListener("change", e => {
+  if (e.target.name !== "mode") return;
+  prefs.mode = e.target.value === "party" ? "party" : "classic"; savePrefs();
+  if (netOn()) hostStart(); else if (!(isParty() && !game.over)) hostStop();
+  renderSetup();
+});
+$("#pStrikes").addEventListener("change", e => { prefs.pStrikes = Number(e.target.value); savePrefs(); if (isParty() && !game.over) { game.strikeLimit = prefs.pStrikes; saveGame(); } });
+$("#pTime").addEventListener("change", e => { prefs.pTime = Number(e.target.value); savePrefs(); if (isParty() && !game.over) { game.roundSecs = prefs.pTime; saveGame(); } });
 $("#reopenBtn").addEventListener("click", reopenBuzzers);
 $("#timer").addEventListener("click", toggleTimerPause);
 $("#netChip").addEventListener("click", () => splash({ big: prefs.code || "", sub: "Join code: open the game on a team computer and choose Join a game", tone: "sun", ms: 6000 }));
@@ -1891,10 +2092,10 @@ $("#joinModeBtn").addEventListener("click", () => { if (prefs.devices) { prefs.d
 $("#rounds").addEventListener("change", e => { prefs.rounds = Number(e.target.value); savePrefs(); });
 $("#shuffle").addEventListener("change", e => { prefs.shuffle = e.target.checked; savePrefs(); });
 $("#lastDouble").addEventListener("change", e => { prefs.lastDouble = e.target.checked; savePrefs(); if (game) { game.lastDouble = e.target.checked; saveGame(); } });
-$("#score-a").addEventListener("input", e => { if (game) { game.teams[0].score = parseInt(e.target.value, 10) || 0; saveGame(); } });
-$("#score-b").addEventListener("input", e => { if (game) { game.teams[1].score = parseInt(e.target.value, 10) || 0; saveGame(); } });
+$("#score-a").addEventListener("input", e => { if (game && game.teams) { game.teams[0].score = parseInt(e.target.value, 10) || 0; saveGame(); } });
+$("#score-b").addEventListener("input", e => { if (game && game.teams) { game.teams[1].score = parseInt(e.target.value, 10) || 0; saveGame(); } });
 $("#startBtn").addEventListener("click", startGame);
-$("#resumeBtn").addEventListener("click", () => { boardKey = null; show("game"); keepAwake(); });
+$("#resumeBtn").addEventListener("click", () => { boardKey = null; pBoardKey = null; if (isParty()) hostStart(); show("game"); keepAwake(); });
 $("#editBtn").addEventListener("click", () => show("editor"));
 $("#againBtn").addEventListener("click", () => { $("#win").hidden = true; startGame(); });
 $("#winSetup").addEventListener("click", () => { $("#win").hidden = true; show("setup"); });
@@ -2007,10 +2208,241 @@ $("#topicList").addEventListener("change", e => {
 $("#answerTime").addEventListener("change", e => { prefs.answerTime = Number(e.target.value); savePrefs(); });
 $("#stealTime").addEventListener("change", e => { prefs.stealTime = Number(e.target.value); savePrefs(); });
 
+/* ---------- Everyone plays: host side ---------- */
+// Each joined computer is a player keyed by a stable id it keeps in its browser, so a reconnect keeps its score.
+const isParty = () => !!(game && game.mode === "party");
+const freshRound = () => ({ found: [], strikes: 0, wrong: [], pts: 0, done: false });
+let pBoardKey = null, bumpPid = null, kickArmed = { pid: null, at: 0 }, partyEnding = false;
+
+function startParty() {
+  const pool = poolQs();
+  if (!pool.length) { toast("The topics you picked have no questions yet"); return; }
+  const n = Math.min(Number(prefs.rounds) || 5, pool.length);
+  let idx = pool.map((_, i) => i);
+  if (prefs.shuffle) shuffle(idx);
+  const players = {};
+  // Computers already connected from an earlier game stay in.
+  conns.forEach(c => { const m = c._meta; if (c.open && m && m.pid && !players[m.pid]) players[m.pid] = { name: m.name || `Player ${Object.keys(players).length + 1}`, total: 0, r: freshRound(), joined: Date.now() }; });
+  game = { mode: "party", qs: idx.slice(0, n).map(i => clone(pool[i])), round: 0, pphase: "lobby", players, kicked: [], over: false,
+    lastDouble: !!prefs.lastDouble, strikeLimit: Number(prefs.pStrikes) || 0, roundSecs: Number(prefs.pTime) || 0, deadline: null, paused: null };
+  history = []; pBoardKey = null; saveGame();
+  hostStart(); show("party"); keepAwake();
+}
+function rankList() {
+  return Object.entries(game.players).map(([pid, p]) => ({ pid, ...p }))
+    .sort((a, b) => b.total - a.total || b.r.pts - a.r.pts || a.joined - b.joined);
+}
+function onlinePids() { const s = new Set(); conns.forEach(c => { if (c.open && c._meta && c._meta.pid) s.add(c._meta.pid); }); return s; }
+function partyHello(conn, m) {
+  if (game.kicked.includes(m.pid)) { sendTo(conn, { t: "kicked" }); setTimeout(() => { try { conn.close(); } catch (e) {} }, 400); return; }
+  let p = game.players[m.pid];
+  if (!p) {
+    p = game.players[m.pid] = { name: m.name || `Player ${Object.keys(game.players).length + 1}`, total: 0, r: freshRound(), joined: Date.now() };
+    if (view === "party") sfx("buzzin");
+  } else if (m.name) p.name = m.name;
+  saveGame(); partyRender();
+}
+function partyGuess(conn, m, text) {
+  const p = game.players[m.pid];
+  if (!p || game.over || game.pphase !== "live" || p.r.done) return;
+  const now = Date.now(); if (now - (conn._lastGuess || 0) < 600) return; conn._lastGuess = now;
+  const q = curQ(), g = norm(text); if (!g) return;
+  let hit = -1, dup = false;
+  q.answers.forEach((a, i) => { if (cands(a).some(c => similar(g, c))) { if (p.r.found.includes(i)) dup = true; else if (hit < 0) hit = i; } });
+  let r;
+  if (hit >= 0) {
+    const pts = q.answers[hit].p * mult();
+    p.r.found.push(hit); p.r.pts += pts; p.total += pts; r = "hit"; bumpPid = m.pid;
+    if (p.r.found.length === q.answers.length) p.r.done = true;
+  } else if (dup) r = "dup";
+  else {
+    p.r.strikes++; p.r.wrong.push(text.trim().slice(0, 40)); r = "miss";
+    if (game.strikeLimit > 0 && p.r.strikes >= game.strikeLimit) p.r.done = true;
+  }
+  saveGame();
+  sendTo(conn, { t: "result", r, text });
+  partyRender();
+  if (p.r.done && everyoneDone()) setTimeout(() => { if (isParty() && game.pphase === "live" && everyoneDone()) partyEndRound("all"); }, 1500);
+}
+function everyoneDone() {
+  const on = onlinePids();
+  const active = Object.entries(game.players).filter(([pid]) => on.has(pid));
+  return active.length > 0 && active.every(([, p]) => p.r.done);
+}
+function partyMsg(m) {
+  if (!isParty()) return { t: "pstate", mode: "lobby", name: m.name || "", total: 0, rank: 0, players: 0 };
+  const p = m.pid ? game.players[m.pid] : null;
+  const ranked = rankList();
+  const msg = { t: "pstate", mode: game.over ? "over" : game.pphase, name: p ? p.name : (m.name || ""), total: p ? p.total : 0,
+    rank: p ? ranked.findIndex(x => x.pid === m.pid) + 1 : 0, players: ranked.length, round: game.round + 1, rounds: game.qs.length,
+    strikeLimit: game.strikeLimit };
+  if (!game.over && game.pphase !== "lobby") {
+    const q = curQ();
+    Object.assign(msg, { q: q.q, n: q.answers.length, mult: mult(), found: {}, strikes: p ? p.r.strikes : 0, wrong: p ? p.r.wrong : [],
+      pts: p ? p.r.pts : 0, done: p ? p.r.done : false });
+    (p ? p.r.found : []).forEach(i => { msg.found[i] = [q.answers[i].t, q.answers[i].p]; });
+    if (game.pphase === "reveal") msg.all = q.answers.map(a => [a.t, a.p]);   // answers leave the board only after the round
+    if (game.pphase === "live") Object.assign(msg, { timeLeft: timeLeftMs(), timerPaused: game.paused != null, timerMax: game.roundSecs });
+  }
+  if (game.over) msg.top = ranked.slice(0, 3).map(x => ({ name: x.name, total: x.total }));
+  return msg;
+}
+function partyBeginRound() {
+  game.pphase = "live";
+  Object.values(game.players).forEach(p => { p.r = freshRound(); });
+  game.deadline = game.roundSecs > 0 ? Date.now() + game.roundSecs * 1000 + 3500 : null;
+  game.paused = null; game.autoPaused = false;
+  saveGame(); pBoardKey = null; partyRender(); introRound();
+}
+function partyEndRound(why) {
+  if (!isParty() || game.pphase !== "live") return;
+  game.pphase = "reveal"; game.deadline = null; game.paused = null;
+  saveGame(); partyRender(); sfx("bank");
+  const best = rankList().filter(p => p.r.pts > 0).sort((a, b) => b.r.pts - a.r.pts)[0];
+  splash({ big: why === "time" ? "Time's up!" : "Round over!", sub: best ? `Top score this round: ${best.name} (+${best.r.pts})` : "Here are all the answers.",
+    tone: why === "time" ? "coral" : "sun", ms: 2800 });
+  if (best) setTimeout(() => rain(120), 500);
+}
+function partyFinish() {
+  if (!isParty()) return;
+  game.over = true; game.deadline = null; game.paused = null;
+  saveGame(); partyRender();
+  const top = rankList();
+  $("#winTitle").textContent = top.length ? `${top[0].name} wins!` : "Game over";
+  const fs = $("#finalScores"); fs.className = "final party";
+  fs.innerHTML = top.slice(0, 3).map((p, i) => `<div>${["1st", "2nd", "3rd"][i]} · ${esc(p.name)}<b>${p.total}</b></div>`).join("");
+  $("#win").hidden = false; sfx("win"); confetti();
+}
+function kickPlayer(pid) {
+  if (!isParty()) return;
+  game.kicked.push(pid); delete game.players[pid];
+  conns.forEach(c => { if (c._meta && c._meta.pid === pid) { sendTo(c, { t: "kicked" }); setTimeout(() => { try { c.close(); } catch (e) {} }, 400); } });
+  saveGame(); partyRender(); toast("Player removed");
+}
+function renderPartyTimer() {
+  const el = $("#pTimer"), left = game && game.pphase === "live" ? timeLeftMs() : null;
+  if (left == null) { el.hidden = true; return; }
+  const max = game.roundSecs * 1000 || 1, sec = Math.min(game.roundSecs, Math.ceil(left / 1000));
+  el.hidden = false;
+  el.style.setProperty("--p", Math.max(0, Math.min(100, (left / max) * 100)).toFixed(1));
+  el.classList.toggle("paused", game.paused != null);
+  el.classList.toggle("warn", game.paused == null && sec <= 10);
+  el.firstElementChild.textContent = game.paused != null ? "PAUSED" : sec;
+  if (game.paused == null && sec <= 5 && sec > 0 && sec !== lastTickSec) { lastTickSec = sec; if (prefs.sound) tone(sec <= 3 ? 1200 : 900, 0, 0.08, "square", 0.06); }
+  if (sec > 5) lastTickSec = -1;
+}
+function partyRender() {
+  if (!isParty()) return;
+  if (view === "party") {
+    const lobby = game.pphase === "lobby", live = game.pphase === "live", reveal = game.pphase === "reveal";
+    const ranked = rankList(), on = onlinePids();
+    $("#pLobby").hidden = !lobby;
+    $("#pBoard").hidden = lobby;
+    const chip = $("#roundChip");
+    chip.textContent = lobby ? "Lobby" : `Round ${game.round + 1} of ${game.qs.length}` + (mult() > 1 ? ` · ${mult() === 2 ? "Double" : "Triple"} points` : "");
+    chip.classList.toggle("hot", !lobby && mult() > 1);
+    if (lobby) {
+      $("#pQuestion").innerHTML = `<small>Everyone plays</small>Join the game on your computer`;
+      $("#pCode").textContent = prefs.code || "·····";
+      $("#pUrl").textContent = (location.host + location.pathname).replace(/index\.html$/, "");
+    } else {
+      const q = curQ(), n = q.answers.length;
+      const key = game.round + "|" + q.q;
+      const qEl = $("#pQuestion");
+      qEl.innerHTML = `<small>${q.topic ? esc(q.topic) + " · " : ""}Top ${n} answers</small>${esc(q.q)}`;
+      const board = $("#pBoard");
+      if (pBoardKey !== key) {
+        pBoardKey = key;
+        qEl.classList.remove("qin"); void qEl.offsetWidth; qEl.classList.add("qin");
+        const rows = Math.max(2, Math.ceil(n / 2));
+        board.style.gridTemplateRows = `repeat(${rows}, minmax(0, 1fr))`;
+        let html = "";
+        for (let i = 0; i < rows * 2; i++) {
+          html += i < n
+            ? `<div class="tile enter" style="--d:${(i % rows) * 0.12 + Math.floor(i / rows) * 0.06}s" data-i="${i}"><span class="flip"><span class="face front"><span class="n">${i + 1}</span><span class="cnt" hidden></span></span><span class="face back"><span class="ans">${esc(q.answers[i].t)}</span><span class="cnt"></span><span class="pts">${esc(q.answers[i].p)}</span></span></span></div>`
+            : `<div class="tile empty"></div>`;
+        }
+        board.innerHTML = html;
+        setTimeout(() => board.querySelectorAll(".tile.enter").forEach(t => t.classList.remove("enter")), 1600);
+      }
+      const counts = q.answers.map((_, i) => Object.values(game.players).filter(p => p.r.found.includes(i)).length);
+      board.querySelectorAll(".tile[data-i]").forEach(t => {
+        const i = Number(t.dataset.i), c = counts[i];
+        const wasOn = t.classList.contains("on");
+        t.classList.toggle("on", reveal);
+        if (reveal && !wasOn) { t.classList.remove("enter", "flash"); void t.offsetWidth; t.classList.add("flash"); }
+        const label = c ? `${c} found` : "nobody";
+        const fc = t.querySelector(".front .cnt"); fc.hidden = !c; fc.textContent = label;
+        t.querySelector(".back .cnt").textContent = label;
+      });
+    }
+    // Leaderboard
+    const list = $("#lbList");
+    const nAns = lobby ? 0 : curQ().answers.length;
+    list.classList.toggle("two", ranked.length > 12);
+    $("#lbCount").textContent = `${ranked.length} player${ranked.length === 1 ? "" : "s"}`;
+    list.innerHTML = ranked.length ? ranked.map((p, i) => {
+      const dots = lobby ? "" : Array.from({ length: nAns }, (_, k) => `<i class="${k < p.r.found.length ? "on" : ""}"></i>`).join("");
+      const xs = lobby ? "" : "✕".repeat(p.r.strikes);
+      const armed = kickArmed.pid === p.pid && Date.now() - kickArmed.at < 3000;
+      return `<li class="lbrow${on.has(p.pid) ? "" : " off"}${!lobby && p.r.done ? " done" : ""}${bumpPid === p.pid ? " bump" : ""}">
+        <span class="rk">${i + 1}</span><span class="nm">${esc(p.name)}</span><span class="dots">${dots}</span><span class="xs">${xs}</span>
+        <span class="rp">${!lobby && p.r.pts ? "+" + p.r.pts : ""}</span><span class="tot">${p.total}</span>
+        <button class="kick${armed ? " armed" : ""}" type="button" data-pid="${esc(p.pid)}" aria-label="Remove ${esc(p.name)}">${armed ? "Remove?" : "✕"}</button></li>`;
+    }).join("") : `<li class="empty">Nobody has joined yet.</li>`;
+    bumpPid = null;
+    // Status and buttons
+    const doneCount = ranked.filter(p => on.has(p.pid) && p.r.done).length, onCount = ranked.filter(p => on.has(p.pid)).length;
+    $("#pStatus").textContent = lobby ? (ranked.length ? `${ranked.length} joined. Start when everyone is in.` : "Waiting for players to join…")
+      : live ? `${doneCount} of ${onCount} player${onCount === 1 ? "" : "s"} finished.`
+      : game.over ? "Game over." : "Round over. Everyone can see the answers on their computer.";
+    const last = game.round >= game.qs.length - 1;
+    $("#pStart").hidden = !lobby;
+    $("#pEnd").hidden = !live;
+    $("#pNext").hidden = !reveal || last;
+    $("#pFinish").hidden = lobby || live;
+    $("#pFinish").textContent = last ? "Final results →" : "End game";
+    $("#pFinish").className = "btn " + (last ? "primary" : "ghost");
+    renderPartyTimer();
+    renderNet();
+  }
+  broadcast();
+}
+setInterval(() => {
+  if (!isParty() || game.over || view !== "party") return;
+  renderPartyTimer();
+  if (game.pphase === "live" && game.deadline != null && game.deadline <= Date.now() && !partyEnding) {
+    partyEnding = true; partyEndRound("time"); partyEnding = false;
+  }
+}, 250);
+// Keep the "x of y finished" count honest as computers come and go.
+setInterval(() => { if (isParty() && view === "party" && !game.over) partyRender(); }, 5000);
+
+$("#pStart").addEventListener("click", () => { if (isParty() && game.pphase === "lobby") partyBeginRound(); });
+$("#pEnd").addEventListener("click", () => partyEndRound("host"));
+$("#pNext").addEventListener("click", () => {
+  if (!isParty() || game.pphase !== "reveal" || game.round >= game.qs.length - 1) return;
+  game.round++; partyBeginRound();
+});
+$("#pFinish").addEventListener("click", partyFinish);
+$("#pTimer").addEventListener("click", toggleTimerPause);
+$("#pNewCode").addEventListener("click", e => changeCode(e.currentTarget));
+$("#newCodeBtn").addEventListener("click", e => changeCode(e.currentTarget));
+$("#lbList").addEventListener("click", e => {
+  const b = e.target.closest(".kick"); if (!b) return;
+  const pid = b.dataset.pid;
+  if (kickArmed.pid === pid && Date.now() - kickArmed.at < 3000) { kickArmed = { pid: null, at: 0 }; kickPlayer(pid); }
+  else { kickArmed = { pid, at: Date.now() }; partyRender(); setTimeout(() => { if (kickArmed.pid === pid) { kickArmed = { pid: null, at: 0 }; partyRender(); } }, 3100); }
+});
+
 /* ---------- Team devices: team side ---------- */
 const LS_JOIN = "ss-join-v1";
 const join = Object.assign({ code: "", name: "", team: null, active: false }, lsGet(LS_JOIN) || {});
+// Player id lives per browser tab, so a refresh keeps the score but two tabs count as two players.
+let myPid = "p" + Math.random().toString(36).slice(2, 12);
+try { const s = sessionStorage.getItem("ss-pid"); if (s) myPid = s; else sessionStorage.setItem("ss-pid", myPid); } catch (e) {}
 let dpeer = null, dconn = null, dstate = null, dRetry = null, dEverConnected = false, fbTimer;
+let dpstate = null, dmode = "classic", dFails = 0;
 const saveJoin = () => lsSet(LS_JOIN, join);
 function setJoinStatus(msg, bad) { const s = $("#joinStatus"); s.textContent = msg; s.className = "note" + (bad ? " netbad" : ""); }
 
@@ -2026,7 +2458,10 @@ function joinConnect() {
       if (p !== dpeer) return;
       if (err.type === "peer-unavailable") {
         dconn = null;
-        if (dEverConnected) { setJoinStatus("The board isn't answering. Retrying…"); retryJoin(); }
+        if (dEverConnected && ++dFails >= 5) {
+          leaveJoin();
+          setJoinStatus("Lost the game. If the host changed the join code, type the new one.", true);
+        } else if (dEverConnected) { setJoinStatus("The board isn't answering. Retrying…"); retryJoin(); }
         else setJoinStatus(`No game found with code ${join.code}. Check the code, and make sure the board has team computers turned on.`, true);
       } else if (["network", "server-error", "socket-error", "socket-closed"].includes(err.type)) {
         setJoinStatus("Can't reach the connection service. Retrying…", true); retryJoin();
@@ -2040,8 +2475,8 @@ function openConn() {
   const c = dconn = dpeer.connect(PREFIX + join.code, { reliable: true });
   c.on("open", () => {
     if (c !== dconn) return;
-    dEverConnected = true; join.active = true; saveJoin(); setJoinStatus("");
-    c.send({ t: "hello", name: join.name });
+    dEverConnected = true; dFails = 0; join.active = true; saveJoin(); setJoinStatus("");
+    c.send({ t: "hello", name: join.name, pid: myPid });
     if (join.team != null) c.send({ t: "team", team: join.team });
     renderTeam();
   });
@@ -2062,18 +2497,20 @@ function leaveJoin() {
   clearTimeout(dRetry); dRetry = null; dEverConnected = false;
   if (dconn) { const c = dconn; dconn = null; try { c.close(); } catch (e) {} }
   if (dpeer) { const p = dpeer; dpeer = null; try { p.destroy(); } catch (e) {} }
-  dstate = null; join.active = false; saveJoin();
+  dstate = null; dpstate = null; join.active = false; saveJoin();
   renderTeam();
 }
 function onHostData(msg) {
   if (!msg || typeof msg !== "object") return;
-  if (msg.t === "state" && Array.isArray(msg.teams) && msg.teams.length === 2) { dstate = msg; renderTeam(); }
+  if (msg.t === "state" && Array.isArray(msg.teams) && msg.teams.length === 2) { dstate = msg; dmode = "classic"; renderTeam(); }
+  else if (msg.t === "pstate") { dpstate = msg; dmode = "party"; renderTeam(); }
   else if (msg.t === "result") showFb(msg.r);
+  else if (msg.t === "kicked") { leaveJoin(); setJoinStatus("The host removed you from this game.", true); }
 }
 function showFb(r) {
   const map = { hit: ["On the board!", "ok"], miss: ["Not on the board", "no"], dup: ["Already on the board", "wait"], turn: ["It's not your team's turn", "wait"], busy: ["One answer at a time", "wait"], timeout: ["Time's up!", "no"] };
   const m = map[r]; if (!m) return;
-  const fb = $("#padFb");
+  const fb = dmode === "party" ? $("#ppFb") : $("#padFb");
   fb.textContent = m[0]; fb.className = "fb " + m[1];
   fb.hidden = true; void fb.offsetWidth; fb.hidden = false;
   if (r === "hit") { sfx("ding"); burstAt(fb, 40, ["#5ef2c2", "#ffb547", "#ffffff"]); }
@@ -2089,10 +2526,13 @@ function doBuzz() {
 }
 function renderTeam() {
   if (view !== "team") return;
-  const connected = !!(dconn && dconn.open && dstate);
+  const party = dmode === "party" && !!dpstate;
+  const connected = !!(dconn && dconn.open && (party ? dpstate : dstate));
   $("#joinCard").hidden = connected;
-  $("#pickCard").hidden = !connected || join.team != null;
-  $("#padCard").hidden = !connected || join.team == null;
+  $("#partyCard").hidden = !connected || !party;
+  $("#pickCard").hidden = !connected || party || join.team != null;
+  $("#padCard").hidden = !connected || party || join.team == null;
+  if (connected && party) { renderParty(); return; }
   if (!connected) {
     if (document.activeElement !== $("#join-code")) $("#join-code").value = join.code;
     if (document.activeElement !== $("#join-name")) $("#join-name").value = join.name;
@@ -2156,9 +2596,56 @@ function renderTeam() {
     : null;
   renderPadTimer();
 }
+function renderParty() {
+  const s = dpstate;
+  $("#ppName").textContent = s.name || join.name || "You";
+  $("#ppRound").textContent = s.mode === "lobby" ? "Lobby" : s.mode === "over" ? "Game over"
+    : `Round ${s.round} of ${s.rounds}` + (s.mult > 1 ? ` · ${s.mult === 2 ? "Double" : "Triple"} points` : "");
+  $("#ppRank").textContent = s.rank ? `#${s.rank} of ${s.players}` : "";
+  $("#ppTotal").textContent = `${Number(s.total) || 0} pts`;
+  let msg = "", showForm = false, board = "", strikes = "", wrong = [];
+  if (s.mode === "lobby") {
+    $("#ppQ").textContent = "You're in! Waiting for the host to start.";
+    msg = `${s.players} player${s.players === 1 ? " has" : "s have"} joined. Watch the big screen.`;
+  } else if (s.mode === "over") {
+    $("#ppQ").textContent = s.rank === 1 ? "You won!" : s.rank ? `You finished #${s.rank} of ${s.players}` : "Game over";
+    msg = (s.top || []).map((p, i) => `${i + 1}. ${p.name} (${p.total})`).join("   ");
+  } else {
+    $("#ppQ").textContent = s.q;
+    for (let i = 0; i < s.n; i++) {
+      const f = s.found && s.found[i], a = s.all && s.all[i];
+      board += f ? `<li class="on"><span>${esc(f[0])}</span><b>${esc(f[1])}</b></li>`
+        : a ? `<li class="missed"><span>${esc(a[0])}</span><b>${esc(a[1])}</b></li>`
+        : `<li><span>${i + 1}</span></li>`;
+    }
+    strikes = s.strikeLimit > 0
+      ? Array.from({ length: s.strikeLimit }, (_, i) => `<span class="${i < s.strikes ? "on" : ""}">✕</span>`).join("")
+      : (s.strikes ? `<span class="on">✕</span> ${s.strikes} wrong` : "");
+    wrong = s.wrong || [];
+    const allFound = Object.keys(s.found || {}).length === s.n;
+    if (s.mode === "live") {
+      if (s.done) msg = allFound ? `You found every answer! +${s.pts}. Waiting for the others…` : `Out of guesses with ${s.pts} points. Waiting for the others…`;
+      else { showForm = true; msg = s.pts ? `+${s.pts} this round. Keep going!` : "Type as many answers as you can!"; }
+    } else {
+      msg = `Round over: you scored ${s.pts} point${s.pts === 1 ? "" : "s"}. Green answers are the ones you found. Wait for the next round.`;
+    }
+  }
+  $("#ppBoard").innerHTML = board;
+  $("#ppStrikes").innerHTML = strikes;
+  $("#ppWrong").innerHTML = wrong.map(w => `<li>${esc(w)}</li>`).join("");
+  $("#ppMsg").textContent = msg;
+  const form = $("#ppForm"), wasHidden = form.hidden;
+  form.hidden = !showForm;
+  if (showForm && wasHidden) { $("#ppIn").value = ""; $("#ppIn").focus(); }
+  dTimer = (s.mode === "live" && s.timeLeft != null)
+    ? { until: Date.now() + s.timeLeft, left: s.timeLeft, paused: !!s.timerPaused, max: (Number(s.timerMax) || 1) * 1000, mine: !s.done }
+    : null;
+  renderPadTimer();
+}
 let dTimer = null, dTick = -1;
 function renderPadTimer() {
-  const el = $("#padTimer");
+  const el = dmode === "party" ? $("#ppTimer") : $("#padTimer");
+  (dmode === "party" ? $("#padTimer") : $("#ppTimer")).hidden = true;
   if (!dTimer || view !== "team") { el.hidden = true; return; }
   const left = dTimer.paused ? dTimer.left : Math.max(0, dTimer.until - Date.now());
   const sec = Math.min(dTimer.max / 1000, Math.ceil(left / 1000));
@@ -2190,6 +2677,14 @@ $("#switchTeam").addEventListener("click", () => { join.team = null; saveJoin();
 $("#leaveGame").addEventListener("click", () => { leaveJoin(); setJoinStatus("You left the game."); });
 $("#buzzBtn").addEventListener("pointerdown", e => { e.preventDefault(); doBuzz(); });
 $("#buzzBtn").addEventListener("click", doBuzz);
+$("#ppForm").addEventListener("submit", e => {
+  e.preventDefault();
+  const v = $("#ppIn").value.trim();
+  if (!v || !dconn || !dconn.open) return;
+  dconn.send({ t: "pguess", text: v });
+  $("#ppIn").value = ""; $("#ppIn").focus();
+});
+$("#ppLeave").addEventListener("click", () => { leaveJoin(); setJoinStatus("You left the game."); });
 $("#ansForm").addEventListener("submit", e => {
   e.preventDefault();
   const v = $("#ansIn").value.trim();
@@ -2347,7 +2842,7 @@ function start(data) {
     if (join.code.length === 5) joinConnect();
     return;
   }
-  if (devicesOn()) hostStart();
+  if (netOn() || (isParty() && !game.over)) hostStart();
   show(data && data.view && data.view !== "editor" && game ? data.view : "setup");
 }
 window.claude?.hot?.snapshot?.(() => ({ game, view }));
