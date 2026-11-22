@@ -390,7 +390,7 @@ button.chip { font: inherit; font-weight: 700; font-size: 0.8rem; letter-spacing
 .mini li { display: flex; justify-content: space-between; align-items: center; gap: 0.6rem; padding: 0.35rem 0.8rem; border-radius: 0.4rem; background: linear-gradient(180deg, #3a2f85, #221c52); font-weight: 700; color: var(--muted); min-height: 1.7rem; }
 .mini li.on { background: linear-gradient(180deg, #b8ffeb, var(--mint) 45%, #2fd3a4); color: var(--mint-ink); text-transform: uppercase; }
 .mini li b { font-family: var(--display); font-weight: 400; }
-.padright { display: grid; gap: 1rem; justify-items: center; text-align: center; }
+.padright { display: grid; gap: 1rem; justify-items: center; text-align: center; min-width: 0; }
 .padmsg { font-size: 1.4rem; font-weight: 700; text-wrap: balance; }
 .yourturn .padmsg { color: var(--tc); text-shadow: 0 0 1rem var(--tc-glow); }
 .buzz {
@@ -404,10 +404,11 @@ button.chip { font: inherit; font-weight: 700; font-size: 0.8rem; letter-spacing
 @keyframes buzzPulse { 50% { box-shadow: 0 0.7rem 0 rgba(0,0,0,0.45), 0 0 5rem var(--tc); } }
 #ansForm { display: flex; gap: 0.5rem; width: 100%; flex-wrap: wrap; }
 #ansForm input { flex: 1 1 12rem; min-width: 0; font-size: 1.3rem; padding: 0.7rem 1rem; border-radius: 0.7rem; border: 0.15rem solid var(--tc); background: rgba(0,0,0,0.35); box-shadow: 0 0 1.2rem var(--tc-glow); }
-.fb { font-family: var(--display); font-size: 1.6rem; padding: 0.4rem 1.2rem; border-radius: 0.6rem; animation: slam .5s cubic-bezier(.2,1.6,.4,1) both; }
+.fb { font-family: var(--display); font-size: 1.5rem; padding: 0.4rem 1.2rem; border-radius: 0.6rem; max-width: 100%; box-sizing: border-box; text-align: center; overflow-wrap: anywhere; animation: slam .5s cubic-bezier(.2,1.6,.4,1) both; }
 .fb.ok { background: var(--mint); color: var(--mint-ink); }
 .fb.no { background: var(--coral); color: #2b0507; }
 .fb.wait { background: var(--stage-2); color: var(--ink); animation: none; }
+.fb.speed { background: linear-gradient(180deg, #ffe7a8, var(--sun) 50%, #f08a1c); color: var(--sun-ink); box-shadow: 0 0 2rem rgba(255,181,71,0.6); }
 
 /* Topics */
 .topics { display: flex; flex-wrap: wrap; gap: 0.6rem; }
@@ -664,6 +665,10 @@ button.chip { font: inherit; font-weight: 700; font-size: 0.8rem; letter-spacing
             <option value="0">No time limit</option><option value="30">30 seconds</option><option value="45">45 seconds</option><option value="60">1 minute</option>
             <option value="90">90 seconds</option><option value="120">2 minutes</option><option value="180">3 minutes</option><option value="300">5 minutes</option>
           </select></label>
+          <label class="f" id="lblSpeed">Speed bonus<select id="speedBonus">
+            <option value="0">Off</option><option value="5">+5 points</option><option value="10">+10 points</option><option value="20">+20 points</option>
+          </select></label>
+          <p class="note" id="speedNote" style="align-self:end;margin:0"></p>
           <label class="f" id="lblAnswerTime">Time to answer<select id="answerTime">
             <option value="0">No time limit</option><option value="10">10 seconds</option><option value="15">15 seconds</option>
             <option value="20">20 seconds</option><option value="30">30 seconds</option><option value="45">45 seconds</option><option value="60">1 minute</option>
@@ -1144,9 +1149,9 @@ if (!lib || !Array.isArray(lib.sets) || !lib.sets.length || !lib.sets.every(s =>
 const saveLib = () => lsSet(LS_LIB, lib);
 const setById = id => lib.sets.find(s => s.id === id);
 
-const PREF_KEYS = ["teamA", "teamB", "rounds", "shuffle", "lastDouble", "answerTime", "stealTime", "topics", "sound", "mode", "pStrikes", "pTime"];
+const PREF_KEYS = ["teamA", "teamB", "rounds", "shuffle", "lastDouble", "answerTime", "stealTime", "topics", "sound", "mode", "pStrikes", "pTime", "speedBonus"];
 let prefs = Object.assign({ sound: true, teamA: "Pencils", teamB: "Erasers", rounds: 5, shuffle: true, lastDouble: true, devices: false, code: null,
-  mode: "classic", pStrikes: 3, pTime: 90,
+  mode: "classic", pStrikes: 3, pTime: 90, speedBonus: 10,
   answerTime: 20, stealTime: 30, topics: [lib.sets[0].id], editSet: lib.sets[0].id }, lsGet(LS_PREF) || {});
 // New starter topics reach teachers who already have a library, once; a topic they delete stays deleted.
 if (!Array.isArray(prefs.seenStarters)) prefs.seenStarters = libWasNew ? STARTER.map(s => s.id) : ORIGINAL_STARTERS.slice();
@@ -1485,7 +1490,7 @@ function startGame() {
     teams: [{ name: prefs.teamA || "Team A", score: 0 }, { name: prefs.teamB || "Team B", score: 0 }],
     qs: idx.map(i => clone(pool[i])),
     round: 0, control: 0, revealed: [], strikes: 0, pot: 0, phase: "play", last: null, over: false,
-    faceoff: true, turn: null, faceoffMisses: 0, buzzBy: null,
+    faceoff: true, turn: null, faceoffMisses: 0, buzzBy: null, speedBonus: Number(prefs.speedBonus) || 0,
     lastDouble: !!prefs.lastDouble
   };
   if (!game.qs.length) { game = null; toast("Your questions need answers first"); return; }
@@ -1602,14 +1607,30 @@ function reveal(i) {
     game.revealed.push(i);
     sfx("ding");
     if (game.phase === "done") return;
-    if (game.faceoff) { game.faceoff = false; if (game.turn != null) game.control = game.turn; game.turn = null; }
+    if (game.faceoff) {
+      // Speed bonus: the team that buzzed in first and got the face-off right.
+      const sb = game.buzzBy && game.turn != null && game.buzzBy.team === game.turn ? game.turn : null;
+      const amt = (game.speedBonus ?? Number(prefs.speedBonus) ?? 0) * mult();
+      if (sb != null && amt > 0) { game.teams[sb].score += amt; speedWin = { team: sb, amt }; bumpTeam = sb; }
+      game.faceoff = false; if (game.turn != null) game.control = game.turn; game.turn = null;
+    }
     game.pot += pts;
     if (game.phase === "steal") endRound(other(game.control), "steal");
     else if (game.revealed.length === curQ().answers.length) endRound(game.control, "sweep");
   });
   if (scoring) flyPoints(tileEl, pts);
   setTimeout(() => burstAt(tileEl, 28, ["#5ef2c2", "#ffb547", "#ffffff", "#b8ffeb"]), 250);
+  if (speedWin) {
+    const w = speedWin; speedWin = null;
+    setTimeout(() => {
+      if (!game || !game.teams) return;
+      sfx("buzzin");
+      burstAt(w.team === 0 ? $("#teamA") : $("#teamB"), 60, teamCols(w.team));
+      splash({ big: "Speed bonus!", sub: `${game.teams[w.team].name} buzzed first and got it right`, tag: `+${w.amt} points`, tone: w.team === 0 ? "pink" : "cyan", ms: 2000 });
+    }, 900);
+  }
 }
+let speedWin = null;
 
 function strike() {
   if (!game || game.over) return;
@@ -2067,6 +2088,10 @@ function renderSetup() {
   ["#lblStrikes", "#lblRoundTime", "#partyNote"].forEach(s => { $(s).hidden = !party; });
   $("#pStrikes").value = String(prefs.pStrikes);
   $("#pTime").value = String(prefs.pTime);
+  $("#speedBonus").value = String(prefs.speedBonus);
+  $("#speedNote").textContent = !Number(prefs.speedBonus) ? "No extra points for being first."
+    : party ? "The first player to find each answer gets the bonus."
+    : "The team that buzzes in first and gets the face-off right gets the bonus. Needs team buzzers turned on.";
   const live = game && !game.over;
   $("#resumeCard").hidden = !live;
   $("#startBtn").textContent = live ? "Start a new game instead" : party ? "Open the lobby" : "Start new game";
@@ -2234,6 +2259,11 @@ $("#modePick").addEventListener("change", e => {
   if (netOn()) hostStart(); else if (!(isParty() && !game.over)) hostStop();
   renderSetup();
 });
+$("#speedBonus").addEventListener("change", e => {
+  prefs.speedBonus = Number(e.target.value); savePrefs();
+  if (game && !game.over) { game.speedBonus = prefs.speedBonus; saveGame(); }
+  renderSetup();
+});
 $("#pStrikes").addEventListener("change", e => { prefs.pStrikes = Number(e.target.value); savePrefs(); if (isParty() && !game.over) { game.strikeLimit = prefs.pStrikes; saveGame(); } });
 $("#pTime").addEventListener("change", e => { prefs.pTime = Number(e.target.value); savePrefs(); if (isParty() && !game.over) { game.roundSecs = prefs.pTime; saveGame(); } });
 $("#reopenBtn").addEventListener("click", reopenBuzzers);
@@ -2375,7 +2405,8 @@ function startParty() {
   // Computers already connected from an earlier game stay in.
   conns.forEach(c => { const m = c._meta; if (c.open && m && m.pid && !players[m.pid]) players[m.pid] = { name: m.name || `Player ${Object.keys(players).length + 1}`, total: 0, r: freshRound(), joined: Date.now() }; });
   game = { mode: "party", qs: idx.slice(0, n).map(i => clone(pool[i])), round: 0, pphase: "lobby", players, kicked: [], over: false,
-    lastDouble: !!prefs.lastDouble, strikeLimit: Number(prefs.pStrikes) || 0, roundSecs: Number(prefs.pTime) || 0, deadline: null, paused: null };
+    lastDouble: !!prefs.lastDouble, strikeLimit: Number(prefs.pStrikes) || 0, roundSecs: Number(prefs.pTime) || 0, deadline: null, paused: null,
+    speedBonus: Number(prefs.speedBonus) || 0, firsts: {} };
   history = []; pBoardKey = null; saveGame();
   hostStart(); show("party"); keepAwake();
 }
@@ -2399,10 +2430,17 @@ function partyGuess(conn, m, text) {
   const now = Date.now(); if (now - (conn._lastGuess || 0) < 600) return; conn._lastGuess = now;
   const q = curQ(), g = norm(text); if (!g) return;
   const { hit, dup } = pickMatch(q.answers, text, p.r.found);
-  let r;
+  let r, bonus = 0;
   if (hit >= 0) {
     const pts = q.answers[hit].p * mult();
     p.r.found.push(hit); p.r.pts += pts; p.total += pts; r = "hit"; bumpPid = m.pid;
+    // Speed bonus: the first player this round to find this answer.
+    game.firsts = game.firsts || {};
+    if (game.speedBonus > 0 && game.firsts[hit] == null) {
+      game.firsts[hit] = m.pid;
+      bonus = game.speedBonus * mult();
+      p.r.pts += bonus; p.total += bonus; p.r.bonus = (p.r.bonus || 0) + bonus;
+    }
     if (p.r.found.length === q.answers.length) p.r.done = true;
   } else if (dup) r = "dup";
   else {
@@ -2410,7 +2448,7 @@ function partyGuess(conn, m, text) {
     if (game.strikeLimit > 0 && p.r.strikes >= game.strikeLimit) p.r.done = true;
   }
   saveGame();
-  sendTo(conn, { t: "result", r, text });
+  sendTo(conn, { t: "result", r, text, bonus });
   partyRender();
   if (p.r.done && everyoneDone()) setTimeout(() => { if (isParty() && game.pphase === "live" && everyoneDone()) partyEndRound("all"); }, 1500);
 }
@@ -2430,7 +2468,8 @@ function partyMsg(m) {
     const q = curQ();
     Object.assign(msg, { q: q.q, n: q.answers.length, mult: mult(), found: {}, strikes: p ? p.r.strikes : 0, wrong: p ? p.r.wrong : [],
       pts: p ? p.r.pts : 0, done: p ? p.r.done : false });
-    (p ? p.r.found : []).forEach(i => { msg.found[i] = [q.answers[i].t, q.answers[i].p]; });
+    (p ? p.r.found : []).forEach(i => { msg.found[i] = [q.answers[i].t, q.answers[i].p, (game.firsts || {})[i] === m.pid]; });
+    msg.bonus = p ? (p.r.bonus || 0) : 0;
     if (game.pphase === "reveal") msg.all = q.answers.map(a => [a.t, a.p]);   // answers leave the board only after the round
     if (game.pphase === "live") Object.assign(msg, { timeLeft: timeLeftMs(), timerPaused: game.paused != null, timerMax: game.roundSecs });
   }
@@ -2438,7 +2477,7 @@ function partyMsg(m) {
   return msg;
 }
 function partyBeginRound() {
-  game.pphase = "live";
+  game.pphase = "live"; game.firsts = {};
   Object.values(game.players).forEach(p => { p.r = freshRound(); });
   game.deadline = game.roundSecs > 0 ? Date.now() + game.roundSecs * 1000 + 3500 : null;
   game.paused = null; game.autoPaused = false;
@@ -2521,9 +2560,10 @@ function partyRender() {
         const wasOn = t.classList.contains("on");
         t.classList.toggle("on", reveal);
         if (reveal && !wasOn) { t.classList.remove("enter", "flash"); void t.offsetWidth; t.classList.add("flash"); }
-        const label = c ? `${c} found` : "nobody";
+        const fp = (game.firsts || {})[i], fname = fp && game.players[fp] ? game.players[fp].name : "";
+        const label = c ? `${c} found` + (fname ? ` · ⚡ ${fname} first` : "") : "nobody";
         const fc = t.querySelector(".front .cnt"); fc.hidden = !c; fc.textContent = label;
-        const bc = t.querySelector(".back .cnt"); bc.hidden = !c; bc.textContent = c;   // just the number on the narrow answer side
+        const bc = t.querySelector(".back .cnt"); bc.hidden = !c; bc.textContent = fname ? `⚡${c}` : c;   // just the number on the narrow answer side
         bc.title = label;
       });
     }
@@ -2726,16 +2766,17 @@ function onHostData(msg) {
   if (!msg || typeof msg !== "object") return;
   if (msg.t === "state" && Array.isArray(msg.teams) && msg.teams.length === 2) { dstate = msg; dmode = "classic"; renderTeam(); }
   else if (msg.t === "pstate") { dpstate = msg; dmode = "party"; renderTeam(); }
-  else if (msg.t === "result") showFb(msg.r);
+  else if (msg.t === "result") showFb(msg.r, Number(msg.bonus) || 0);
   else if (msg.t === "kicked") { leaveJoin(); setJoinStatus("The host removed you from this game.", true); }
 }
-function showFb(r) {
+function showFb(r, bonus = 0) {
   const map = { hit: ["On the board!", "ok"], miss: ["Not on the board", "no"], dup: ["Already on the board", "wait"], turn: ["It's not your team's turn", "wait"], busy: ["One answer at a time", "wait"], timeout: ["Time's up!", "no"], accepted: ["The host accepted your answer!", "ok"] };
   const m = map[r]; if (!m) return;
   const fb = dmode === "party" ? $("#ppFb") : $("#padFb");
-  fb.textContent = m[0]; fb.className = "fb " + m[1];
+  fb.textContent = r === "hit" && bonus ? `⚡ First! +${bonus}` : m[0];
+  fb.className = "fb " + m[1] + (r === "hit" && bonus ? " speed" : "");
   fb.hidden = true; void fb.offsetWidth; fb.hidden = false;
-  if (r === "hit" || r === "accepted") { sfx("ding"); burstAt(fb, 40, ["#5ef2c2", "#ffb547", "#ffffff"]); }
+  if (r === "hit" || r === "accepted") { sfx(bonus ? "buzzin" : "ding"); burstAt(fb, bonus ? 70 : 40, ["#5ef2c2", "#ffb547", "#ffffff"]); }
   if (r === "miss" || r === "timeout") sfx("buzz");
   clearTimeout(fbTimer); fbTimer = setTimeout(() => { fb.hidden = true; }, 2600);
 }
@@ -2836,7 +2877,7 @@ function renderParty() {
     $("#ppQ").textContent = s.q;
     for (let i = 0; i < s.n; i++) {
       const f = s.found && s.found[i], a = s.all && s.all[i];
-      board += f ? `<li class="on"><span>${esc(f[0])}</span><b>${esc(f[1])}</b></li>`
+      board += f ? `<li class="on"><span>${esc(f[0])}</span><b>${f[2] ? "⚡ " : ""}${esc(f[1])}</b></li>`
         : a ? `<li class="missed"><span>${esc(a[0])}</span><b>${esc(a[1])}</b></li>`
         : `<li><span>${i + 1}</span></li>`;
     }
@@ -2851,6 +2892,7 @@ function renderParty() {
     } else {
       msg = `Round over: you scored ${s.pts} point${s.pts === 1 ? "" : "s"}. Green answers are the ones you found. Wait for the next round.`;
     }
+    if (s.bonus) msg += ` (⚡ includes +${s.bonus} for finding answers first)`;
   }
   $("#ppBoard").innerHTML = board;
   $("#ppStrikes").innerHTML = strikes;
