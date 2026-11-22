@@ -459,6 +459,8 @@ button.chip { font: inherit; font-weight: 700; font-size: 0.8rem; letter-spacing
 .lobby p b { color: var(--mint); }
 .tile .cnt { position: absolute; right: 0.7rem; top: 50%; transform: translateY(-50%); font-size: 0.75rem; font-weight: 700; background: rgba(94,242,194,0.18); color: var(--mint); padding: 0.1rem 0.55rem; border-radius: 99rem; white-space: nowrap; }
 .back .cnt { position: static; transform: none; margin-right: 0.6rem; background: rgba(8,42,33,0.15); color: var(--mint-ink); }
+#pBoard .back .ans { font-size: 1.15rem; overflow-wrap: normal; word-break: normal; hyphens: auto; padding-inline: 0.8rem; }
+#pBoard .back .pts { min-width: 3.4rem; font-size: 1.35rem; }
 .lb { display: flex; flex-direction: column; min-height: 0; border-radius: 1rem; background: rgba(0,0,0,0.32); border: 0.12rem solid var(--line); padding: 0.7rem 0.8rem; }
 .lb h3 { margin: 0 0 0.5rem; font-family: var(--display); font-weight: 400; color: var(--sun); font-size: 1.15rem; display: flex; justify-content: space-between; align-items: baseline; gap: 0.5rem; }
 .lb h3 small { font-family: var(--body); font-size: 0.75rem; color: var(--muted); font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; }
@@ -487,6 +489,21 @@ button.chip { font: inherit; font-weight: 700; font-size: 0.8rem; letter-spacing
 @keyframes lbBump { 30% { background: rgba(94,242,194,0.45); transform: scale(1.02); } }
 .kick { border: 0; background: transparent; color: var(--muted); font-weight: 700; border-radius: 0.3rem; padding: 0.1rem 0.3rem; font-size: 0.8rem; min-height: 1.4rem; }
 .kick.armed { background: var(--coral); color: #2b0507; white-space: nowrap; }
+
+/* Host review of wrong guesses */
+.review { display: grid; gap: 0.4rem; justify-items: center; }
+.review .rlabel { font-size: 0.75rem; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); }
+.chips { display: flex; flex-wrap: wrap; gap: 0.4rem; justify-content: center; max-height: 5.6rem; overflow-y: auto; }
+.gchip { border: 0.1rem solid rgba(255,90,95,0.55); background: rgba(255,90,95,0.14); color: #ffd6d7; border-radius: 99rem; padding: 0.25rem 0.85rem; font-weight: 700; font-size: 0.9rem; }
+.gchip small { color: var(--muted); font-weight: 400; margin-left: 0.4rem; }
+.gchip:active { transform: scale(0.96); }
+#acceptBox { position: fixed; inset: 0; z-index: 38; display: grid; place-items: center; background: rgba(10,6,24,0.82); padding: 1rem; }
+.acard { background: var(--stage-2); border: 0.15rem solid var(--line); border-radius: 1rem; padding: 1.2rem 1.4rem; display: grid; gap: 0.9rem; width: min(46rem, 100%); box-sizing: border-box; box-shadow: 0 1rem 3rem rgba(0,0,0,0.5); }
+.acard h3 { margin: 0; font-size: 1.4rem; text-wrap: balance; }
+.acard p { margin: 0; color: var(--muted); font-size: 0.9rem; }
+.agrid { display: grid; grid-template-columns: repeat(auto-fit, minmax(13rem, 1fr)); gap: 0.5rem; }
+.agrid .btn { display: flex; justify-content: space-between; gap: 0.6rem; text-align: left; white-space: normal; }
+.agrid .btn b { font-family: var(--display); font-weight: 400; color: var(--sun); }
 
 /* Everyone plays: player screen */
 #partyCard { display: grid; gap: 1rem; }
@@ -764,6 +781,10 @@ button.chip { font: inherit; font-weight: 700; font-size: 0.8rem; letter-spacing
     </div>
     <div class="controls">
       <div class="status" id="pStatus" aria-live="polite"></div>
+      <div class="review" id="pReview" hidden>
+        <span class="rlabel">Wrong guesses · tap one that should count</span>
+        <div class="chips" id="pReviewList"></div>
+      </div>
       <div class="row">
         <button class="btn sun" id="pStart" type="button">Start round 1</button>
         <button class="btn strike" id="pEnd" type="button" hidden>End round</button>
@@ -907,6 +928,14 @@ button.chip { font: inherit; font-weight: 700; font-size: 0.8rem; letter-spacing
       <button class="btn sun" id="againBtn" type="button">Play again</button>
       <button class="btn" id="winSetup" type="button">Setup</button>
     </div>
+  </div>
+</div>
+<div id="acceptBox" hidden>
+  <div class="acard" role="dialog" aria-modal="true" aria-labelledby="acceptTitle">
+    <h3 id="acceptTitle"></h3>
+    <p id="acceptWho"></p>
+    <div class="agrid" id="acceptList"></div>
+    <div class="row" style="justify-content:flex-end"><button class="btn ghost" id="acceptCancel" type="button">Cancel</button></div>
   </div>
 </div>
 <div id="splash" hidden>
@@ -1501,6 +1530,7 @@ function act(fn) {
 function undo() {
   if (!history.length) { toast("Nothing to undo"); return; }
   game = JSON.parse(history.pop());
+  if (lastMiss && Date.now() - lastMiss.at < 60000) lastMiss.undone = true;
   syncTimer("", true);
   saveGame(); $("#win").hidden = true; renderGame();
 }
@@ -1685,10 +1715,15 @@ function checkGuess(text, team = null) {
   if (hit >= 0) { reveal(hit); return "hit"; }
   if (dup) { toast("That one is already on the board"); return "dup"; }
   if (game.phase === "done") { toast("Not on the board"); return "miss"; }
+  lastMiss = { text: String(text).trim(), round: game.round, at: Date.now(), undone: false };
   if (team != null && game.faceoff && game.phase === "play") { faceoffMiss(team); return "miss"; }
   strike();
+  const said = lastMiss.text;
+  setTimeout(() => toast(`“${said}” isn't on the board. Wrong call? Press Undo, then tap the right answer.`), 1400);
   return "miss";
 }
+// After a typed guess is marked wrong, Undo then tapping a tile accepts that wording from now on.
+let lastMiss = null;
 
 /* ---------- Team devices: host side ---------- */
 let peer = null, peerRetries = 0;
@@ -2125,7 +2160,16 @@ function fromText(txt) {
 
 /* ---------- Events ---------- */
 $("#board").addEventListener("click", e => {
-  const t = e.target.closest(".tile[data-i]"); if (t) reveal(Number(t.dataset.i));
+  const t = e.target.closest(".tile[data-i]"); if (!t) return;
+  const i = Number(t.dataset.i);
+  const learn = lastMiss && lastMiss.undone && game && lastMiss.round === game.round && Date.now() - lastMiss.at < 120000 && !game.revealed.includes(i);
+  reveal(i);
+  if (learn) {
+    const q = curQ(), said = lastMiss.text;
+    rememberAlias(q, i, said);
+    setTimeout(() => toast(`“${said}” will count as ${q.answers[i].t} from now on.`), 300);
+    lastMiss = null;
+  }
 });
 $("#strikeBtn").addEventListener("click", strike);
 $("#teamA").addEventListener("click", () => setControl(0));
@@ -2479,7 +2523,8 @@ function partyRender() {
         if (reveal && !wasOn) { t.classList.remove("enter", "flash"); void t.offsetWidth; t.classList.add("flash"); }
         const label = c ? `${c} found` : "nobody";
         const fc = t.querySelector(".front .cnt"); fc.hidden = !c; fc.textContent = label;
-        t.querySelector(".back .cnt").textContent = label;
+        const bc = t.querySelector(".back .cnt"); bc.hidden = !c; bc.textContent = c;   // just the number on the narrow answer side
+        bc.title = label;
       });
     }
     // Leaderboard
@@ -2510,10 +2555,81 @@ function partyRender() {
     $("#pFinish").textContent = last ? "Final results →" : "End game";
     $("#pFinish").className = "btn " + (last ? "primary" : "ghost");
     renderPartyTimer();
+    renderReview();
     renderNet();
   }
   broadcast();
 }
+
+/* Host review: accept a wrong guess after the round */
+function wrongGroups() {
+  const groups = new Map();
+  Object.entries(game.players).forEach(([pid, p]) => (p.r.wrong || []).forEach((text, idx) => {
+    const key = toks(text).join(" ") || String(text).toLowerCase();
+    if (!groups.has(key)) groups.set(key, { key, text, who: [] });
+    groups.get(key).who.push({ pid, idx, name: p.name });
+  }));
+  return [...groups.values()].sort((a, b) => b.who.length - a.who.length || a.text.localeCompare(b.text));
+}
+let acceptKey = null;
+function renderReview() {
+  const show = isParty() && !game.over && game.pphase === "reveal";
+  const groups = show ? wrongGroups() : [];
+  $("#pReview").hidden = !groups.length;
+  $("#pReviewList").innerHTML = groups.map(g =>
+    `<button class="gchip" type="button" data-key="${esc(g.key)}">${esc(g.text)}<small>${g.who.length > 1 ? "×" + g.who.length : esc(g.who[0].name)}</small></button>`).join("");
+  if (!show) $("#acceptBox").hidden = true;
+}
+function openAccept(key) {
+  if (!isParty() || game.pphase !== "reveal") return;
+  const g = wrongGroups().find(x => x.key === key); if (!g) return;
+  acceptKey = key;
+  const q = curQ();
+  $("#acceptTitle").textContent = `Count “${g.text}” as…`;
+  $("#acceptWho").textContent = `Typed by ${g.who.map(w => w.name).join(", ")}. They get the points, and this wording will count from now on.`;
+  $("#acceptList").innerHTML = q.answers.map((a, i) => `<button class="btn" type="button" data-ai="${i}"><span>${esc(a.t)}</span><b>${a.p * mult()}</b></button>`).join("");
+  $("#acceptBox").hidden = false;
+  $("#acceptList .btn")?.focus();
+}
+function acceptGroup(key, ai) {
+  const g = wrongGroups().find(x => x.key === key);
+  $("#acceptBox").hidden = true; acceptKey = null;
+  if (!g || !isParty()) return;
+  const q = curQ(), pts = q.answers[ai].p * mult();
+  const byPid = {};
+  g.who.forEach(w => { (byPid[w.pid] = byPid[w.pid] || []).push(w.idx); });
+  let n = 0;
+  Object.entries(byPid).forEach(([pid, idxs]) => {
+    const p = game.players[pid]; if (!p) return;
+    idxs.sort((a, b) => b - a).forEach(ix => p.r.wrong.splice(ix, 1));
+    p.r.strikes = Math.max(0, p.r.strikes - idxs.length);
+    if (!p.r.found.includes(ai)) { p.r.found.push(ai); p.r.pts += pts; p.total += pts; n++; bumpPid = pid; }
+    conns.forEach(c => { if (c._meta && c._meta.pid === pid) sendTo(c, { t: "result", r: "accepted" }); });
+  });
+  rememberAlias(q, ai, g.text);
+  saveGame(); partyRender(); sfx("ding");
+  toast(n ? `“${g.text}” now counts as ${q.answers[ai].t}: +${pts} for ${n} player${n === 1 ? "" : "s"}`
+          : `“${g.text}” now counts as ${q.answers[ai].t}. Those players already had it.`);
+}
+// Adds an accepted wording to the answer's "Also accept" list, in this game and in the saved topic.
+function rememberAlias(q, ai, text) {
+  const ans = q.answers[ai], word = String(text).replace(/,/g, " ").trim().slice(0, 40);
+  if (!word) return;
+  const add = a => {
+    const list = String(a.alt || "").split(",").map(s => s.trim()).filter(Boolean);
+    if (!list.some(s => s.toLowerCase() === word.toLowerCase())) { list.push(word); a.alt = list.join(", "); }
+  };
+  add(ans);
+  const sets = lib.sets.filter(s => s.name === q.topic);
+  const src = (sets.length ? sets : lib.sets).flatMap(s => s.questions).find(x => x.q === q.q);
+  const srcAns = src && src.answers.find(a => a.t === ans.t);
+  if (srcAns) { add(srcAns); saveLib(); }
+}
+$("#pReviewList").addEventListener("click", e => { const b = e.target.closest(".gchip"); if (b) openAccept(b.dataset.key); });
+$("#acceptList").addEventListener("click", e => { const b = e.target.closest("[data-ai]"); if (b && acceptKey) acceptGroup(acceptKey, Number(b.dataset.ai)); });
+$("#acceptCancel").addEventListener("click", () => { $("#acceptBox").hidden = true; acceptKey = null; });
+$("#acceptBox").addEventListener("click", e => { if (e.target.id === "acceptBox") { $("#acceptBox").hidden = true; acceptKey = null; } });
+document.addEventListener("keydown", e => { if (e.key === "Escape" && !$("#acceptBox").hidden) { $("#acceptBox").hidden = true; acceptKey = null; } });
 setInterval(() => {
   if (!isParty() || game.over || view !== "party") return;
   renderPartyTimer();
@@ -2614,12 +2730,12 @@ function onHostData(msg) {
   else if (msg.t === "kicked") { leaveJoin(); setJoinStatus("The host removed you from this game.", true); }
 }
 function showFb(r) {
-  const map = { hit: ["On the board!", "ok"], miss: ["Not on the board", "no"], dup: ["Already on the board", "wait"], turn: ["It's not your team's turn", "wait"], busy: ["One answer at a time", "wait"], timeout: ["Time's up!", "no"] };
+  const map = { hit: ["On the board!", "ok"], miss: ["Not on the board", "no"], dup: ["Already on the board", "wait"], turn: ["It's not your team's turn", "wait"], busy: ["One answer at a time", "wait"], timeout: ["Time's up!", "no"], accepted: ["The host accepted your answer!", "ok"] };
   const m = map[r]; if (!m) return;
   const fb = dmode === "party" ? $("#ppFb") : $("#padFb");
   fb.textContent = m[0]; fb.className = "fb " + m[1];
   fb.hidden = true; void fb.offsetWidth; fb.hidden = false;
-  if (r === "hit") { sfx("ding"); burstAt(fb, 40, ["#5ef2c2", "#ffb547", "#ffffff"]); }
+  if (r === "hit" || r === "accepted") { sfx("ding"); burstAt(fb, 40, ["#5ef2c2", "#ffb547", "#ffffff"]); }
   if (r === "miss" || r === "timeout") sfx("buzz");
   clearTimeout(fbTimer); fbTimer = setTimeout(() => { fb.hidden = true; }, 2600);
 }
