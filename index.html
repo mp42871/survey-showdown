@@ -255,8 +255,15 @@ body { background: var(--stage); }
 }
 .beam {
   position: absolute; top: -25vh; width: 36vw; height: 150vh; transform-origin: 50% 0;
-  clip-path: polygon(46% 0, 54% 0, 100% 100%, 0 100%); filter: blur(0.5vw); mix-blend-mode: screen;
+  /* No blur filter or blend mode: those make some interactive panels' graphics chips redraw the top of the screen every frame. */
+  clip-path: polygon(46% 0, 54% 0, 100% 100%, 0 100%);
+  will-change: transform; backface-visibility: hidden; -webkit-backface-visibility: hidden;
 }
+/* "Moving background" switched off (default on Android panels such as Clevertouch). */
+body.lite .beam, body.lite #sparkle { display: none; }
+body.lite .brand, body.lite .hero h1, body.lite .wincard h2 { animation: none; }
+body.lite .front::after, body.lite .team::after { animation: none; display: none; }
+body.lite .board::before, body.lite .board::after { animation: none; }
 .beam.b1 { left: -6vw; background: linear-gradient(180deg, rgba(255,79,163,0.32), transparent 72%); animation: sweepL 9s ease-in-out infinite alternate; }
 .beam.b2 { right: -6vw; background: linear-gradient(180deg, rgba(62,200,255,0.3), transparent 72%); animation: sweepR 11s ease-in-out infinite alternate; }
 .beam.b3 { left: 32vw; background: linear-gradient(180deg, rgba(255,181,71,0.2), transparent 65%); animation: sweepL 14s ease-in-out infinite alternate-reverse; }
@@ -289,7 +296,7 @@ body { background: var(--stage); }
 .dtile .db i { font-style: normal; font-family: var(--display); align-self: stretch; width: 3.4rem; display: grid; place-items: center; background: var(--mint-ink); color: var(--mint); }
 @keyframes dflip { 0%, 12% { transform: rotateX(0); } 22%, 78% { transform: rotateX(180deg); } 88%, 100% { transform: rotateX(360deg); } }
 
-.card { background: linear-gradient(180deg, rgba(143,125,255,0.12), rgba(0,0,0,0.28)); border-color: rgba(143,125,255,0.35); backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px); }
+.card { background: linear-gradient(180deg, rgba(143,125,255,0.12), rgba(0,0,0,0.42)); border-color: rgba(143,125,255,0.35); }
 .card h3 { color: var(--sun); }
 
 /* Chunky arcade buttons */
@@ -1674,6 +1681,7 @@ function sparkleBg() {
     col: pick(["255,181,71", "94,242,194", "255,79,163", "62,200,255", "244,241,255"]) }));
   const draw = t => {
     c.clearRect(0, 0, W, H);
+    if (document.body.classList.contains("lite")) { setTimeout(() => requestAnimationFrame(draw), 1000); return; }   // sparkles off
     const scale = W / 1200 + 0.5;
     for (const d of S) {
       const a = 0.2 + 0.6 * (0.5 + 0.5 * Math.sin(t * 0.002 + d.p));
@@ -3667,6 +3675,7 @@ const OPT_DEFS = [
   ["Running the game", "lightning", "Lightning round", "Finish a game with five quick questions against the clock."],
   ["Running the game", "audio", "Sound and music settings", "Volume controls, background music and quiet mode."],
   ["Running the game", "pause", "Pause screen", "Cover the board and stop the clocks with one tap."],
+  ["Running the game", "fx", "Moving background", "Sweeping spotlights and sparkles. Turn off if the screen flickers (off by default on Android panels like Clevertouch)."],
   ["Teams and fairness", "teams", "Teams in Everyone plays", "Several computers share one team score."],
   ["Teams and fairness", "filter", "Name filter", "Automatically replaces inappropriate player names."],
   ["Teams and fairness", "catchup", "Late-join help", "Players who join mid-game start with the average score so far."],
@@ -3676,8 +3685,13 @@ const OPT_DEFS = [
   ["Saving and sharing", "history", "Game history", "Keep final scores and mistake reports from past games."],
   ["Saving and sharing", "classroom", "Google Classroom button", "Post the join link or a topic link to a class."]
 ];
-function opt(k) { return !prefs.opt || prefs.opt[k] !== false; }
+function opt(k) {
+  // Moving background: unless the teacher chose, off on Android (interactive panels like Clevertouch flicker with it).
+  if (k === "fx" && !(prefs.opt && "fx" in prefs.opt)) return !/Android/i.test(navigator.userAgent);
+  return !prefs.opt || prefs.opt[k] !== false;
+}
 function applyOpts() {
+  document.body.classList.toggle("lite", !opt("fx"));
   let css = "";
   OPT_DEFS.forEach(([, k]) => { if (!opt(k)) css += `[data-opt~="${k}"]{display:none!important}`; });
   let st = document.getElementById("optStyle");
