@@ -860,7 +860,7 @@ button.chip { font: inherit; font-weight: 700; font-size: 0.8rem; letter-spacing
           <li><b>Three strikes.</b> After three wrong answers, the other team huddles and gets one guess to steal every round point.</li>
           <li><b>Win.</b> The team with the most points after the last round wins.</li>
         </ol>
-        <p class="note">Hosting: tap a tile to reveal it, or type a student's guess in the box and the game checks it against the answers, so the host doesn't need to know them. Keyboard: <kbd>1</kbd>–<kbd>8</kbd> reveal, <kbd>X</kbd> strike, <kbd>Z</kbd> undo, <kbd>N</kbd> next round.</p>
+        <p class="note">Hosting: type each student's guess in the box and the game checks it and scores it, so the host doesn't need to know the answers. Tapping a tile just shows that answer, with no points. Keyboard: <kbd>1</kbd>–<kbd>8</kbd> show an answer, <kbd>X</kbd> strike, <kbd>Z</kbd> undo, <kbd>N</kbd> next round.</p>
       </div>
     </div>
   </section>
@@ -1021,7 +1021,8 @@ button.chip { font: inherit; font-weight: 700; font-size: 0.8rem; letter-spacing
         <li>Everything is saved in this browser as you go. Use <b>Save your work</b> to keep a copy in Google Drive or a file.</li></ol></div>
       <div class="card" id="h-classic"><h3>Two-team game</h3><ol class="howto">
         <li><b>Face-off:</b> one player from each team answers. Tap the winning team's score panel to give them control, or turn on team buzzers so teams buzz in from their computers.</li>
-        <li><b>Play:</b> the team in control keeps guessing. Tap a tile to reveal it, or type the guess in the box and the game checks it for you, even with misspellings.</li>
+        <li><b>Play:</b> the team in control keeps guessing. Type each guess in the box: the game checks it, even with misspellings, and scores it. With team buzzers on, teams type their own answers.</li>
+        <li><b>Showing answers:</b> tapping a tile (or pressing <kbd>1</kbd>–<kbd>8</kbd>) only reveals that answer. It never gives points. Use it to show answers after a round, or when you're explaining. <b>Give points to…</b> awards the round points to a team.</li>
         <li><b>Strikes and steals:</b> three wrong answers, and the next team gets one guess to steal all the round points.</li>
         <li><b>Mistakes:</b> press <b>Undo</b> to take back anything. If a correct guess was marked wrong, press Undo, then tap the right tile; that wording counts from then on.</li>
         <li>With 3 or 4 teams (Options), control rotates each round and the next team in order steals.</li></ol></div>
@@ -1034,7 +1035,7 @@ button.chip { font: inherit; font-weight: 700; font-size: 0.8rem; letter-spacing
         <li>Tap ✕ next to a name on the leaderboard, then <b>Remove?</b>, to remove a player.</li></ol></div>
       <div class="card" id="h-devices"><h3>Student computers</h3>
         <p>Computers connect over the internet with the join code. No accounts are needed. Each computer needs the game's web address and internet access. <b>New code</b> makes a fresh code if the old one got shared too widely. A student who refreshes keeps their score.</p>
-        <p><b>Host remote:</b> on your phone, open the game, choose <b>Join a game</b>, tick <b>I'm the teacher</b> and type the code. Tap <b>Allow</b> on the big screen. Your phone shows the hidden answers and the main buttons.</p></div>
+        <p><b>Host remote:</b> on your phone, open the game, choose <b>Join a game</b>, tick <b>I'm the teacher</b> and type the code. Tap <b>Allow</b> on the big screen. Your phone shows the hidden answers and the main buttons. Tapping an answer on the phone shows it on the board without giving points.</p></div>
       <div class="card" id="h-topics"><h3>Topics &amp; questions</h3>
         <p>Press <b>Edit topics and questions</b> to make topics, add questions, and set each answer's points and other accepted wordings (<b>Also accept</b>). Answers are matched forgivingly: plurals, typos, word order and common synonyms count.</p>
         <p>Other ways to add questions: paste from a <b>spreadsheet</b>, use <b>Make questions with AI</b>, browse the <b>topic library</b>, or run a <b>class survey</b> to build boards from your students' real answers.</p></div>
@@ -1058,7 +1059,7 @@ button.chip { font: inherit; font-weight: 700; font-size: 0.8rem; letter-spacing
         <li><b>Something looks stuck:</b> refresh the page. Games, topics and scores are saved as you go.</li>
         <li><b>A correct answer marked wrong:</b> Undo and tap the tile (two teams), or accept it after the round (Everyone plays).</li></ul></div>
       <div class="card" id="h-keys"><h3>Keyboard shortcuts (on the board)</h3>
-        <p><kbd>1</kbd>–<kbd>8</kbd> reveal an answer · <kbd>X</kbd> strike · <kbd>Z</kbd> undo · <kbd>N</kbd> next round · <kbd>R</kbd> reveal the rest · <kbd>P</kbd> pause · <kbd>G</kbd> type a guess. On a team computer, <kbd>Space</kbd> buzzes in.</p></div>
+        <p><kbd>1</kbd>–<kbd>8</kbd> show an answer (no points) · <kbd>X</kbd> strike · <kbd>Z</kbd> undo · <kbd>N</kbd> next round · <kbd>R</kbd> reveal the rest · <kbd>P</kbd> pause · <kbd>G</kbd> type a guess. On a team computer, <kbd>Space</kbd> buzzes in.</p></div>
     </div>
   </section>
 
@@ -1968,16 +1969,18 @@ setInterval(() => {
   if (game.deadline != null && game.deadline <= Date.now() && !answerPending && $("#xo").hidden) timeUp();
 }, 200);
 
-function reveal(i) {
+// score: true when a guess was judged correct (typed guess, buzzer answer, or a corrected call).
+// Tapping a tile, the 1–8 keys and the remote only show the answer: no points, no change of control.
+function reveal(i, score = true) {
   if (!game || game.over || game.revealed.includes(i)) return;
-  const scoring = game.phase !== "done";
+  const scoring = score && game.phase !== "done";
   const pts = curQ().answers[i].p * mult();
   const tileEl = document.querySelector(`.tile[data-i="${i}"]`);
   if (scoring) potDelay = 700;
   act(() => {
     game.revealed.push(i);
     sfx("ding");
-    if (game.phase === "done") return;
+    if (!scoring) { if (game.phase !== "done") (game.shown = game.shown || []).push(i); return; }
     if (game.faceoff) {
       // Speed bonus: the team that buzzed in first and got the face-off right.
       const sb = game.buzzBy && game.turn != null && game.buzzBy.team === game.turn ? game.turn : null;
@@ -2096,7 +2099,7 @@ function nextRound() {
     game.round++;
     game.revealed = []; game.strikes = 0; game.pot = 0; game.phase = "play"; game.last = null;
     game.control = game.round % game.teams.length;
-    game.faceoff = true; game.turn = null; game.faceoffMisses = 0; game.buzzBy = null; game.foundBefore = null;
+    game.faceoff = true; game.turn = null; game.faceoffMisses = 0; game.buzzBy = null; game.foundBefore = null; game.shown = [];
   });
   if (game.over) showWinner(); else introRound();
 }
@@ -2417,7 +2420,7 @@ function renderGame() {
     const by = game.buzzBy && game.buzzBy.team === game.turn && game.buzzBy.name ? ` (${game.buzzBy.name})` : "";
     st.textContent = `${game.teams[game.turn].name}${by} ${game.buzzBy ? "buzzed in" : "can answer"}. Type the answer on your computer.`;
   } else if (game.phase === "play") {
-    if (game.faceoff && game.strikes === 0 && game.revealed.length === 0) st.textContent = `Face-off! Tap the winning team's score panel. ${A} is in control for now.`;
+    if (game.faceoff && game.strikes === 0 && game.pot === 0) st.textContent = `Face-off! Tap the winning team's score panel. ${A} is in control for now.`;
     else st.textContent = `${A} is guessing. ${3 - game.strikes} strike${3 - game.strikes === 1 ? "" : "s"} left.`;
   } else if (game.phase === "steal") {
     st.classList.add("steal");
@@ -2441,7 +2444,8 @@ function renderGame() {
   });
   renderWhy();
   $("#revealBtn").hidden = !done || game.revealed.length >= q.answers.length;
-  $("#nextBtn").hidden = !done && !(game.pot === 0 && game.revealed.length === 0 && game.strikes === 0);
+  // Before the round is settled, you can still move on as long as no points are waiting in the pot.
+  $("#nextBtn").hidden = !done && game.pot > 0;
   $("#nextBtn").textContent = game.round >= game.qs.length - 1 ? "Final score →" : "Next round →";
   if (!done) $("#nextBtn").textContent = "Skip question →";
   if (done) $("#nextBtn").textContent = game.round >= game.qs.length - 1 ? "Final score →" : "Next round →";
@@ -2627,7 +2631,9 @@ $("#board").addEventListener("click", e => {
   const t = e.target.closest(".tile[data-i]"); if (!t) return;
   const i = Number(t.dataset.i);
   const learn = lastMiss && lastMiss.undone && game && lastMiss.round === game.round && Date.now() - lastMiss.at < 120000 && !game.revealed.includes(i);
-  reveal(i);
+  // A plain tap only shows the answer. The one exception: right after Undo of a guess marked wrong,
+  // the tap corrects that call, so it scores like the guess should have.
+  reveal(i, !!learn);
   if (learn) {
     const q = curQ(), said = lastMiss.text;
     rememberAlias(q, i, said);
@@ -2687,7 +2693,7 @@ document.addEventListener("keydown", e => {
   if (view !== "game" || !$("#win").hidden && e.key.toLowerCase() !== "z") return;
   if (e.target.matches("input, textarea, select")) return;
   const k = e.key.toLowerCase();
-  if (/^[1-8]$/.test(k)) { const i = Number(k) - 1; if (game && i < curQ().answers.length) reveal(i); }
+  if (/^[1-8]$/.test(k)) { const i = Number(k) - 1; if (game && i < curQ().answers.length) reveal(i, false); }
   else if (k === "x") strike();
   else if (k === "z") undo();
   else if (k === "n") nextRound();
@@ -4017,7 +4023,8 @@ function groupWrong(texts) {
 }
 function recordClassicRound() {
   if (!game || !game.teams || game.lightning) return;
-  const q = curQ(), found = game.foundBefore || game.revealed;
+  const q = curQ(), shown = game.shown || [];
+  const found = (game.foundBefore || game.revealed).filter(i => !shown.includes(i));   // tapped-open tiles weren't found by a team
   game.report = game.report || [];
   game.report[game.round] = { q: q.q, topic: q.topic || "", of: 1,
     answers: q.answers.map((a, i) => ({ t: a.t, p: a.p, found: found.includes(i) ? 1 : 0 })),
@@ -4156,7 +4163,7 @@ function remoteCommand(cmd, arg) {
     if (cmd === "accept" && arg && game.pphase === "reveal" && curQ().answers[Number(arg.ai)]) acceptGroup(String(arg.key), Number(arg.ai));
     return;
   }
-  if (cmd === "reveal" && Number.isInteger(arg) && arg >= 0 && arg < curQ().answers.length) reveal(arg);
+  if (cmd === "reveal" && Number.isInteger(arg) && arg >= 0 && arg < curQ().answers.length) reveal(arg, false);
   else if (cmd === "strike") strike();
   else if (cmd === "undo") undo();
   else if (cmd === "reopen") reopenBuzzers();
