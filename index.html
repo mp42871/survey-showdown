@@ -539,6 +539,21 @@ button.chip { font: inherit; font-weight: 700; font-size: 0.8rem; letter-spacing
 .wrong li { background: rgba(255,90,95,0.16); color: #ffb3b5; border: 0.1rem solid rgba(255,90,95,0.5); border-radius: 99rem; padding: 0.2rem 0.75rem; font-weight: 700; text-decoration: line-through; }
 .final.party > div b { color: var(--sun) !important; text-shadow: 0 0 1.2rem rgba(255,181,71,0.6) !important; }
 
+/* Question picker */
+.picked { margin: 0; padding-left: 1.6rem; display: grid; gap: 0.3rem; max-height: 16rem; overflow-y: auto; }
+.picked li { padding: 0.25rem 0; }
+.picked li small { color: var(--muted); }
+.picked li button { margin-left: 0.4rem; }
+.pickset { border: 0.1rem solid var(--line); border-radius: 0.7rem; background: rgba(0,0,0,0.2); }
+.pickset summary { cursor: pointer; padding: 0.6rem 0.9rem; font-weight: 700; display: flex; justify-content: space-between; gap: 0.6rem; }
+.pickset summary small { color: var(--mint); }
+.pickset .qrows { display: grid; gap: 0.15rem; padding: 0 0.9rem 0.7rem; }
+.qrow { display: grid; grid-template-columns: auto 1fr; gap: 0.6rem; align-items: start; padding: 0.35rem 0.4rem; border-radius: 0.4rem; cursor: pointer; }
+.qrow:hover { background: rgba(255,255,255,0.05); }
+.qrow input { width: 1.2rem; height: 1.2rem; accent-color: var(--mint); margin: 0.1rem 0 0; }
+.qrow small { display: block; color: var(--muted); font-size: 0.8rem; }
+.acard.wide { width: min(60rem, 100%); }
+
 /* Options, help, tour, modals, pause, sound */
 .optcard summary { cursor: pointer; list-style: none; }
 .optcard summary::-webkit-details-marker { display: none; }
@@ -757,8 +772,21 @@ button.chip { font: inherit; font-weight: 700; font-size: 0.8rem; letter-spacing
 
       <div class="card">
         <h3>Topics</h3>
-        <p class="note">Pick one or more topics. Rounds are drawn from the questions in the topics you pick.</p>
-        <div class="topics" id="topicList"></div>
+        <div class="modes" id="qModePick">
+          <label class="mode"><input type="radio" name="qmode" value="topics"><b>Whole topics</b><span>Tick topics; rounds are drawn from all their questions.</span></label>
+          <label class="mode"><input type="radio" name="qmode" value="pick"><b>Choose questions</b><span>Pick the exact questions to play, from any topics.</span></label>
+        </div>
+        <div id="topicsWrap" style="display:grid;gap:0.8rem">
+          <p class="note">Pick one or more topics. Rounds are drawn from the questions in the topics you pick.</p>
+          <div class="topics" id="topicList"></div>
+        </div>
+        <div id="pickWrap" hidden style="display:grid;gap:0.6rem">
+          <div class="row" style="justify-content:flex-start;align-items:center">
+            <button class="btn sun" id="pickOpen" type="button">Choose questions…</button>
+            <span class="note" id="pickSummary"></span>
+          </div>
+          <ol class="picked" id="pickedList"></ol>
+        </div>
         <div class="row" style="justify-content:flex-start">
           <button class="btn" id="editBtn" type="button">Edit topics and questions</button>
           <button class="btn" id="libraryBtn" type="button" data-opt="library">Browse the topic library</button>
@@ -1054,7 +1082,11 @@ button.chip { font: inherit; font-weight: 700; font-size: 0.8rem; letter-spacing
         <li><b>Game history</b> lists finished games with scores and mistake reports. Add a class or period name in Setup to tell them apart.</li>
         <li><b>Share to Google Classroom</b> posts the join link to a class.</li></ul></div>
       <div class="card" id="h-trouble"><h3>Troubleshooting</h3><ul class="howto">
-        <li><b>"Can't reach the connection service" or "No game found":</b> check the code, and that the board shows the same code. Some school networks block this kind of connection; ask IT to allow it, or play on the board only.</li>
+        <li><b>"No game found":</b> check the code, and that the board shows the same code.</li>
+        <li><b>Students stuck on "Connecting…":</b> loading the page uses normal web traffic, but joining a game needs two more things that school filters often block. The join screen says which one after about 10 seconds:
+          <br>1. <b>The connection service</b>: a secure WebSocket to <code>0.peerjs.com</code> on port 443. Web filters (GoGuardian, Securly, Lightspeed, Cisco Umbrella and others) often block it as "uncategorized". Ask IT to allow <code>0.peerjs.com</code>, and <code>unpkg.com</code> for the connection code.
+          <br>2. <b>The direct link</b> between each student computer and the board (WebRTC). It uses UDP and a STUN server (<code>stun.l.google.com</code>, port 19302) to find a route. Firewalls that block UDP, or Wi-Fi with "client isolation" (devices can't talk to each other), stop it. Ask IT to allow WebRTC/UDP to the board, or STUN on port 19302.
+          <br>If the board itself shows a join code and "Ready", the connection service works on the teacher's computer; student devices are often filtered more strictly.</li>
         <li><b>Google sign-in blocked:</b> school accounts may need IT to allow the app. Personal Gmail works.</li>
         <li><b>Something looks stuck:</b> refresh the page. Games, topics and scores are saved as you go.</li>
         <li><b>A correct answer marked wrong:</b> Undo and tap the tile (two teams), or accept it after the round (Everyone plays).</li></ul></div>
@@ -1512,7 +1544,7 @@ const saveLib = () => lsSet(LS_LIB, lib);
 const setById = id => lib.sets.find(s => s.id === id);
 
 const PREF_KEYS = ["teamA", "teamB", "teamC", "teamD", "teamCount", "rounds", "shuffle", "lastDouble", "answerTime", "stealTime", "topics", "sound", "mode",
-  "pStrikes", "pTime", "speedBonus", "opt", "pTeams", "lightning", "lTime", "periodLabel", "fxVol", "musicOn", "musicVol", "quiet", "tourDone"];
+  "pStrikes", "pTime", "speedBonus", "opt", "pTeams", "lightning", "lTime", "periodLabel", "fxVol", "musicOn", "musicVol", "quiet", "tourDone", "qmode", "picked"];
 let prefs = Object.assign({ sound: true, teamA: "Pencils", teamB: "Erasers", rounds: 5, shuffle: true, lastDouble: true, devices: false, code: null,
   mode: "classic", pStrikes: 3, pTime: 90, speedBonus: 10,
   answerTime: 20, stealTime: 30, topics: [lib.sets[0].id], editSet: lib.sets[0].id }, lsGet(LS_PREF) || {});
@@ -1538,8 +1570,20 @@ function fixTopics() {
 fixTopics();
 function edSet() { let s = setById(prefs.editSet); if (!s) { s = lib.sets[0]; prefs.editSet = s.id; } return s; }
 let pack = edSet().questions;
-const poolQs = () => prefs.topics.map(setById).filter(Boolean)
-  .flatMap(s => s.questions.map(q => ({ ...q, topic: s.name }))).filter(q => q.answers.length && q.q.trim());
+// Questions come either from whole ticked topics, or from a hand-picked list ("setId|question text") across topics.
+const playable = q => q.answers.length && q.q.trim();
+const qKey = (setId, q) => setId + "|" + q.q;
+const pickMode = () => prefs.qmode === "pick";
+const allQs = () => lib.sets.flatMap(s => s.questions.map(q => ({ ...q, topic: s.name }))).filter(playable);
+const topicQs = () => prefs.topics.map(setById).filter(Boolean).flatMap(s => s.questions.map(q => ({ ...q, topic: s.name }))).filter(playable);
+function pickedQs() {
+  return (prefs.picked || []).map(k => {
+    const i = k.indexOf("|"), s = setById(k.slice(0, i));
+    const q = s && s.questions.find(x => x.q === k.slice(i + 1));
+    return q && playable(q) ? { ...q, topic: s.name } : null;
+  }).filter(Boolean);
+}
+const poolQs = () => pickMode() ? pickedQs() : topicQs();
 const PREFIX = "survey-showdown-v1-";
 const CODE_CHARS = "ABCDEFGHJKMNPQRSTUVWXYZ23456789";
 const inClaude = !!window.claude;   // inside the Claude viewer, peer connections are blocked
@@ -1852,7 +1896,7 @@ function startGame() {
   if (prefs.mode === "party" && !inClaude) { startParty(); return; }
   const pool = poolQs();
   if (!pool.length) { toast("The topics you picked have no questions yet"); return; }
-  const n = Math.min(Number(prefs.rounds) || 5, pool.length);
+  const n = pickMode() ? pool.length : Math.min(Number(prefs.rounds) || 5, pool.length);
   let idx = pool.map((_, i) => i);
   if (prefs.shuffle) shuffle(idx);
   idx = idx.slice(0, n);
@@ -1861,7 +1905,7 @@ function startGame() {
   game = {
     teams: tnames.slice(0, teamCount()).map(name => ({ name, score: 0 })),
     qs: idx.map(i => clone(pool[i])),
-    lightQs: pickLightning(pool, idx, lightN), report: [], wrongLog: [], startedAt: Date.now(),
+    lightQs: lightningFrom(pool, idx, lightN), report: [], wrongLog: [], startedAt: Date.now(),
     round: 0, control: 0, revealed: [], strikes: 0, pot: 0, phase: "play", last: null, over: false,
     faceoff: true, turn: null, faceoffMisses: 0, buzzBy: null, speedBonus: Number(prefs.speedBonus) || 0,
     lastDouble: !!prefs.lastDouble
@@ -2514,7 +2558,11 @@ function renderSetup() {
   $("#stealTime").value = String(prefs.stealTime);
   $("#shuffle").checked = !!prefs.shuffle;
   $("#lastDouble").checked = !!prefs.lastDouble;
-  $("#packNote").textContent = `${pool.length} question${pool.length === 1 ? "" : "s"} in the topics you picked.`;
+  $("#packNote").textContent = pickMode()
+    ? `${pool.length} chosen question${pool.length === 1 ? "" : "s"}, so ${pool.length} round${pool.length === 1 ? "" : "s"}.${prefs.shuffle ? " Shuffled." : " Played in the order listed."}`
+    : `${pool.length} question${pool.length === 1 ? "" : "s"} in the topics you picked.`;
+  sel.closest("label").hidden = pickMode();
+  renderPickSetup();
   $("#driveCard").hidden = inClaude;
   renderDrive();
   $("#devices").checked = devicesOn();
@@ -2728,7 +2776,7 @@ $("#timer").addEventListener("click", toggleTimerPause);
 $("#netChip").addEventListener("click", () => splash({ big: prefs.code || "", sub: "Join code: open the game on a team computer and choose Join a game", tone: "sun", ms: 6000 }));
 $("#joinModeBtn").addEventListener("click", () => { if (prefs.devices) { prefs.devices = false; savePrefs(); hostStop(); } show("team"); });
 $("#rounds").addEventListener("change", e => { prefs.rounds = Number(e.target.value); savePrefs(); });
-$("#shuffle").addEventListener("change", e => { prefs.shuffle = e.target.checked; savePrefs(); });
+$("#shuffle").addEventListener("change", e => { prefs.shuffle = e.target.checked; savePrefs(); renderSetup(); });
 $("#lastDouble").addEventListener("change", e => { prefs.lastDouble = e.target.checked; savePrefs(); if (game) { game.lastDouble = e.target.checked; saveGame(); } });
 $("#score-a").addEventListener("input", e => { if (game && game.teams) { game.teams[0].score = parseInt(e.target.value, 10) || 0; saveGame(); } });
 $("#score-b").addEventListener("input", e => { if (game && game.teams) { game.teams[1].score = parseInt(e.target.value, 10) || 0; saveGame(); } });
@@ -2855,7 +2903,7 @@ let pBoardKey = null, bumpPid = null, kickArmed = { pid: null, at: 0 }, partyEnd
 function startParty() {
   const pool = poolQs();
   if (!pool.length) { toast("The topics you picked have no questions yet"); return; }
-  const n = Math.min(Number(prefs.rounds) || 5, pool.length);
+  const n = pickMode() ? pool.length : Math.min(Number(prefs.rounds) || 5, pool.length);
   let idx = pool.map((_, i) => i);
   if (prefs.shuffle) shuffle(idx);
   const players = {};
@@ -2866,7 +2914,7 @@ function startParty() {
     lastDouble: !!prefs.lastDouble, strikeLimit: Number(prefs.pStrikes) || 0, roundSecs: Number(prefs.pTime) || 0, deadline: null, paused: null,
     speedBonus: Number(prefs.speedBonus) || 0, firsts: {},
     teamMode: opt("teams") ? Number(prefs.pTeams) || 0 : 0,
-    lightQs: pickLightning(pool, used, prefs.lightning && opt("lightning") ? LQ : 0), report: [], startedAt: Date.now() };
+    lightQs: lightningFrom(pool, used, prefs.lightning && opt("lightning") ? LQ : 0), report: [], startedAt: Date.now() };
   history = []; pBoardKey = null; saveGame();
   hostStart(); show("party"); keepAwake();
 }
@@ -3214,10 +3262,17 @@ let dpstate = null, dmode = "classic", dFails = 0, drstate = null, dsstate = nul
 const saveJoin = () => lsSet(LS_JOIN, join);
 function setJoinStatus(msg, bad) { const s = $("#joinStatus"); s.textContent = msg; s.className = "note" + (bad ? " netbad" : ""); }
 
+let diagTimer = null;
 function joinConnect() {
   if (inClaude) { setJoinStatus("Joining only works in the game file opened in a regular web browser.", true); return; }
-  if (typeof Peer === "undefined") { setJoinStatus("The connection code didn't load. This computer needs an internet connection.", true); return; }
+  if (typeof Peer === "undefined") { setJoinStatus("The connection code didn't load (unpkg.com may be blocked by the web filter).", true); return; }
   setJoinStatus("Connecting…");
+  // If nothing happens, say which step is stuck so IT knows what to allow.
+  clearTimeout(diagTimer);
+  diagTimer = setTimeout(() => {
+    if (dconn && dconn.open) return;
+    if (!dpeer || !dpeer.open) setJoinStatus("Still connecting. This computer can't reach the connection service (0.peerjs.com). A school web filter or firewall is probably blocking it. See Help → Troubleshooting.", true);
+  }, 10000);
   if (!dpeer || dpeer.destroyed) {
     const p = dpeer = new Peer({ debug: 0 });
     p.on("open", () => { if (p === dpeer) openConn(); });
@@ -3241,7 +3296,13 @@ function joinConnect() {
 function openConn() {
   if (dconn) { const old = dconn; dconn = null; try { old.close(); } catch (e) {} }
   const c = dconn = dpeer.connect(PREFIX + join.code, { reliable: true });
+  clearTimeout(diagTimer);
+  diagTimer = setTimeout(() => {
+    if (c !== dconn || c.open) return;
+    setJoinStatus(`Found game ${join.code}, but the direct connection to the board is being blocked. School networks often block this (WebRTC over UDP), or the Wi-Fi keeps devices from talking to each other. See Help → Troubleshooting.`, true);
+  }, 12000);
   c.on("open", () => {
+    clearTimeout(diagTimer);
     if (c !== dconn) return;
     dEverConnected = true; dFails = 0; join.active = true; saveJoin(); setJoinStatus("");
     c.send({ t: "hello", name: join.name, pid: myPid, remote: !!($("#joinRemote") && $("#joinRemote").checked && opt("remote")) });
@@ -3722,7 +3783,9 @@ $("#optList").addEventListener("change", e => {
 /* ---------- Simple modal ---------- */
 function modal(title, bodyHtml, buttons) {
   $("#modalTitle").textContent = title;
-  $("#modalBody").innerHTML = bodyHtml;
+  $("#modal .acard").classList.remove("wide");
+  const mb = $("#modalBody"); mb.onclick = mb.onchange = mb.oninput = null;
+  mb.innerHTML = bodyHtml;
   const box = $("#modalBtns"); box.innerHTML = "";
   (buttons && buttons.length ? buttons : [{ label: "Close" }]).forEach(b => {
     const el = document.createElement("button");
@@ -4207,6 +4270,85 @@ $("#rmLeave").addEventListener("click", () => { leaveJoin(); setJoinStatus("Remo
 
 /* ---------- Lightning round ---------- */
 const LQ = 5;
+// In "Choose questions" mode the lightning round uses other questions from your topics, so chosen ones aren't repeated.
+function lightningFrom(pool, used, n) {
+  if (!n) return [];
+  if (!pickMode()) return pickLightning(pool, used, n);
+  const others = allQs().filter(q => !pool.some(p => p.q === q.q));
+  return others.length ? pickLightning(others, [], n) : pickLightning(pool, [], n);
+}
+
+/* ---------- Choose specific questions across topics ---------- */
+function renderPickSetup() {
+  const pick = pickMode();
+  document.querySelectorAll("#qModePick input").forEach(r => { r.checked = r.value === (pick ? "pick" : "topics"); });
+  $("#topicsWrap").hidden = pick;
+  $("#pickWrap").hidden = !pick;
+  if (!pick) return;
+  const qs = pickedQs(), keys = pickKeysShown = (prefs.picked || []).filter(k => { const i = k.indexOf("|"), s = setById(k.slice(0, i)); return s && s.questions.some(q => q.q === k.slice(i + 1) && playable(q)); });
+  const topics = new Set(qs.map(q => q.topic));
+  $("#pickSummary").textContent = qs.length ? `${qs.length} question${qs.length === 1 ? "" : "s"} chosen from ${topics.size} topic${topics.size === 1 ? "" : "s"}.` : "No questions chosen yet.";
+  $("#pickedList").innerHTML = qs.map((q, i) => `<li>${esc(q.q)} <small>· ${esc(q.topic)}</small>
+    <button class="sbtn" type="button" data-pmove="${i}" aria-label="Move up"${i === 0 ? " disabled" : ""}>↑</button><button class="sbtn danger" type="button" data-pdel="${esc(keys[i])}" aria-label="Remove">✕</button></li>`).join("");
+}
+function togglePick(k, on) {
+  const list = (prefs.picked || []).filter(x => x !== k);
+  if (on) list.push(k);
+  prefs.picked = list; savePrefs();
+}
+function openPicker() {
+  const chosen = new Set(prefs.picked || []);
+  const body = `<input type="search" id="pickFilter" placeholder="Search questions…" autocomplete="off" style="padding:.55rem .8rem;border-radius:.5rem;border:.12rem solid var(--line);background:rgba(0,0,0,.3);color:var(--ink)">
+    ${lib.sets.map(s => {
+      const qs = s.questions.filter(playable);
+      if (!qs.length) return "";
+      const n = qs.filter(q => chosen.has(qKey(s.id, q))).length;
+      return `<details class="pickset" data-set="${esc(s.id)}"${n ? " open" : ""}><summary><span>${esc(s.name)}</span><small data-count>${n ? n + " chosen" : ""}</small></summary>
+        <div class="qrows">${qs.map(q => `<label class="qrow"><input type="checkbox" data-k="${esc(qKey(s.id, q))}"${chosen.has(qKey(s.id, q)) ? " checked" : ""}><span>${esc(q.q)}<small>${q.answers.slice(0, 4).map(a => esc(a.t)).join(", ")}${q.answers.length > 4 ? "…" : ""}</small></span></label>`).join("")}</div></details>`;
+    }).join("")}`;
+  modal("Choose questions", body, [
+    { label: "Clear all", cls: "ghost", keep: true, fn: () => { prefs.picked = []; savePrefs(); document.querySelectorAll("#modalBody [data-k]").forEach(c => { c.checked = false; }); updatePickCounts(); renderSetup(); } },
+    { label: "Done", cls: "sun", fn: () => renderSetup() }
+  ]);
+  $("#modal .acard").classList.add("wide");
+  const mb = $("#modalBody");
+  mb.onclick = null;
+  mb.onchange = e => { const k = e.target.dataset && e.target.dataset.k; if (!k) return; togglePick(k, e.target.checked); updatePickCounts(); renderSetup(); };
+  mb.oninput = e => {
+    if (e.target.id !== "pickFilter") return;
+    const f = e.target.value.trim().toLowerCase();
+    mb.querySelectorAll(".pickset").forEach(d => {
+      let any = false;
+      d.querySelectorAll(".qrow").forEach(r => { const hit = !f || r.textContent.toLowerCase().includes(f); r.hidden = !hit; any = any || hit; });
+      d.hidden = !any; if (f && any) d.open = true;
+    });
+  };
+}
+function updatePickCounts() {
+  const chosen = new Set(prefs.picked || []);
+  document.querySelectorAll("#modalBody .pickset").forEach(d => {
+    const n = [...d.querySelectorAll("[data-k]")].filter(c => chosen.has(c.dataset.k)).length;
+    d.querySelector("[data-count]").textContent = n ? n + " chosen" : "";
+  });
+  $("#modalTitle").textContent = `Choose questions (${chosen.size} chosen)`;
+}
+$("#qModePick").addEventListener("change", e => {
+  if (e.target.name !== "qmode") return;
+  prefs.qmode = e.target.value === "pick" ? "pick" : "topics"; savePrefs(); renderSetup();
+  if (pickMode() && !(prefs.picked || []).length) openPicker();
+});
+$("#pickOpen").addEventListener("click", () => { openPicker(); updatePickCounts(); });
+$("#pickedList").addEventListener("click", e => {
+  const del = e.target.closest("[data-pdel]"), mv = e.target.closest("[data-pmove]");
+  if (del) { togglePick(del.dataset.pdel, false); renderSetup(); }
+  if (mv) {
+    const keys = pickKeysShown.slice(), i = Number(mv.dataset.pmove); if (i < 1) return;
+    [keys[i - 1], keys[i]] = [keys[i], keys[i - 1]];
+    prefs.picked = keys; savePrefs(); renderSetup();
+  }
+});
+let pickKeysShown = [];
+
 function pickLightning(pool, used, n) {
   if (!n || !pool.length) return [];
   const rest = shuffle(pool.map((_, i) => i).filter(i => !used.includes(i)));
